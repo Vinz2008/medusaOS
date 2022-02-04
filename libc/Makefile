@@ -38,6 +38,7 @@ string/memcpy.o \
 string/memmove.o \
 string/memset.o \
 string/strlen.o \
+detectMonochromeColordisplay/detectMonochromeColordisplay.o\
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
