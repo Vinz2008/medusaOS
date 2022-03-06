@@ -6,4 +6,5 @@
 void kernel_main(void) {
 	terminal_initialize();
 	printf("Welcome to the OS\n");
+	printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 }
