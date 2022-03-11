@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "stdlib.h": "c",
-        "vga.h": "c"
+        "vga.h": "c",
+        "random": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

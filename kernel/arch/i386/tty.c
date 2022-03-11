@@ -41,20 +41,20 @@ void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 
 void terminal_putchar(char c) {
 	unsigned char uc = c;
-	if (uc == "\\"[0]){
-	IsBacklash = true;
+	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	if (uc == '\\'){
+		IsBacklash = true;
 	}
 	else if (IsBacklash == true) {
 		if (uc == "n"[0]) {
-			terminal_column = 0;
-			++terminal_row;
+				terminal_row++;
+				terminal_column = 0;
 		}
 		IsBacklash = false;
 	}
 	else {
-	IsBacklash = false;
+		IsBacklash = false;
 	}
-	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
 		if (++terminal_row == VGA_HEIGHT) {
@@ -67,6 +67,7 @@ void terminal_write(const char* data, size_t size) {
 	for (size_t i = 0; i < size; i++) {
 		terminal_putchar(data[i]);
 	}
+
 }
 
 void terminal_writestring(const char* data) {
