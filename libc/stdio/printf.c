@@ -58,9 +58,26 @@ int printf(const char* restrict format, ...) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
+			
 			if (!print(str, len))
 				return -1;
 			written += len;
+		} else if (*format == 'i') {
+			format++;
+			char i2;
+			int i3;
+			int i = va_arg(parameters, int);
+			i2 = i + '0';
+			i3 = i2;
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!print(&i3, sizeof(i3))) {
+				return -1;
+			}
+			written++;
+
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);
