@@ -6,6 +6,6 @@
 void kernel_main(void) {
 	terminal_initialize();
 	int i = 1;
-	printf("Welcome to the OS %i\n", i);
-	printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+	printf("Welcome to kernel %i\n", i);
+	printf("This kernel is made using the osdev wiki\n");
 }
