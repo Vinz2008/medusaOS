@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <kernel/tty.h>
+#include <kernel/gdt.h>
 #include <stddef.h>
 
 void kernel_main(void) {

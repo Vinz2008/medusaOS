@@ -2,7 +2,9 @@
     "files.associations": {
         "stdlib.h": "c",
         "vga.h": "c",
-        "random": "c"
+        "random": "c",
+        "functional": "c",
+        "gdt.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
