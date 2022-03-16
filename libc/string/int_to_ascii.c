@@ -1,3 +1,17 @@
+#include <string.h>
+void reverse(char *str1)  
+{  
+    int i, len, temp;  
+    len = strlen(str1);
+    for (i = 0; i < len/2; i++)  
+    {
+        temp = str1[i];  
+        str1[i] = str1[len - i - 1];  
+        str1[len - i - 1] = temp;  
+    }  
+}  
+
+
 void int_to_ascii(int n, char str[]){
     int i, sign;
     if ((sign = n) < 0) n = -n;
@@ -11,16 +25,3 @@ void int_to_ascii(int n, char str[]){
 
     reverse(str);
 }
-
-
-void reverse(char *str1)  
-{  
-    int i, len, temp;  
-    len = strlen(str1);
-    for (i = 0; i < len/2; i++)  
-    {
-        temp = str1[i];  
-        str1[i] = str1[len - i - 1];  
-        str1[len - i - 1] = temp;  
-    }  
-}  
