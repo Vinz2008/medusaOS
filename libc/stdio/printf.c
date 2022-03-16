@@ -64,16 +64,14 @@ int printf(const char* restrict format, ...) {
 			written += len;
 		} else if (*format == 'i') {
 			format++;
-			char i2;
-			int i3;
+			char i2[10];
 			int i = va_arg(parameters, int);
-			i2 = i + '0';
-			i3 = i2;
+			int_to_ascii(i, i2);
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(&i3, sizeof(i3))) {
+			if (!print(&i2, sizeof(i2))) {
 				return -1;
 			}
 			written++;

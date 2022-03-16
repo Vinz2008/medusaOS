@@ -30,6 +30,7 @@ LIBK_CPPFLAGS:=$(LIBK_CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 FREEOBJS=\
 $(ARCH_FREEOBJS) \
 stdio/printf.o \
+stdio/outb.o \
 stdio/putchar.o \
 stdio/puts.o \
 stdlib/abort.o \
@@ -38,6 +39,7 @@ string/memcpy.o \
 string/memmove.o \
 string/memset.o \
 string/strlen.o \
+string/int_to_ascii.o \
 detectMonochromeColordisplay/detectMonochromeColordisplay.o\
 
 HOSTEDOBJS=\
