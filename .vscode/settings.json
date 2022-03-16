@@ -4,7 +4,8 @@
         "vga.h": "c",
         "random": "c",
         "functional": "c",
-        "gdt.h": "c"
+        "gdt.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

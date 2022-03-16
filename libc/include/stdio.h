@@ -13,7 +13,6 @@ extern "C" {
 int printf(const char* __restrict, ...);
 int putchar(int);
 int puts(const char*);
-void outb(uint16_t port, uint8_t value);
 
 #ifdef __cplusplus
 }
