@@ -2,12 +2,13 @@
 #include <stdint.h>
 #include <kernel/tty.h>
 #include <kernel/keyboard.h>
+#include <kernel/gdt.h>
 #include <stddef.h>
 #include <string.h>
 
 void kernel_main(void) {
 	terminal_initialize();
-	
+	//gdt_install();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
