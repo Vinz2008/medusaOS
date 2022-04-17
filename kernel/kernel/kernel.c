@@ -3,12 +3,16 @@
 #include <kernel/tty.h>
 #include <kernel/keyboard.h>
 #include <kernel/gdt.h>
+#include <kernel/paging.h>
 #include <stddef.h>
 #include <string.h>
+#include <multiboot.h>
 
 void kernel_main(void) {
+	//unsigned int ebx;
 	terminal_initialize();
 	//gdt_install();
+	//start_paging();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
@@ -16,6 +20,8 @@ void kernel_main(void) {
 	uint8_t scancode;
 	uint8_t old_scancode = 0x00;
 	uint8_t escape_key = 0x01;
+	//multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+    //unsigned int address_of_module = mbinfo->mods_addr;
 	while (1)
 	{
 		scancode = read_scan_code();
