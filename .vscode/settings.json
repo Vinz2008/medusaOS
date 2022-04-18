@@ -6,7 +6,8 @@
         "functional": "c",
         "gdt.h": "c",
         "stdio.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "misc.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
