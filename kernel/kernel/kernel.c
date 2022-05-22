@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <kernel/tty.h>
+#include <kernel/serial.h>
 #include <kernel/keyboard.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
@@ -11,6 +12,9 @@
 void kernel_main(void) {
 	//unsigned int ebx;
 	terminal_initialize();
+	serial_init(SERIAL_COM1_BASE);
+	write_serial('a', SERIAL_COM1_BASE);
+	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
 	//gdt_install();
 	//start_paging();
 	int i = 1233;

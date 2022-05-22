@@ -1,5 +1,8 @@
 #include <types.h>
 
+__attribute__((noreturn))
+void exception_handler(void);
+
 typedef struct registers
 {
    uint32_t ds;
