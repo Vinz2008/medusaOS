@@ -1,4 +1,4 @@
-typedef struct tss_entry {
+typedef struct {
 	uint32_t	prev_tss;
 	uint32_t	esp0;
 	uint32_t	ss0;

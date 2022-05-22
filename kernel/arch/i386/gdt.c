@@ -4,11 +4,48 @@
 #include <kernel/gdt.h>
 #include <string.h>
 
-static void write_tss(int32, uint16_t, uint32_t);
 tss_entry_t tss_entry;
 
 struct gdt_entry gdt[6];
 struct gdt_ptr gp;
+
+static void write_tss(int32, uint16_t, uint32_t);
+
+
+void encodeGdtEntry(uint8_t *target, struct gdt_entry source)
+{
+    if (source.limit_low > 0xFFFFF) {printf("GDT cannot encode limits larger than 0xFFFFF");}
+    target[0] = source.limit_low & 0xFF;
+    target[1] = (source.limit_low >> 8) & 0xFF;
+    target[6] = (source.limit_low >> 16) & 0x0F;
+    target[2] = source.base_low & 0xFF;
+    target[3] = (source.base_low >> 8) & 0xFF;
+    target[4] = (source.base_low >> 16) & 0xFF;
+    target[7] = (source.base_low >> 24) & 0xFF;
+    target[5] = source.access;
+    target[6] |= (source.flags << 4);
+}
+
+
+void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag){
+    int64 descriptor;
+ 
+    // Create the high 32 bit segment
+    descriptor  =  limit       & 0x000F0000;         // set limit bits 19:16
+    descriptor |= (flag <<  8) & 0x00F0FF00;         // set type, p, dpl, s, g, d/b, l and avl fields
+    descriptor |= (base >> 16) & 0x000000FF;         // set base bits 23:16
+    descriptor |=  base        & 0xFF000000;         // set base bits 31:24
+ 
+    // Shift by 32 to allow for low part of segment
+    descriptor <<= 32;
+ 
+    // Create the low 32 bit segment
+    descriptor |= base  << 16;                       // set base bits 15:0
+    descriptor |= limit  & 0x0000FFFF;               // set limit bits 15:0
+ 
+    printf("0x%.16llX\n", descriptor);
+}
+
 
 void gdt_set_gate(int num, int32 base, int32 limit, int32 access,int8 gran) {
     gdt[num].base_low = (base & 0xFFFF);
