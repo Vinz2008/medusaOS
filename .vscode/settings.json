@@ -3,11 +3,10 @@
         "stdlib.h": "c",
         "vga.h": "c",
         "random": "c",
-        "functional": "c",
-        "gdt.h": "c",
         "stdio.h": "c",
         "types.h": "c",
-        "misc.h": "c"
+        "misc.h": "c",
+        "tss.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

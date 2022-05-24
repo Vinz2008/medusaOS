@@ -3,7 +3,7 @@
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
-#include <kernel/gdt.h>
+#include <kernel/descriptors_tables.h>
 #include <kernel/paging.h>
 #include <stddef.h>
 #include <string.h>
@@ -15,7 +15,7 @@ void kernel_main(void) {
 	serial_init(SERIAL_COM1_BASE);
 	write_serial('a', SERIAL_COM1_BASE);
 	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
-	//gdt_install();
+	descriptor_tables_initialize();
 	//start_paging();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
