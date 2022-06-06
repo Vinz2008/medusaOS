@@ -1,4 +1,3 @@
-
 .macro no_error_code_interrupt_handler input="1"
 .global interrupt_handler_\input
     interrupt_handler_\input:

@@ -6,7 +6,8 @@
         "stdio.h": "c",
         "types.h": "c",
         "misc.h": "c",
-        "tss.h": "c"
+        "tss.h": "c",
+        "descriptors_tables.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -1,4 +1,5 @@
 #include <types.h>
+#include <string.h>
 #include <stdio.h>
 
 void hex_to_ascii(int n, char str[]) {

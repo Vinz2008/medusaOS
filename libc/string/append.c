@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void append(char s[], char n) {
     int len = strlen(s);

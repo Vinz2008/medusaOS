@@ -12,15 +12,15 @@ extern void flush_tss();
 
 GdtEntry g_gdt_entries[6];
 GdtPointer g_gdt_pointer;
-//IdtEntry g_idt_entries[256];
-//IdtPointer g_idt_pointer;
+IdtEntry g_idt_entries[256];
+IdtPointer g_idt_pointer;
 Tss g_tss;
 
 static void gdt_initialize();
-//static void idt_initialize();
+static void idt_initialize();
 
 static void set_gdt_entry(int32 num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
-//static void set_idt_entry(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
+static void set_idt_entry(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 
 
 
@@ -84,9 +84,9 @@ static void set_gdt_entry(int32 num, uint32_t base, uint32_t limit, uint8_t acce
 
 
 
-//void irq_timer();
+void irq_timer();
 
-/*static void idt_initialize()
+static void idt_initialize()
 {
     g_idt_pointer.limit = sizeof(IdtEntry) * 256 -1;
     g_idt_pointer.base  = (uint32_t)&g_idt_entries;
@@ -167,4 +167,4 @@ static void set_idt_entry(uint8_t num, uint32_t base, uint16_t sel, uint8_t flag
     g_idt_entries[num].sel     = sel;
     g_idt_entries[num].always0 = 0;
     g_idt_entries[num].flags   = flags  | 0x60;
-}*/
+}
