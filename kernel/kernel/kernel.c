@@ -24,6 +24,7 @@ void kernel_main(void) {
 	uint8_t scancode;
 	uint8_t old_scancode = 0x00;
 	uint8_t escape_key = 0x01;
+	int scancodeNb = 0;
 	//multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
     //unsigned int address_of_module = mbinfo->mods_addr;
 	while (1)
@@ -36,7 +37,11 @@ void kernel_main(void) {
 		else /*if (scancode == escape_key)*/ {
 			//printf("escape\n");
 			hex_to_ascii(scancode, output);
-			printf("%c\n",output);
+			//printf("%c\n",output);
+		}
+		if (scancodeNb == 0x5A){
+		printf("enter pressed\n");
+		scancodeNb++;
 		}
 		old_scancode = scancode;
 		//printf("%c\n", scancodes);
