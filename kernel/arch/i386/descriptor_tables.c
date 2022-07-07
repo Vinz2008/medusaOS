@@ -1,10 +1,11 @@
 // I looked at this to implement it https://github.com/ozkl/soso/blob/master/kernel/descriptortables.c
 #include <types.h>
 #include <stdio.h>
+#include <string.h>
 #include <kernel/misc.h>
 #include <kernel/io.h>
 #include <kernel/descriptors_tables.h>
-#include <string.h>
+#include <kernel/serial.h>
 
 extern void flush_gdt(uint32_t);
 extern void flush_idt(uint32_t);
@@ -29,6 +30,7 @@ void descriptor_tables_initialize()
 {
     gdt_initialize();
     printf("gdt initialized\n");
+    write_serial("gdt initialized\n");
     //idt_initialize();
 
     //memset((uint8_t*)&g_interrupt_handlers, 0, sizeof(IsrFunction)*256);

@@ -1,0 +1,1 @@
+unsigned read_pit_count(void);

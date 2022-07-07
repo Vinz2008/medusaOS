@@ -1,0 +1,4 @@
+.global cli
+
+cli:
+    cli

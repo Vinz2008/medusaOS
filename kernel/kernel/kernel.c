@@ -1,22 +1,25 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include <multiboot.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/paging.h>
-#include <stddef.h>
-#include <string.h>
-#include <multiboot.h>
+#include <kernel/pit.h>
+#include <kernel/tty.h>
 
 void kernel_main(void) {
 	//unsigned int ebx;
 	terminal_initialize();
 	init_serial();
-	write_serial("LOG START");
+	write_serial("LOG START\n");
+	enable_cursor(1, 2);
+	update_cursor(2, 10);
 	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
 	descriptor_tables_initialize();
-	//start_paging();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
