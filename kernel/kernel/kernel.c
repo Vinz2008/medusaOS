@@ -12,8 +12,8 @@
 void kernel_main(void) {
 	//unsigned int ebx;
 	terminal_initialize();
-	serial_init(SERIAL_COM1_BASE);
-	write_serial('a', SERIAL_COM1_BASE);
+	init_serial();
+	write_serial("LOG START");
 	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
 	descriptor_tables_initialize();
 	//start_paging();
