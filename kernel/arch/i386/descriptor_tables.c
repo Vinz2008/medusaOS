@@ -17,6 +17,7 @@ IdtEntry g_idt_entries[256];
 IdtPointer g_idt_pointer;
 Tss g_tss;
 
+
 static void gdt_initialize();
 static void idt_initialize();
 
@@ -83,7 +84,6 @@ static void set_gdt_entry(int32 num, uint32_t base, uint32_t limit, uint8_t acce
     g_gdt_entries[num].granularity |= gran & 0xF0;
     g_gdt_entries[num].access      = access;
 }
-
 
 
 void irq_timer();

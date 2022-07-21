@@ -17,12 +17,13 @@ void kernel_main(void) {
 	init_serial();
 	write_serial("LOG START\n");
 	enable_cursor(1, 2);
-	update_cursor(2, 10);
+	update_cursor(2, 4);
 	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
 	descriptor_tables_initialize();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
+	printf(">\n");
 	char output[10];
 	uint8_t scancode;
 	uint8_t old_scancode = 0x00;
