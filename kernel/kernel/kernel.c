@@ -8,6 +8,7 @@
 #include <kernel/keyboard.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/paging.h>
+#include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/tty.h>
 

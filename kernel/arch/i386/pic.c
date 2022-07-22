@@ -29,7 +29,7 @@ void pic_acknowledge(unsigned int interrupt)
     }
 }
 
-inline void i86_pic_send_command (uint8_t cmd, uint8_t picNum) {
+inline void i86_pic_send_command(uint8_t cmd, uint8_t picNum) {
  
 	if (picNum > 1)
 		return;
@@ -38,16 +38,14 @@ inline void i86_pic_send_command (uint8_t cmd, uint8_t picNum) {
 	outb(reg, cmd);
 }
 
-inline void i86_pic_send_data (uint8_t data, uint8_t picNum) {
- 
+inline void i86_pic_send_data(uint8_t data, uint8_t picNum) {
 	if (picNum > 1)
 		return;
- 
 	uint8_t	reg = (picNum==1) ? PIC2_REG_DATA : PIC1_REG_DATA;
 	outb(reg, data);
 }
  
-inline uint8_t i86_pic_read_data (uint8_t picNum) {
+inline uint8_t i86_pic_read_data(uint8_t picNum) {
 	if (picNum > 1)
 		return 0;
 	uint8_t	reg = (picNum==1) ? PIC2_REG_DATA : PIC1_REG_DATA;
@@ -55,7 +53,7 @@ inline uint8_t i86_pic_read_data (uint8_t picNum) {
 }
 
 
-void i86_pic_initialize (uint8_t base0, uint8_t base1) {
+void i86_pic_initialize(uint8_t base0, uint8_t base1) {
 	uint8_t icw	= 0;
 	//! Begin initialization of PIC
 	icw = (icw & ~PIC_ICW1_INIT) | PIC_ICW1_INIT;

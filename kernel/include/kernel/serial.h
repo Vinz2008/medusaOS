@@ -2,4 +2,5 @@
 
 int init_serial();
 
-void write_serial(char* str);
+void write_serial(const char* str);
+void write_serialf(const char* restrict format, ...);
