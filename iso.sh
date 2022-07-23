@@ -11,8 +11,9 @@ cp -r sysroot/* isodir/
 #cp sysroot/boot/kernel.kernel isodir/boot/kernel.kernel
 cp grub/* isodir/boot/grub/
 
-if ![ -e x.memtest86plus ]
+if ! [[ -e "memtest86plus" ]]
 then
+echo "don't exist"
 git clone https://github.com/memtest86plus/memtest86plus.git
 fi
 cd memtest86plus
