@@ -7,3 +7,15 @@ __idt_default_handler:
 	out %al, %dx
 	popal
 	iretl
+
+.global _set_idtr
+.type _set_idtr, @function
+_set_idtr:
+	push %ebp
+	movl %esp, %ebp
+
+	lidt 0x10F0
+
+	movl %ebp, %esp
+	pop %ebp
+	ret

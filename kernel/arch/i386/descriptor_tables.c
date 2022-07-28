@@ -6,6 +6,7 @@
 #include <kernel/misc.h>
 #include <kernel/io.h>
 #include <kernel/idt.h>
+#include <kernel/task.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/serial.h>
 
@@ -30,15 +31,12 @@ static uint32_t test_timeout = 0x1000;
 
 void __idt_default_handler();
 void __idt_test_handler();
+extern void _set_idtr();
 
 static void gdt_initialize();
 static void idt_initialize();
 
 static void set_gdt_entry(int32 num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
-static void set_idt_entry(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
-
-
-
 
 void descriptor_tables_initialize()
 {
@@ -103,12 +101,36 @@ void irq_timer();
 
 static void idt_initialize(){
     idt_location = 0x2000;
+    write_serialf("Location: 0x%x\n", idt_location);
+    write_serialf("IDTR location: 0x%x\n", idtr_location);
     idtr_location = 0x10F0;
     __idt_setup = 1;
-    for(uint8_t i = 0; i < 255; i++)
-	{
+    for(uint8_t i = 0; i < 255; i++){
 		idt_register_interrupt(i, (uint32_t)&__idt_default_handler);
 	}
+    idt_register_interrupt(0x2f, (uint32_t)&__idt_test_handler);
+	idt_register_interrupt(0x2e, (uint32_t)&schedule);
+    write_serialf("Registered all interrupts to default handler.\n");
+    *(uint16_t*)idtr_location = idt_size - 1;
+	*(uint32_t*)(idtr_location + 2) = idt_location;
+    write_serialf("IDTR.size = 0x%x IDTR.offset = 0x%x\n", *(uint16_t*)idtr_location, *(uint32_t*)(idtr_location + 2));
+    _set_idtr();
+    write_serialf("idtr set\n");
+    /*asm volatile("int $0x2f");
+    write_serialf("int $0x2f\n");
+	while(test_timeout-- != 0)
+	{
+		if(test_success != 0)
+		{
+			write_serialf("Test succeeded, disabling INT#0x2F\n");
+			idt_register_interrupt(0x2F, (uint32_t)&__idt_default_handler);
+			break;
+		}
+	}
+	if(!test_success)
+		write_serialf("IDT link is offline (timeout).");
+        abort();*/
+	return;
 }
 
 void __idt_test_handler()
@@ -129,6 +151,6 @@ void idt_register_interrupt(uint8_t i, uint32_t callback)
 	*(uint8_t*) (idt_location + 8*i + 4) = 0x00;
 	*(uint8_t*) (idt_location + 8*i + 5) = 0x8e;//0 | IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;
 	*(uint16_t*)(idt_location + 8*i + 6) = (uint16_t)((callback & 0xffff0000) >> 16);
-	if(test_success) write_serialf("Registered INT %i\n", i);
+	if(test_success) write_serialf("registered INT %i\n", i);
 	return;
 }

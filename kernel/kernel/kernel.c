@@ -17,8 +17,6 @@ void kernel_main(void) {
 	terminal_initialize();
 	init_serial();
 	write_serial("LOG START\n");
-	write_serialf("test %s\n", "test");
-	write_serialf("\n");
 	enable_cursor(1, 2);
 	update_cursor(2, 4);
 	//printf("serial: %c",read_serial(SERIAL_COM1_BASE));
