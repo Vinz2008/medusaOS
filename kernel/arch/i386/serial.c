@@ -49,8 +49,15 @@ void write_serial(const char* str){
    }
 }
 
+
+void write_serial_with_size(const char* data, size_t length){
+	const unsigned char* bytes = (const unsigned char*) data;
+	for (size_t i = 0; i < length; i++)
+		write_serial_char(bytes[i]);
+}
+
 void write_serialf(const char* restrict format, ...){
-   va_list parameters;
+	va_list parameters;
 	va_start(parameters, format);
    	int written = 0;
    	while (*format != '\0') {
@@ -66,7 +73,7 @@ void write_serialf(const char* restrict format, ...){
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			write_serial(format);
+			write_serial_with_size(format, amount);
 			format += amount;
 			written += amount;
 			continue;
@@ -81,7 +88,7 @@ void write_serialf(const char* restrict format, ...){
 				// TODO: Set errno to EOVERFLOW.
 				return;
 			}
-			write_serial(&c);
+			write_serial_with_size(&c, sizeof(c));
 			written++;
 		} else if (*format == 's') {
 			format++;
