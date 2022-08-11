@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <kernel/vfs.h>
 
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
@@ -12,10 +13,13 @@ static bool print(const char* data, size_t length) {
 	return true;
 }
 
-int printf(const char* restrict format, ...) {
+int printf(const char* restrict format, ...){
 	va_list parameters;
 	va_start(parameters, format);
+	vprintf(format, parameters);
+}
 
+int vprintf(const char* restrict format, va_list parameters) {
 	int written = 0;
 
 	while (*format != '\0') {
@@ -65,6 +69,7 @@ int printf(const char* restrict format, ...) {
 		} else if (*format == 'i') {
 			format++;
 			char i2[10];
+			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
 			if (!maxrem) {
