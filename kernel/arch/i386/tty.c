@@ -6,6 +6,9 @@
 #include <kernel/io.h>
 #include "vga.h"
 
+
+extern char keyboard_us[];
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 static uint16_t* const VGA_MEMORY = (uint16_t*) 0xB8000;
@@ -14,6 +17,8 @@ static size_t terminal_row;
 static size_t terminal_column;
 static uint8_t terminal_color;
 static uint16_t* terminal_buffer;
+static size_t terminal_keypress_index = 0;
+static size_t terminal_tick_index = 0;
 int IsBacklash = false;
 
 
@@ -96,4 +101,23 @@ void terminal_write(const char* data, size_t size) {
 
 void terminal_writestring(const char* data) {
 	terminal_write(data, strlen(data));
+}
+
+
+void terminal_keypress_init(uint8_t n){
+	terminal_keypress_index = VGA_WIDTH * terminal_row + n;
+}
+
+
+void terminal_tick_init(uint8_t n){
+	terminal_tick_index = VGA_WIDTH * terminal_row + n;
+}
+
+void terminal_tick(char c){
+	terminal_buffer[terminal_tick_index] = vga_entry(c,terminal_color);
+}
+
+void terminal_keypress(uint8_t scan_code) {
+	char c = keyboard_us[scan_code];
+	terminal_buffer[terminal_keypress_index] = vga_entry(c,terminal_color);
 }

@@ -81,6 +81,21 @@ int vprintf(const char* restrict format, va_list parameters) {
 			}
 			written++;
 
+		} else if (*format == 'd') {
+			format++;
+			char i2[10];
+			//char* i2;
+			int i = va_arg(parameters, int);
+			int_to_ascii(i, i2);
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!print(&i2, sizeof(i2))) {
+				return -1;
+			}
+			written++;
+	
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);

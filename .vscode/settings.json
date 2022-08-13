@@ -7,7 +7,8 @@
     "types.h": "c",
     "misc.h": "c",
     "tss.h": "c",
-    "descriptors_tables.h": "c"
+    "descriptors_tables.h": "c",
+    "x86.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

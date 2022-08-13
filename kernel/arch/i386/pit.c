@@ -1,21 +1,41 @@
 #include <types.h>
 #include <kernel/io.h>
 #include <kernel/pit.h>
+#include <kernel/x86.h>
 
-extern cli();
+static uint64_t timer_delta_time;
+static uint16_t divisor;
 
-unsigned read_pit_count(void) {
-	unsigned count = 0;
-	cli();
-	outb(0x43,0b0000000);
-	count = inb(0x40);
-	count |= inb(0x40) <<8;
-	return count;
-}
+/* PIT (i8253) registers */
+#define I8253_CONTROL_REG 0x43
+#define I8253_DATA_REG  0x40
 
-void set_pit_count(unsigned count) {
-	cli();
-	outb(0x40,count & 0xFF);
-	outb(0x40,(count & 0xFF00) >> 8);
-	return;
+#define INTERNAL_FREQ 1193182ULL
+#define INTERNAL_FREQ_3X 3579546ULL
+
+void pit_init(uint32_t frequency){
+    uint32_t count, remainder;
+    /* figure out the correct divisor for the desired frequency */
+    if (frequency <= 18) {
+        count = 0xffff;
+    } else if (frequency >= INTERNAL_FREQ) {
+        count = 1;
+    } else {
+        count = INTERNAL_FREQ_3X / frequency;
+        remainder = INTERNAL_FREQ_3X % frequency;
+        if (remainder >= INTERNAL_FREQ_3X / 2) {
+            count += 1;
+        }
+        count /= 3;
+        remainder = count % 3;
+
+        if (remainder >= 1) {
+            count += 1;
+        }
+    }
+    divisor = count & 0xffff;
+    timer_delta_time = (3685982306ULL * count) >> 10;
+    outb(I8253_CONTROL_REG, 0x34);
+    outb(I8253_DATA_REG, divisor & 0xff); // LSB
+    outb(I8253_DATA_REG, divisor >> 8); // MSB
 }

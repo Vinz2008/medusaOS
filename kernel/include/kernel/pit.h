@@ -1,1 +1,1 @@
-unsigned read_pit_count(void);
+void pit_init(uint32_t frequency);
