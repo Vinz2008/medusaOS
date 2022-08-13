@@ -3,24 +3,24 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <kernel/vfs.h>
 
-static bool print(const char* data, size_t length) {
+static bool fprint(file_descriptor_t file, const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
 	for (size_t i = 0; i < length; i++)
-		if (putchar(bytes[i]) == EOF)
+		if (fputchar(bytes[i], file) == EOF)
 			return false;
 	return true;
 }
 
-int printf(const char* restrict format, ...){
+int fprintf(file_descriptor_t file, const char* format, ...){
 	va_list parameters;
 	va_start(parameters, format);
-	vprintf(format, parameters);
+	vfprintf(file, format, parameters);
 }
 
-int vprintf(const char* restrict format, va_list parameters) {
+int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 	int written = 0;
-
 	while (*format != '\0') {
 		size_t maxrem = INT_MAX - written;
 
@@ -34,7 +34,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(format, amount))
+			if (!fprint(file, format, amount))
 				return -1;
 			format += amount;
 			written += amount;
@@ -50,7 +50,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(&c, sizeof(c)))
+			if (!fprint(file, &c, sizeof(c)))
 				return -1;
 			written++;
 		} else if (*format == 's') {
@@ -62,7 +62,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				return -1;
 			}
 			
-			if (!print(str, len))
+			if (!fprint(file, str, len))
 				return -1;
 			written += len;
 		} else if (*format == 'i') {
@@ -75,7 +75,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(&i2, sizeof(i2))) {
+			if (!fprint(file, &i2, sizeof(i2))) {
 				return -1;
 			}
 			written++;
@@ -90,7 +90,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(&i2, sizeof(i2))) {
+			if (!fprint(file, &i2, sizeof(i2))) {
 				return -1;
 			}
 			written++;
@@ -102,7 +102,7 @@ int vprintf(const char* restrict format, va_list parameters) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!print(format, len))
+			if (!fprint(file, format, len))
 				return -1;
 			written += len;
 			format += len;

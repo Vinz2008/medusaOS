@@ -13,11 +13,13 @@ extern "C" {
 #endif
 
 int printf(const char* __restrict, ...);
+int vprintf(const char* __restrict, va_list parameters);
 int putchar(int);
 int puts(const char*);
 
 int fprintf(file_descriptor_t file, const char* format, ...);
-int vfprintf(file_descriptor_t file, const char* format, va_list args);
+int fputs(const char* string, file_descriptor_t file);
+int vfprintf(file_descriptor_t file, const char* format, va_list parameters);
 int fputchar(char c, file_descriptor_t file);
 
 #ifdef __cplusplus

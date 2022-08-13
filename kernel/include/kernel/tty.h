@@ -15,5 +15,7 @@ uint16_t get_cursor_position(void);
 void sys_key_handler(x86_iframe_t* frame);
 void terminal_tick_init(uint8_t n);
 void terminal_tick(char c);
+void terminal_keypress_init(uint8_t n);
+void terminal_keypress(uint8_t scan_code);
 
 #endif

@@ -8,7 +8,6 @@
 #include <kernel/keyboard.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/irq_handlers.h>
-#include <kernel/paging.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/tty.h>
@@ -34,36 +33,17 @@ void kernel_main(void) {
     irq_register_handler(1, sys_key_handler);
     printf("IRQ handler set: sys_key_handler\n");
 	write_serialf("IRQ handler set: sys_key_handler\n");
+	char timer_str[] = "System timer is ticking\n";
+    terminal_tick_init(sizeof(timer_str));
+    puts(timer_str);
+    char key_str[] = "Last keypress:\n";
+    terminal_keypress_init(sizeof(key_str));
+    puts(key_str);
+	x86_enable_int();
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
+	printf("Press ESC to reboot\n");
 	printf(">\n");
-	char output[10];
-	uint8_t scancode;
-	uint8_t old_scancode = 0x00;
-	uint8_t escape_key = 0x01;
-	int scancodeNb = 0;
-	printf("test div 0 : %d\n", 0/0);
-	//multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
-    //unsigned int address_of_module = mbinfo->mods_addr;
-	while (1)
-	{
-		scancode = read_scan_code();
-		if (scancode == old_scancode) {
-			scancode = old_scancode;
-		}
-
-		else /*if (scancode == escape_key)*/ {
-			//printf("escape\n");
-			hex_to_ascii(scancode, output);
-			//printf("%c\n",output);
-		}
-		if (scancodeNb == 0x5A){
-		printf("enter pressed\n");
-		scancodeNb++;
-		}
-		old_scancode = scancode;
-		//printf("%c\n", scancodes);
-	}
-	
+	while(1);
 }
