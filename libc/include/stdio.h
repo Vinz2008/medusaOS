@@ -6,6 +6,12 @@
 #include <types.h>
 #include <kernel/vfs.h>
 
+#define LOG_SCREEN 0
+#define LOG_SERIAL 1
+#define LOG_ALL 3
+
+
+
 #define EOF (-1)
 
 #ifdef __cplusplus
@@ -21,6 +27,13 @@ int fprintf(file_descriptor_t file, const char* format, ...);
 int fputs(const char* string, file_descriptor_t file);
 int vfprintf(file_descriptor_t file, const char* format, va_list parameters);
 int fputchar(char c, file_descriptor_t file);
+
+
+void log(int log_level, bool ok_printing, const char* restrict format, ...);
+void alert(const char* restrict format, ...);
+void green(const char* restrict format, ...);
+void ok_printing_boot(const char* restrict format, ...);
+void vok_printing_boot(const char* restrict format, va_list parameters);
 
 #ifdef __cplusplus
 }

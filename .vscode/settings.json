@@ -8,7 +8,8 @@
     "misc.h": "c",
     "tss.h": "c",
     "descriptors_tables.h": "c",
-    "x86.h": "c"
+    "x86.h": "c",
+    "modes.C": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

@@ -59,6 +59,11 @@ void write_serial_with_size(const char* data, size_t length){
 void write_serialf(const char* restrict format, ...){
 	va_list parameters;
 	va_start(parameters, format);
+	vwrite_serialf(format, parameters);
+}
+
+
+void vwrite_serialf(const char* restrict format, va_list parameters){
    	int written = 0;
    	while (*format != '\0') {
 		size_t maxrem = INT_MAX - written;

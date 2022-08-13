@@ -35,6 +35,8 @@ stdio/puts.o \
 stdio/fprintf.o \
 stdio/fputchar.o \
 stdio/fputs.o \
+stdio/modes.o \
+stdio/log.o \
 stdlib/abort.o \
 stdlib/stack_chk.o \
 string/memcmp.o \

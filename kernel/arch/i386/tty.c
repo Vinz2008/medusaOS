@@ -16,6 +16,7 @@ static uint16_t* const VGA_MEMORY = (uint16_t*) 0xB8000;
 static size_t terminal_row;
 static size_t terminal_column;
 static uint8_t terminal_color;
+static uint8_t old_terminal_color;
 static uint16_t* terminal_buffer;
 static size_t terminal_keypress_index = 0;
 static size_t terminal_tick_index = 0;
@@ -58,6 +59,7 @@ void terminal_initialize(void) {
 	terminal_row = 0;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+
 	terminal_buffer = VGA_MEMORY;
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
@@ -67,8 +69,18 @@ void terminal_initialize(void) {
 	}
 }
 
-void terminal_setcolor(uint8_t color) {
+void terminal_setcolor(uint8_t color){
+	old_terminal_color = terminal_color;
 	terminal_color = color;
+}
+
+void terminal_setcolors(uint8_t fg, uint8_t bg){
+	old_terminal_color = terminal_color;
+	terminal_color = vga_entry_color(fg, bg);
+}
+
+void terminal_reset_color(){
+	terminal_color = old_terminal_color;
 }
 
 void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
