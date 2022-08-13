@@ -117,7 +117,7 @@ void terminal_tick(char c){
 	terminal_buffer[terminal_tick_index] = vga_entry(c,terminal_color);
 }
 
-void terminal_keypress(uint8_t scan_code) {
+void terminal_keypress(uint8_t scan_code){
 	char c = keyboard_us[scan_code];
 	terminal_buffer[terminal_keypress_index] = vga_entry(c,terminal_color);
 }
