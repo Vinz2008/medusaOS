@@ -11,6 +11,7 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/tty.h>
+#include <kernel/vfs.h>
 
 #define SYSTEM_TICKS_PER_SEC 100
 
@@ -44,6 +45,8 @@ void kernel_main(void) {
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
 	printf("Press ESC to reboot\n");
+	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
+	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");
 	printf(">\n");
 	while(1);
 }
