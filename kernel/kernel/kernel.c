@@ -37,6 +37,10 @@ void kernel_main(void) {
     terminal_keypress_init(sizeof(key_str));
     puts(key_str);
 	x86_enable_int();
+	/*initialise_paging();
+	log(LOG_ALL, true, "Paging enabled\n");
+	uint32_t *ptr = (uint32_t*)0xA0000000;
+    uint32_t do_page_fault = *ptr;*/
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");

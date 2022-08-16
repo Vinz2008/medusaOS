@@ -94,7 +94,19 @@ int vprintf(const char* restrict format, va_list parameters) {
 				return -1;
 			}
 			written++;
-	
+		} else if (*format == 'p'){
+			format++;
+			char i2[10];
+			void* i = va_arg(parameters, void*);
+			hex_to_ascii(i, i2);
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!print(&i2, sizeof(i2))) {
+				return -1;
+			}
+			written++;
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);

@@ -5,6 +5,7 @@
 .set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 .set KERNEL_VIRTUAL_BASE, 0xC0000000 
+.extern end
 
 
 # Declare a header as in the Multiboot Standard.
@@ -13,6 +14,7 @@
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
+.long end
 
 # Reserve a stack for the initial thread.
 .section .bss

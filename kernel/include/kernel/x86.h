@@ -11,6 +11,8 @@ typedef struct x86_32_iframe {
     uint32_t user_sp, user_ss;                          
 } x86_iframe_t ;
 
+typedef x86_iframe_t registers_t;
+
 static uint64_t ticks = 0;
 
 

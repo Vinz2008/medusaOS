@@ -48,6 +48,7 @@ string/append.o \
 string/reverse.o \
 string/int_to_ascii.o \
 string/hex_to_ascii.o \
+string/strncat.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
