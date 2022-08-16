@@ -2,6 +2,10 @@
 set -e
 . ./build.sh
 
+dd if=/dev/zero of=disk.img bs=1M count=2
+mkfs.vfat -F12 disk.img
+cp disk.img sysroot/boot/disk.img
+
 mkdir -p isodir
 mkdir -p isodir/boot
 mkdir -p isodir/boot/grub
