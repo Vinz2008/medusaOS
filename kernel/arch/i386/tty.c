@@ -1,13 +1,18 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <multiboot.h>
 #include <kernel/tty.h>
 #include <kernel/io.h>
+#include <kernel/serial.h>
+#include <kernel/initrd.h>
 #include "vga.h"
 
 
 extern char keyboard_us[];
+extern multiboot_module_t *mod;
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
@@ -22,6 +27,14 @@ static size_t terminal_keypress_index = 0;
 static size_t terminal_tick_index = 0;
 int IsBacklash = false;
 
+int x_pos_cursor;
+int y_pos_cursor;
+
+char line_cli[100];
+
+void empty_line_cli(){
+	memset(line_cli, 0, 100);
+}
 
 void enable_cursor(uint8_t cursor_start, uint8_t cursor_end){
 	outb(0x3D4, 0x0A);
@@ -38,6 +51,8 @@ void disable_cursor(){
 
 
 void update_cursor(int x, int y){
+	x_pos_cursor = x;
+	y_pos_cursor = y;
 	uint16_t pos = y * VGA_WIDTH + x;
 	outb(0x3D4, 0x0F);
 	outb(0x3D5, (uint8_t) (pos & 0xFF));
@@ -54,6 +69,42 @@ uint16_t get_cursor_position(void){
     return pos;
 }
 
+int get_cursor_position_x(){
+	return x_pos_cursor;
+}
+
+int get_cursor_position_y(){
+	return y_pos_cursor;
+}
+
+void move_cursor_left(){
+	uint16_t x = x_pos_cursor;
+	uint16_t y = y_pos_cursor;
+	x++;
+	update_cursor(x, y);
+}
+
+void move_cursor_right(){
+	uint16_t x = x_pos_cursor;
+	uint16_t y = y_pos_cursor;
+	x--;
+	update_cursor(x, y);
+}
+
+void move_cursor_next_line(){
+	uint16_t x = x_pos_cursor;
+	uint16_t y = y_pos_cursor;
+	y++;
+	update_cursor(2, y);
+}
+
+void move_cursor_last_line(){
+	uint16_t x = x_pos_cursor;
+	uint16_t y = y_pos_cursor;
+	y--;
+	update_cursor(2, y);
+}
+
 
 void terminal_initialize(void) {
 	terminal_row = 0;
@@ -67,6 +118,8 @@ void terminal_initialize(void) {
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
+	enable_cursor(1, 2);
+	update_cursor(2, 16);
 }
 
 void terminal_setcolor(uint8_t color){
@@ -81,6 +134,11 @@ void terminal_setcolors(uint8_t fg, uint8_t bg){
 
 void terminal_reset_color(){
 	terminal_color = old_terminal_color;
+}
+
+void terminal_clear(){
+	terminal_initialize();
+	update_cursor(2, 1);
 }
 
 void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
@@ -131,5 +189,28 @@ void terminal_tick(char c){
 
 void terminal_keypress(uint8_t scan_code){
 	char c = keyboard_us[scan_code];
+	append(line_cli, c);
 	terminal_buffer[terminal_keypress_index] = vga_entry(c,terminal_color);
+	printf("%c", c);
+	move_cursor_left();
+}
+
+void launch_command(){
+	if (startswith("clear", line_cli)){
+		terminal_clear();
+	} else if (startswith("echo", line_cli)){
+		char temp[95];
+		int i2 = 5;
+		for (int i = 0; i < strlen(line_cli); i++){
+			temp[i] = line_cli[i2];
+			i2++;
+		}
+		printf("\n%s", temp);
+		move_cursor_next_line();
+	} else if (startswith("ls", line_cli)){
+		initrd_list_filenames(mod->mod_start);
+	} else {
+		printf("\ncommand not found");
+		move_cursor_next_line();
+	}
 }

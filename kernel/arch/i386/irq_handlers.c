@@ -1,10 +1,12 @@
 #include <kernel/irq_handlers.h>
 #include <types.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <kernel/io.h>
 #include <kernel/x86.h>
 #include <kernel/pic.h>
-#include <kernel/misc.h>   
+#include <kernel/misc.h>
+#include <kernel/tty.h> 
 
 static void *irq_routines[16] = {0};
 
@@ -53,8 +55,12 @@ void sys_key_handler(x86_iframe_t* frame){
     if(0x01 == scan_code){ // ESC - pressed
         reboot();
     }
-
-    if (0x81 > scan_code){
+    if (0x1C == scan_code){ // ENTER - pressed
+        launch_command();
+        empty_line_cli();
+        printf("\n> ");
+        move_cursor_next_line();
+    } else if (0x81 > scan_code){
         terminal_keypress(scan_code);
     }
 }

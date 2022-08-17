@@ -4,6 +4,7 @@
 #include <sys/cdefs.h>
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,7 @@ void append(char s[], char n);
 void hex_to_ascii(int n, char str[]);
 void reverse(char *str1);
 char *strcat(char *dest, const char *src);
+bool startswith(char str[], char code[]);
 
 #ifdef __cplusplus
 }

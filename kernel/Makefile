@@ -33,6 +33,7 @@ kernel/kernel.o \
 kernel/vfs.o \
 kernel/kheap.o \
 kernel/paging.o \
+kernel/initrd.o \
 
 
 OBJS=\

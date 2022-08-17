@@ -109,6 +109,7 @@ void vwrite_serialf(const char* restrict format, va_list parameters){
 		} else if (*format == 'i') {
 			format++;
 			char i2[10];
+			memset(i2, 0, 10);
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
 			if (!maxrem) {
@@ -120,9 +121,22 @@ void vwrite_serialf(const char* restrict format, va_list parameters){
 		} else if (*format == 'd') {
 			format++;
 			char i2[10];
+			memset(i2, 0, 10);
 			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			write_serial(&i2);
+			written++;
+		} else if (*format == 'p'){
+			format++;
+			char i2[10];
+			memset(i2, 0, 10);
+			void* i = va_arg(parameters, void*);
+			hex_to_ascii(i, i2);
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;

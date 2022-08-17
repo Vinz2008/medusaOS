@@ -68,6 +68,7 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 		} else if (*format == 'i') {
 			format++;
 			char i2[10];
+			memset(i2, 0, 10);
 			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
@@ -83,6 +84,7 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 		} else if (*format == 'd') {
 			format++;
 			char i2[10];
+			memset(i2, 0, 10);
 			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);

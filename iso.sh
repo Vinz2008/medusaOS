@@ -2,9 +2,9 @@
 set -e
 . ./build.sh
 
-dd if=/dev/zero of=disk.img bs=1M count=2
-mkfs.vfat -F12 disk.img
-cp disk.img sysroot/boot/disk.img
+cd initrd
+tar -cvf ../sysroot/boot/initrd.tar test.txt test2.txt
+cd ..
 
 mkdir -p isodir
 mkdir -p isodir/boot

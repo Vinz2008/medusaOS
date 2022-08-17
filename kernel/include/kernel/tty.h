@@ -14,11 +14,16 @@ void terminal_reset_color();
 void enable_cursor(uint8_t cursor_start, uint8_t cursor_end);
 void disable_cursor();
 void update_cursor(int x, int y);
+void move_cursor_left();
+void move_cursor_right();
+void move_cursor_next_line();
+void move_cursor_last_line();
 uint16_t get_cursor_position(void);
 void sys_key_handler(x86_iframe_t* frame);
 void terminal_tick_init(uint8_t n);
 void terminal_tick(char c);
 void terminal_keypress_init(uint8_t n);
 void terminal_keypress(uint8_t scan_code);
+void empty_line_cli();
 
 #endif
