@@ -67,13 +67,10 @@ int vprintf(const char* restrict format, va_list parameters) {
 			written += len;
 		} else if (*format == 'i') {
 			format++;
+			char i2[10];
+			memset(i2, 0, 10);
 			//char* i2;
 			int i = va_arg(parameters, int);
-			int length = 1;
-			while ( i /= 10 )
-   				length++;
-			char i2[length];
-			memset(i2, 0, length);
 			int_to_ascii(i, i2);
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.

@@ -19,7 +19,7 @@ unsigned int initrd_get_number_files(unsigned int address){
         struct tar_header *header = (struct tar_header *)address;
         if (header->filename[0] == '\0')
             break;
-        write_serialf("(get number files) filename %i : %s\n",i, header->filename);
+        write_serialf("filename %i : %s\n",i, header->filename);
         unsigned int size = getsize(header->size);
         headers[i] = header;
         address += ((size / 512) + 1) * 512;
@@ -37,7 +37,6 @@ void initrd_list_filenames(unsigned int address){
         if (header->filename[0] == '\0')
             break;
         printf("\nfilename [%i] : %s\n",i, header->filename);
-        write_serialf("\nfilename [%i] : %s\n",i, header->filename);
         unsigned int size = getsize(header->size);
         headers[i] = header;
         address += ((size / 512) + 1) * 512;
