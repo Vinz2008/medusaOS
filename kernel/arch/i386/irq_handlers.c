@@ -6,7 +6,8 @@
 #include <kernel/x86.h>
 #include <kernel/pic.h>
 #include <kernel/misc.h>
-#include <kernel/tty.h> 
+#include <kernel/tty.h>
+#include <kernel/serial.h>
 
 static void *irq_routines[16] = {0};
 
@@ -60,6 +61,10 @@ void sys_key_handler(x86_iframe_t* frame){
         empty_line_cli();
         printf("\n> ");
         move_cursor_next_line();
+    } else if (0x53 == scan_code){ // DELETE - pressed
+        write_serialf("delete pressed\n");
+        move_cursor_left();
+        remove_character();
     } else if (0x81 > scan_code){
         terminal_keypress(scan_code);
     }

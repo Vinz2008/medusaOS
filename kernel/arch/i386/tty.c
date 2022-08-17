@@ -77,14 +77,14 @@ int get_cursor_position_y(){
 	return y_pos_cursor;
 }
 
-void move_cursor_left(){
+void move_cursor_right(){
 	uint16_t x = x_pos_cursor;
 	uint16_t y = y_pos_cursor;
 	x++;
 	update_cursor(x, y);
 }
 
-void move_cursor_right(){
+void move_cursor_left(){
 	uint16_t x = x_pos_cursor;
 	uint16_t y = y_pos_cursor;
 	x--;
@@ -151,7 +151,12 @@ void terminal_putchar(char c) {
 	if (uc == '\n'){
 		terminal_row++;
 		terminal_column = 0;
-	}else {
+	} else if (uc =='\t'){
+		for (int i = 0; i < 4; i++){
+			terminal_putchar(' ');
+		}
+	
+	} else {
 	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
 	}
 	if (++terminal_column == VGA_WIDTH) {
@@ -166,7 +171,6 @@ void terminal_write(const char* data, size_t size) {
 	for (size_t i = 0; i < size; i++) {
 		terminal_putchar(data[i]);
 	}
-
 }
 
 void terminal_writestring(const char* data) {
@@ -177,7 +181,6 @@ void terminal_writestring(const char* data) {
 void terminal_keypress_init(uint8_t n){
 	terminal_keypress_index = VGA_WIDTH * terminal_row + n;
 }
-
 
 void terminal_tick_init(uint8_t n){
 	terminal_tick_index = VGA_WIDTH * terminal_row + n;
@@ -192,7 +195,7 @@ void terminal_keypress(uint8_t scan_code){
 	append(line_cli, c);
 	terminal_buffer[terminal_keypress_index] = vga_entry(c,terminal_color);
 	printf("%c", c);
-	move_cursor_left();
+	move_cursor_right();
 }
 
 void launch_command(){
@@ -216,4 +219,8 @@ void launch_command(){
 		printf("\ncommand not found");
 		move_cursor_next_line();
 	}
+}
+
+void remove_character(){
+	terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
 }
