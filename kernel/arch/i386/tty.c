@@ -209,6 +209,9 @@ void launch_command(){
 		move_cursor_next_line();
 	} else if (startswith("ls", line_cli)){
 		initrd_list_filenames(mod->mod_start);
+		for (int i = 0; i < 4; i++){
+			move_cursor_next_line();
+		}
 	} else {
 		printf("\ncommand not found");
 		move_cursor_next_line();
