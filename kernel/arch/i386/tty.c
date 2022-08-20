@@ -148,16 +148,19 @@ void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 
 void terminal_putchar(char c) {
 	unsigned char uc = c;
-	if (uc == '\n'){
+	switch (uc)
+	{
+	case '\n':
 		terminal_row++;
 		terminal_column = 0;
-	} else if (uc =='\t'){
+		break;
+	case '\t':
 		for (int i = 0; i < 4; i++){
 			terminal_putchar(' ');
 		}
-	
-	} else {
-	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	default:
+		terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+		break;
 	}
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
@@ -168,8 +171,42 @@ void terminal_putchar(char c) {
 }
 
 void terminal_write(const char* data, size_t size) {
+	bool verifyNextChar = false;
+	bool controlSequence = false;
+	char sequence[10];
 	for (size_t i = 0; i < size; i++) {
-		terminal_putchar(data[i]);
+		switch (data[i]) {
+		case '\x1B':
+			write_serialf("found escape character\n");
+			verifyNextChar = true;
+			break;
+		case '\x9B':
+			controlSequence = true;
+			verifyNextChar = true;
+			break;
+		default:
+			if (verifyNextChar == true){
+				write_serialf("data[i] : %c\n", data[i]);
+				switch(data[i]){
+				case '[':
+					verifyNextChar = true;
+					controlSequence = true;
+					break;
+				default:
+					if (controlSequence){
+						append(sequence, data[i]);
+					} else {
+						verifyNextChar = false;
+					}
+					break;
+				}
+				write_serialf("sequence : %s", sequence);
+			} else {
+				terminal_putchar(data[i]);
+				verifyNextChar = false;
+			}
+			break;
+		}
 	}
 }
 
