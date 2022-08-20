@@ -171,39 +171,25 @@ void terminal_putchar(char c) {
 }
 
 void terminal_write(const char* data, size_t size) {
-	bool verifyNextChar = false;
 	bool controlSequence = false;
 	char sequence[10];
 	for (size_t i = 0; i < size; i++) {
 		switch (data[i]) {
 		case '\x1B':
 			write_serialf("found escape character\n");
-			verifyNextChar = true;
+			if (data[i + 1] == '['){
+				controlSequence = true;
+				i++;
+			}			
 			break;
 		case '\x9B':
 			controlSequence = true;
-			verifyNextChar = true;
 			break;
 		default:
-			if (verifyNextChar == true){
-				write_serialf("data[i] : %c\n", data[i]);
-				switch(data[i]){
-				case '[':
-					verifyNextChar = true;
-					controlSequence = true;
-					break;
-				default:
-					if (controlSequence){
-						append(sequence, data[i]);
-					} else {
-						verifyNextChar = false;
-					}
-					break;
-				}
-				write_serialf("sequence : %s", sequence);
+			if (controlSequence){
+				write_serialf("control sequence found\n");
 			} else {
 				terminal_putchar(data[i]);
-				verifyNextChar = false;
 			}
 			break;
 		}

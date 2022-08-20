@@ -63,7 +63,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	}
 	write_serialf("modules %d\n", mb_info->mods_count);
 	write_serialf("addr %p\n", mb_info->mods_addr);
-	printf("\x9B1;31m\n");
+	printf("\x1B]1;31m\n");
 	printf("> ");
 	while(1);
 }
