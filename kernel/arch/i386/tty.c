@@ -186,7 +186,7 @@ void terminal_write(const char* data, size_t size) {
 			controlSequence = true;
 			break;
 		default:
-			if (controlSequence){
+			if (controlSequence == true){
 				write_serialf("control sequence found\n");
 			} else {
 				terminal_putchar(data[i]);

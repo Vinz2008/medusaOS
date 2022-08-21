@@ -10,3 +10,7 @@ uint8_t inb (uint16_t port) {
     __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
     return result;
 }
+
+inline void io_wait(void){
+    outb(0x80, 0);
+}

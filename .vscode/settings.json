@@ -1,5 +1,7 @@
 {
   "files.associations": {
+    "io": "llvm",
+    "std": "llvm",
     "stdlib.h": "c",
     "vga.h": "c",
     "random": "c",
@@ -9,7 +11,9 @@
     "tss.h": "c",
     "descriptors_tables.h": "c",
     "x86.h": "c",
-    "modes.C": "cpp"
+    "modes.C": "cpp",
+    "compare": "c",
+    "irq_handlers.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",
