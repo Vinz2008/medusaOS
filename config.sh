@@ -2,7 +2,16 @@ SYSTEM_HEADER_PROJECTS="libc kernel"
 PROJECTS="libc kernel"
 
 export MAKE=${MAKE:-make}
-export HOST=${HOST:-$(./default-host.sh)}
+if [ -z "$1" ]
+then 
+  export HOST=${HOST:-$(./default-host.sh)}
+else 
+  if [ "$1" = "x86_64" ]
+  then
+    export HOST=${HOST:-$(./x86_64-host.sh)}
+  fi
+  export HOST=${HOST:-$(./default-host.sh)}
+fi
 
 export AR=${HOST}-ar
 export AS=${HOST}-as

@@ -16,7 +16,7 @@ mkdir -p isodir/modules
 
 cp -r sysroot/* isodir/
 #cp sysroot/boot/kernel.kernel isodir/boot/kernel.kernel
-cp grub/* isodir/boot/grub/
+cp grub/grub.cfg isodir/boot/grub/grub.cfg
 
 if ! [[ -e "memtest86plus" ]]
 then

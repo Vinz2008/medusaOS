@@ -1,6 +1,18 @@
 #!/bin/sh
 set -e
-. ./config.sh
+
+if [ -z "$1" ]
+  then
+    . ./config.sh
+  else 
+    if [ "$1" = "x86_64" ]
+    then
+      . ./config.sh x86_64
+    else 
+      . ./config.sh
+    fi
+fi
+
 
 mkdir -p "$SYSROOT"
 
