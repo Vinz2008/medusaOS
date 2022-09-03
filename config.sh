@@ -8,7 +8,7 @@ then
 else 
   if [ "$1" = "x86_64" ]
   then
-    export HOST=${HOST:-$(./x86_64-host.sh)}
+    export HOST=${HOST:-$(./x86_64-build/x86_64-host.sh)}
   fi
   export HOST=${HOST:-$(./default-host.sh)}
 fi

@@ -14,6 +14,8 @@ install-kernel: kernel.efi
 	mkdir -p $(DESTDIR)$(BOOTDIR)
 	cp kernel.efi $(DESTDIR)$(BOOTDIR)
 
+ARCH = x86_64
+
 TARGET = kernel.efi
 
 USE_GCC=1 

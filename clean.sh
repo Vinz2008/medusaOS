@@ -6,7 +6,16 @@ for PROJECT in $PROJECTS; do
   (cd $PROJECT && $MAKE clean)
 done
 
-rm -rf sysroot
 rm -rf isodir
 rm -rf kernel.iso
 rm -f disk.img
+rm -f *.img
+rm -f *.iso
+rm -f logs.txt
+rm -rf memtest86plus
+rm -rf sysroot
+rm -rf sysroot-x86_64
+rm -rf build
+rm -f bochslog.txt
+rm -f *.efi
+rm -f *.EFI
