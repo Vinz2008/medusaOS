@@ -13,6 +13,8 @@ else
   export HOST=${HOST:-$(./default-host.sh)}
 fi
 
+echo `HOST : ${HOST}`
+
 export AR=${HOST}-ar
 export AS=${HOST}-as
 export CC=${HOST}-gcc

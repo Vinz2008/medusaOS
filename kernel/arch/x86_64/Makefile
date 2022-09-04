@@ -1,4 +1,6 @@
 ARCHDIR=$(pwd)
+INCLUDEDIR?=$(PREFIX)/include
+PREFIX?=/usr/local
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
@@ -14,8 +16,12 @@ install-kernel: kernel.efi
 	mkdir -p $(DESTDIR)$(BOOTDIR)
 	cp kernel.efi $(DESTDIR)$(BOOTDIR)
 
-ARCH = x86_64
+include make.config
 
+ARCH = x86_64
+SRCS = $(wildcard *.c)
+CFLAGS = -Wall -Wextra --ansi -O2 -ffreestanding
+LIBS=-nostdlib
 TARGET = kernel.efi
 
 USE_GCC=1 
