@@ -5,6 +5,7 @@ set -e
 rm -rf iso-x86_64
 rm -rf sysroot-x86_64
 rm -rf isodir
+rm -rf iso-x86_64
 mkdir sysroot-x86_64
 mkdir sysroot-x86_64/EFI
 

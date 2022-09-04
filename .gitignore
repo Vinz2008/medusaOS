@@ -9,3 +9,4 @@ logs.txt
 memtest86plus
 build/
 sysroot-x86_64
+iso-x86_64

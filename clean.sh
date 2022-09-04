@@ -19,3 +19,4 @@ rm -rf build
 rm -f bochslog.txt
 rm -f *.efi
 rm -f *.EFI
+rm -rf iso-x86_64
