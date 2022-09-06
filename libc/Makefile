@@ -50,6 +50,7 @@ string/int_to_ascii.o \
 string/hex_to_ascii.o \
 string/strncat.o \
 string/startswith.o \
+errno/perror.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
