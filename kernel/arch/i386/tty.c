@@ -249,6 +249,15 @@ void launch_command(){
 		for (int i = 0; i < 4; i++){
 			move_cursor_next_line();
 		}
+	} else if (startswith("help", line_cli)){
+		printf("\nusage help : \n");
+		printf("echo : print string\n");
+		printf("ls : list directory and files\n");
+		printf("clear : clear screen\n");
+		printf("help : print this help\n");
+		for (int i = 0; i < 5; i++){
+			move_cursor_next_line();
+		}
 	} else {
 		printf("\ncommand not found");
 		move_cursor_next_line();
