@@ -1,0 +1,109 @@
+From 33afa7728c939d68be768697137cbacc0a20fa5a Mon Sep 17 00:00:00 2001
+From: Vinz2008 <vincentbidarddelanoe@gmail.com>
+Date: Sat, 17 Sep 2022 17:06:28 +0200
+Subject: [PATCH] changes
+
+---
+ config.sub                  |  2 +-
+ fixincludes/mkfixinc.sh     |  2 ++
+ gcc/config.gcc              | 12 ++++++++++++
+ libgcc/config.host          |  8 ++++++++
+ libstdc++-v3/crossconfig.m4 |  7 ++++++-
+ 5 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/config.sub b/config.sub
+index 63c1f1c8b..3dffb206f 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1725,7 +1725,7 @@ case $os in
+ 	     | skyos* | haiku* | rdos* | toppers* | drops* | es* \
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+-	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx*)
++	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx*| medusaos*)
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff --git a/fixincludes/mkfixinc.sh b/fixincludes/mkfixinc.sh
+index df90720b7..ee97ebf84 100755
+--- a/fixincludes/mkfixinc.sh
++++ b/fixincludes/mkfixinc.sh
+@@ -11,6 +11,8 @@ target=fixinc.sh
+ 
+ # Check for special fix rules for particular targets
+ case $machine in
++    *-medusaos* | \
++    *-*-medusaos* | \
+     i?86-*-cygwin* | \
+     i?86-*-mingw32* | \
+     x86_64-*-mingw32* | \
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index 357b0bed0..e6a3a2973 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -825,6 +825,12 @@ case ${target} in
+ *-*-fuchsia*)
+   native_system_header_dir=/include
+   ;;
++*-*-medusaos*)
++  gas=yes
++  gnu_ld=yes
++  default_use_cxa_atexit=yes
++  use_gcc_stdint=provide
++  ;;
+ *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
+   extra_options="$extra_options gnu-user.opt"
+   gas=yes
+@@ -1890,6 +1896,12 @@ x86_64-*-darwin*)
+ 	tmake_file="${tmake_file} ${cpu_type}/t-darwin64-biarch t-slibgcc"
+ 	tm_file="${tm_file} ${cpu_type}/darwin64-biarch.h"
+ 	;;
++i[34567]86-*-medusaos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h medusaos.h"
++    ;;
++x86_64-*-medusaos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h medusaos.h"
++    ;;
+ i[34567]86-*-elfiamcu)
+ 	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h newlib-stdint.h i386/iamcu.h"
+ 	;;
+diff --git a/libgcc/config.host b/libgcc/config.host
+index 50f000622..d20c1d514 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -711,6 +711,14 @@ x86_64-*-dragonfly*)
+ 	tmake_file="${tmake_file} i386/t-dragonfly i386/t-crtstuff"
+ 	md_unwind_header=i386/dragonfly-unwind.h
+ 	;;
++i[34567]86-*-medusaos*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
++x86_64-*-medusaos*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
+ i[34567]86-*-freebsd*)
+ 	tmake_file="${tmake_file} i386/t-freebsd i386/t-crtstuff"
+ 	md_unwind_header=i386/freebsd-unwind.h
+diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
+index ff44d5ae0..7c2078662 100644
+--- a/libstdc++-v3/crossconfig.m4
++++ b/libstdc++-v3/crossconfig.m4
+@@ -140,7 +140,12 @@ case "${host}" in
+     SECTION_FLAGS='-ffunction-sections -fdata-sections'
+     AC_SUBST(SECTION_FLAGS)
+     ;;
+-
++  *-medusaos*)
++    GLIBCXX_CHECK_COMPILER_FEATURES
++    GLIBCXX_CHECK_LINKER_FEATURES
++    GLIBCXX_CHECK_MATH_SUPPORT
++    GLIBCXX_CHECK_STDLIB_SUPPORT
++    ;;
+   *-hpux*)
+     SECTION_FLAGS='-ffunction-sections -fdata-sections'
+     AC_SUBST(SECTION_FLAGS)
+-- 
+2.37.3
+
