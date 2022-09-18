@@ -119,7 +119,7 @@ void terminal_initialize(void) {
 		}
 	}
 	enable_cursor(1, 2);
-	update_cursor(3, 16);
+	update_cursor(3, 17);
 }
 
 void terminal_setcolor(uint8_t color){
@@ -258,6 +258,9 @@ void launch_command(){
 		for (int i = 0; i < 5; i++){
 			move_cursor_next_line();
 		}
+	} else if (startswith("arch", line_cli)){
+		printf("\ni386");
+		move_cursor_next_line();
 	} else {
 		printf("\ncommand not found");
 		move_cursor_next_line();

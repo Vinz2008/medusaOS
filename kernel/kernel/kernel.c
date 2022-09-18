@@ -10,9 +10,12 @@
 #include <kernel/irq_handlers.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
+#include <kernel/nmi.h>
 #include <kernel/tty.h>
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
+#include <kernel/rtc.h>
+#include <kernel/kheap.h>
 
 #define SYSTEM_TICKS_PER_SEC 100
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -41,10 +44,20 @@ void kernel_main(multiboot_info_t* mbd) {
     terminal_keypress_init(sizeof(key_str));
     puts(key_str);
 	x86_enable_int();
-	/*initialise_paging();
-	log(LOG_ALL, true, "Paging enabled\n");
-	uint32_t *ptr = (uint32_t*)0xA0000000;
-    uint32_t do_page_fault = *ptr;*/
+	NMI_enable();
+	//initialise_paging();
+	int* test = kmalloc(sizeof(int));
+	int* test2 = kmalloc(sizeof(int));
+	int* test3 = kmalloc(sizeof(int));
+	*test = 2;
+	*test2 = 4;
+	*test3 = 6;
+	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
+	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
+	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
+	//log(LOG_ALL, true, "Paging enabled\n");
+	//uint32_t *ptr = (uint32_t*)0xA0000000;
+    //uint32_t do_page_fault = *ptr;
 	int i = 1233;
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
@@ -52,6 +65,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	alert("error : %s\n", "string");
 	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
 	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");
+	read_rtc_date();
 	/*if (CHECK_FLAG (mb_info->flags, 2)){
     printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 	}*/
