@@ -20,6 +20,8 @@
 #define SYSTEM_TICKS_PER_SEC 100
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
+extern uint32_t end;
+
 multiboot_info_t *mb_info;
 multiboot_module_t *mod;
 
@@ -55,6 +57,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
+	log(LOG_SERIAL, false, "end of the kernel : %p\n", end);
 	//log(LOG_ALL, true, "Paging enabled\n");
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
     //uint32_t do_page_fault = *ptr;
@@ -77,6 +80,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	}
 	write_serialf("modules %d\n", mb_info->mods_count);
 	write_serialf("addr %p\n", mb_info->mods_addr);
+	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);
 	//printf("\x9B1;31m\n");
 	printf("> ");
 	while(1);

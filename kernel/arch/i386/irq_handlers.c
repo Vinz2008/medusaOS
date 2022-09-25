@@ -8,6 +8,7 @@
 #include <kernel/misc.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
+#include <kernel/tty.h>
 
 extern bool tick_animation_enabled;
 

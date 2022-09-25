@@ -27,5 +27,8 @@ void terminal_keypress(uint8_t scan_code);
 void terminal_print_last_command();
 void empty_line_cli();
 void remove_character();
+void launch_command();
+void terminal_disable_keypress();
+void terminal_disable_tick();
 
 #endif
