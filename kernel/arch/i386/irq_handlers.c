@@ -9,6 +9,8 @@
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 
+extern bool tick_animation_enabled;
+
 static void *irq_routines[16] = {0};
 
 void irq_register_handler(int irq, void (*handler)(x86_iframe_t*)){
@@ -43,29 +45,31 @@ void handle_platform_irq(x86_iframe_t* frame){
 }
 
 void sys_tick_handler(x86_iframe_t* frame){
+    if (tick_animation_enabled == true){
     const char ticks_anim_chars[] = {'-', '/', '|', '\\'};
-    ++ticks;
+    ++ticks; 
     size_t ti = ticks%4;
     terminal_tick(ticks_anim_chars[ti]);
+    }
     pic_send_EOI(IRQ_PIT);
 }
 
 void sys_key_handler(x86_iframe_t* frame){
     // scan code https://wiki.osdev.org/PS/2_Keyboard
     uint8_t scan_code = inb(0x60);
-    if(0x01 == scan_code){ // ESC - pressed
+    if(scan_code == ESC_KEY){ // ESC - pressed
         reboot();
     }
-    if (0x1C == scan_code){ // ENTER - pressed
+    if (scan_code == ENTER_KEY){ // ENTER - pressed
         launch_command();
         empty_line_cli();
         printf("\n> ");
-        move_cursor_next_line();
-    } else if (0x53 == scan_code){ // DELETE - pressed
+    } else if (scan_code == DELETE_KEY){ // DELETE - pressed
         write_serialf("delete pressed\n");
-        move_cursor_left();
         remove_character();
-    } else if (0x81 > scan_code){
+    } else if (scan_code == CURSOR_LEFT_KEY) {
+        move_cursor_left();
+    } else if (scan_code < 0x81){
         terminal_keypress(scan_code);
     }
 }

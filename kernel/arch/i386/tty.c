@@ -26,6 +26,9 @@ static uint16_t* terminal_buffer;
 static size_t terminal_keypress_index = 0;
 static size_t terminal_tick_index = 0;
 int IsBacklash = false;
+bool tick_animation_enabled = true;
+bool keypress_animation_enabled = true;
+
 
 int x_pos_cursor;
 int y_pos_cursor;
@@ -106,11 +109,10 @@ void move_cursor_last_line(){
 }
 
 
-void terminal_initialize(void) {
+void terminal_clear(){
 	terminal_row = 0;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-
 	terminal_buffer = VGA_MEMORY;
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
@@ -118,8 +120,17 @@ void terminal_initialize(void) {
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
-	enable_cursor(1, 2);
-	update_cursor(3, 17);
+	//terminal_ps1();
+	terminal_disable_tick();
+	terminal_disable_keypress();
+	update_cursor(3, 1);
+}
+
+
+void terminal_initialize() {
+	enable_cursor(0,0);
+	terminal_clear();
+	//update_cursor(3, 17);
 }
 
 void terminal_setcolor(uint8_t color){
@@ -140,11 +151,6 @@ void terminal_ps1(){
 	printf("> ");
 }
 
-void terminal_clear(){
-	terminal_initialize();
-	//terminal_ps1();
-	update_cursor(3, 1);
-}
 
 void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 	if (y >= VGA_HEIGHT || (y >= VGA_HEIGHT && x >= VGA_WIDTH)){
@@ -164,6 +170,7 @@ void terminal_putchar(char c) {
 	case '\n':
 		terminal_row++;
 		terminal_column = 0;
+		move_cursor_next_line();
 		break;
 	case '\t':
 		for (int i = 0; i < 4; i++){
@@ -220,16 +227,29 @@ void terminal_tick_init(uint8_t n){
 	terminal_tick_index = VGA_WIDTH * terminal_row + n;
 }
 
+
 void terminal_tick(char c){
 	terminal_buffer[terminal_tick_index] = vga_entry(c,terminal_color);
+}
+
+
+void terminal_disable_tick(){
+	tick_animation_enabled =  false;
 }
 
 void terminal_keypress(uint8_t scan_code){
 	char c = keyboard_us[scan_code];
 	append(line_cli, c);
+	if (keypress_animation_enabled == true){
 	terminal_buffer[terminal_keypress_index] = vga_entry(c,terminal_color);
-	printf("%c", c);
+	}
+	//printf("%c", c);
+	terminal_putentryat(c, terminal_color, get_cursor_position_x(), get_cursor_position_y() - 1);
 	move_cursor_right();
+}
+
+void terminal_disable_keypress(){
+	keypress_animation_enabled = false;
 }
 
 void launch_command(){
@@ -243,30 +263,26 @@ void launch_command(){
 			i2++;
 		}
 		printf("\n%s", temp);
-		move_cursor_next_line();
 	} else if (startswith("ls", line_cli)){
 		initrd_list_filenames(mod->mod_start);
-		for (int i = 0; i < 4; i++){
-			move_cursor_next_line();
-		}
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");
 		printf("ls : list directory and files\n");
 		printf("clear : clear screen\n");
 		printf("help : print this help\n");
-		for (int i = 0; i < 5; i++){
-			move_cursor_next_line();
-		}
 	} else if (startswith("arch", line_cli)){
 		printf("\ni386");
-		move_cursor_next_line();
+	} else if (startswith("thirdtemple", line_cli)){
+		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
 	} else {
 		printf("\ncommand not found");
-		move_cursor_next_line();
 	}
 }
 
 void remove_character(){
-	terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
+	if (terminal_column > 1){
+		terminal_putentryat(' ', terminal_color, terminal_column--, terminal_row);
+		move_cursor_left();
+	}
 }
