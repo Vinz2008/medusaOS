@@ -22,6 +22,7 @@ void hex_to_ascii(int n, char str[]);
 void reverse(char *str1);
 char *strcat(char *dest, const char *src);
 bool startswith(char str[], char code[]);
+char* strcpy(char* dst, const char* src);
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,7 @@ void terminal_tick_init(uint8_t n);
 void terminal_tick(char c);
 void terminal_keypress_init(uint8_t n);
 void terminal_keypress(uint8_t scan_code);
+void terminal_print_last_command();
 void empty_line_cli();
 void remove_character();
 

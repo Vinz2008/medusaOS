@@ -34,6 +34,7 @@ int x_pos_cursor;
 int y_pos_cursor;
 
 char line_cli[100];
+char last_line_cli[100];
 
 void empty_line_cli(){
 	memset(line_cli, 0, 100);
@@ -277,6 +278,15 @@ void launch_command(){
 		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
 	} else {
 		printf("\ncommand not found");
+	}
+	strcpy(last_line_cli, line_cli);
+}
+
+void terminal_print_last_command(){
+	int temp_pos_column = 0;
+	for (int i = 0; i < strlen(last_line_cli); i++){
+		empty_line_cli();
+		terminal_putentryat(last_line_cli[i],terminal_color , terminal_row, temp_pos_column);
 	}
 }
 

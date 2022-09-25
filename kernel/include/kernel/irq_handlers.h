@@ -7,7 +7,8 @@ enum Key {
     ENTER_KEY = 0x1C,
     DELETE_KEY = 0x53,
     TAB_KEY = 0x0F,
-    CURSOR_LEFT_KEY = 0x4B
+    CURSOR_LEFT_KEY = 0x4B,
+    CURSOR_UP_KEY = 0x75
 };
 
 #define IRQ_PIT 0
