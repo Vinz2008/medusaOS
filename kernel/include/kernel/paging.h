@@ -30,6 +30,9 @@ typedef struct page_directory
    uint32_t physicalAddr;
 } page_directory_t;
 
+
+void paging_enable();
+
 void switch_page_directory(page_directory_t *new);
 
 page_t *get_page(uint32_t address, int make, page_directory_t *dir);

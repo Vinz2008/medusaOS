@@ -100,6 +100,13 @@ void free_frame(page_t *page){
    }
 }
 
+void paging_enable(){
+	asm volatile("mov %%eax, %%cr3": :"a"(kernel_directory));	
+	asm volatile("mov %cr0, %eax");
+	asm volatile("orl $0x80000000, %eax");
+	asm volatile("mov %eax, %cr0");
+}
+
 void initialise_paging(){
    // The size of physical memory. For the moment we
    // assume it is 16MB big.
@@ -133,6 +140,7 @@ void initialise_paging(){
 
    // Now, enable paging!
    switch_page_directory(kernel_directory);
+   paging_enable();
 }
 
 void switch_page_directory(page_directory_t *dir){

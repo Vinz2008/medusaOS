@@ -16,6 +16,7 @@
 #include <kernel/initrd.h>
 #include <kernel/rtc.h>
 #include <kernel/kheap.h>
+#include <kernel/syscall.h>
 
 #define SYSTEM_TICKS_PER_SEC 100
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -47,6 +48,10 @@ void kernel_main(multiboot_info_t* mbd) {
     puts(key_str);
 	x86_enable_int();
 	NMI_enable();
+	init_syscalls();
+	log(LOG_SERIAL, false, "Syscalls enabled\n");
+	//paging_enable();
+	//log(LOG_SERIAL, false, "Paging enabled\n");
 	//initialise_paging();
 	int* test = kmalloc(sizeof(int));
 	int* test2 = kmalloc(sizeof(int));

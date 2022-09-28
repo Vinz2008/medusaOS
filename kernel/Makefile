@@ -31,6 +31,7 @@ KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
 kernel/vfs.o \
+kernel/syscall.o \
 kernel/kheap.o \
 kernel/paging.o \
 kernel/initrd.o \

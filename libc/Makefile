@@ -52,6 +52,7 @@ string/strncat.o \
 string/startswith.o \
 string/strcpy.o \
 errno/perror.o \
+syscalls/syscalls.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
