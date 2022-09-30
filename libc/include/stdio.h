@@ -35,6 +35,35 @@ void green(const char* restrict format, ...);
 void ok_printing_boot(const char* restrict format, ...);
 void vok_printing_boot(const char* restrict format, va_list parameters);
 
+
+// Uninmplemented declarations for hosted cross compiler
+
+#define	F_OK	0
+#define	R_OK	4
+#define	W_OK	2
+#define	X_OK	1
+
+#define	SEEK_SET	0
+#define	SEEK_CUR	1
+#define	SEEK_END	2
+
+int fclose(FILE *stream);
+
+FILE *fopen(const char *filename, const char *mode);
+
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+int fseek(FILE *stream, long int offset, int whence);
+
+long int ftell(FILE *stream);
+
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+void setbuf(FILE *stream, char *buffer);
+
+int sprintf(char *str, const char *format, ...);
+
+
 #ifdef __cplusplus
 }
 #endif

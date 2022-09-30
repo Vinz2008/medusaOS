@@ -14,4 +14,8 @@ void abort(void);
 }
 #endif
 
+// Uninmplemented declarations for hosted cross compiler
+void free(void* ptr);
+void* malloc(size_t size)
+
 #endif

@@ -24,6 +24,10 @@ char *strcat(char *dest, const char *src);
 bool startswith(char str[], char code[]);
 char* strcpy(char* dst, const char* src);
 
+// Uninmplemented declarations for hosted cross compiler
+
+char *strchr(const char *str, int c);
+
 #ifdef __cplusplus
 }
 #endif
