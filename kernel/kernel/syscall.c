@@ -6,9 +6,9 @@
 void syscall_handler(x86_iframe_t * frame){
     switch (frame->ax){
     case SYS_READ:
-        vfs_write(frame->di, frame->si, frame->dx);
         break;
     case SYS_WRITE:
+        vfs_write(frame->di, frame->si, frame->dx);
         break;
     
     default:

@@ -1,6 +1,7 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H 1
 
+#include <stddef.h>
 #include <sys/cdefs.h>
 
 #ifdef __cplusplus
@@ -16,6 +17,6 @@ void abort(void);
 
 // Uninmplemented declarations for hosted cross compiler
 void free(void* ptr);
-void* malloc(size_t size)
+void* malloc(size_t size);
 
 #endif

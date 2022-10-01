@@ -84,7 +84,9 @@ void kernel_main(multiboot_info_t* mbd) {
 		write_serialf("number of files : %d\n", initrd_get_number_files(mod->mod_start));
 	}
 	write_serialf("modules %d\n", mb_info->mods_count);
+	unsigned int* modules = (unsigned int*)mbd->mods_addr;
 	write_serialf("addr %p\n", mb_info->mods_addr);
+	
 	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);
 	//printf("\x9B1;31m\n");
 	printf("> ");

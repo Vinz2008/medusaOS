@@ -38,6 +38,8 @@ void vok_printing_boot(const char* restrict format, va_list parameters);
 
 // Uninmplemented declarations for hosted cross compiler
 
+typedef file_descriptor_t FILE;
+
 #define	F_OK	0
 #define	R_OK	4
 #define	W_OK	2
@@ -49,7 +51,7 @@ void vok_printing_boot(const char* restrict format, va_list parameters);
 
 int fclose(FILE *stream);
 
-FILE *fopen(const char *filename, const char *mode);
+FILE* fopen(const char *filename, const char *mode);
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
