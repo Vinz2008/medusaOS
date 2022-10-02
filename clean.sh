@@ -6,6 +6,8 @@ for PROJECT in $PROJECTS; do
   (cd $PROJECT && $MAKE clean)
 done
 
+cd userspace && $MAKE clean
+
 rm -rf isodir
 rm -rf kernel.iso
 rm -f disk.img
