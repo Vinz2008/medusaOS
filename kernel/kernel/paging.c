@@ -102,8 +102,9 @@ void free_frame(page_t *page){
 
 void paging_enable(){
 	asm volatile("mov %%eax, %%cr3": :"a"(kernel_directory));	
-	asm volatile("mov %cr0, %eax");
-	asm volatile("orl $0x80000000, %eax");
+	asm volatile("mov %cr3, %eax");
+    asm volatile("mov %cr0, %eax");
+	asm volatile("orl $0x80000001, %eax");
 	asm volatile("mov %eax, %cr0");
 }
 
