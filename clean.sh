@@ -6,7 +6,7 @@ for PROJECT in $PROJECTS; do
   (cd $PROJECT && $MAKE clean)
 done
 
-cd userspace && $MAKE clean
+cd userspace && $MAKE clean && cd ..
 
 rm -rf isodir
 rm -rf kernel.iso

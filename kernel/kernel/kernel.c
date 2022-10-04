@@ -62,7 +62,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
-	log(LOG_SERIAL, false, "end of the kernel : %p\n", end);
+	log(LOG_SERIAL, false, "end of the kernel : %p\n", &end);
 	//log(LOG_ALL, true, "Paging enabled\n");
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
     //uint32_t do_page_fault = *ptr;
