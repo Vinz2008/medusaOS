@@ -8,6 +8,7 @@
 #include <kernel/io.h>
 #include <kernel/serial.h>
 #include <kernel/initrd.h>
+#include <kernel/misc.h>
 #include "vga.h"
 
 
@@ -274,6 +275,8 @@ void launch_command(){
 		printf("help : print this help\n");
 	} else if (startswith("arch", line_cli)){
 		printf("\ni386");
+	} else if (startswith("reboot", line_cli)){
+		reboot();
 	} else if (startswith("thirdtemple", line_cli)){
 		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
 	} else {

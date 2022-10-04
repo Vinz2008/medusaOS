@@ -29,4 +29,6 @@ static inline void x86_halt(void){
 		    "cli;"
 		    "hlt");
 }
+
+extern shutdown;
 #endif
