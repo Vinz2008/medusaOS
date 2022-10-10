@@ -17,6 +17,8 @@ page_directory_t *kernel_directory	= 0;
 // The current page directory
 page_directory_t *current_directory	= 0;
 
+extern heap_t *kheap;
+
 // Macros used in the bitset algorithms.
 #define INDEX_FROM_BIT(a) (a/(8*4))
 #define OFFSET_FROM_BIT(a) (a%(8*4))
@@ -130,18 +132,24 @@ void initialise_paging(){
    // by calling kmalloc(). A while loop causes this to be
    // computed on-the-fly rather than once at the start.
    int i = 0;
+   for (i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += 0x1000)
+		get_page(i, 1, kernel_directory);
+   i = 0;
    while (i < placement_address)
    {
        // Kernel code is readable but not writeable from userspace.
        alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
        i += 0x1000;
    }
+   for (i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += 0x1000)
+		alloc_frame( get_page(i, 1, kernel_directory), 0, 0 );
    // Before we enable paging, we must register our page fault handler.;
    irq_register_handler(14, page_fault);
 
    // Now, enable paging!
    switch_page_directory(kernel_directory);
-   paging_enable();
+   kheap = create_heap(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, 0xCFFFF000, 0, 0);
+   //paging_enable();
 }
 
 void switch_page_directory(page_directory_t *dir){

@@ -30,6 +30,7 @@ typedef struct page_directory
    uint32_t physicalAddr;
 } page_directory_t;
 
+void initialize_paging();
 
 void paging_enable();
 

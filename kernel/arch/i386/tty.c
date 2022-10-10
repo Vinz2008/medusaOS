@@ -225,6 +225,10 @@ void terminal_keypress_init(uint8_t n){
 	terminal_keypress_index = VGA_WIDTH * terminal_row + n;
 }
 
+void terminal_enable_tick(){
+	tick_animation_enabled =  true;
+}
+
 void terminal_tick_init(uint8_t n){
 	terminal_tick_index = VGA_WIDTH * terminal_row + n;
 }
@@ -249,6 +253,11 @@ void terminal_keypress(uint8_t scan_code){
 	terminal_putentryat(c, terminal_color, get_cursor_position_x(), get_cursor_position_y() - 1);
 	move_cursor_right();
 }
+
+void terminal_enable_keypress(){
+	keypress_animation_enabled = true;
+}
+
 
 void terminal_disable_keypress(){
 	keypress_animation_enabled = false;

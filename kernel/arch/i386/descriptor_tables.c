@@ -25,11 +25,7 @@ static void set_gdt_entry(int32 index, uint32_t base, uint32_t limit, uint8_t ac
 
 void descriptor_tables_initialize(){
     gdt_initialize();
-    printf("gdt initialized\n");
-    write_serial("gdt initialized\n");
     idt_initialize();
-    printf("idt initialized\n");
-    write_serial("idt initialized\n");
 }
 
 
