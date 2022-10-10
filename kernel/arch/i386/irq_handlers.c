@@ -67,7 +67,8 @@ void sys_key_handler(x86_iframe_t* frame){
         printf("\n> ");
     } else if (scan_code == DELETE_KEY){ // DELETE - pressed
         //write_serialf("delete pressed\n");
-        remove_character();
+        //remove_character();
+        //bug with delete character (wrong keycode)
     } else if (scan_code == CURSOR_LEFT_KEY) {
         move_cursor_left();
     } else if (scan_code == CURSOR_UP_KEY){
