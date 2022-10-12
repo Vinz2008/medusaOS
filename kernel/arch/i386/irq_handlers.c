@@ -72,7 +72,7 @@ void sys_key_handler(x86_iframe_t* frame){
     } else if (scan_code == CURSOR_LEFT_KEY) {
         move_cursor_left();
     } else if (scan_code == CURSOR_UP_KEY){
-        terminal_print_last_command();
+        //terminal_print_last_command();
     } else if (scan_code < 0x81){
         terminal_keypress(scan_code);
     }
