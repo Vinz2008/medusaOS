@@ -18,5 +18,10 @@ void abort(void);
 // Uninmplemented declarations for hosted cross compiler
 void free(void* ptr);
 void* malloc(size_t size);
+int atexit(void (*func)(void));
+int atoi(const char *str);
+char *getenv(const char *name);
+void *calloc(size_t nitems, size_t size);
+int abs(int x);
 
 #endif

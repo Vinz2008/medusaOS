@@ -65,6 +65,9 @@ void setbuf(FILE *stream, char *buffer);
 
 int sprintf(char *str, const char *format, ...);
 
+FILE *stderr;
+
+int fflush(FILE *stream):
 
 #ifdef __cplusplus
 }
