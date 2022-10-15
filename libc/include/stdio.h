@@ -65,9 +65,13 @@ void setbuf(FILE *stream, char *buffer);
 
 int sprintf(char *str, const char *format, ...);
 
-FILE *stderr;
+// took the following from dietlibc
+/*
+static FILE __stderr;
+FILE* stderr=&__stderr;
+*/
 
-int fflush(FILE *stream):
+int fflush(FILE *stream);
 
 #ifdef __cplusplus
 }

@@ -28,6 +28,8 @@ void terminal_print_last_command();
 void empty_line_cli();
 void remove_character();
 void launch_command();
+void terminal_enable_tick();
+void terminal_enable_keypress();
 void terminal_disable_keypress();
 void terminal_disable_tick();
 

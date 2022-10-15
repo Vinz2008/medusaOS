@@ -30,7 +30,7 @@ typedef struct page_directory
    uint32_t physicalAddr;
 } page_directory_t;
 
-void initialize_paging();
+void initialise_paging();
 
 void paging_enable();
 
@@ -39,3 +39,5 @@ void switch_page_directory(page_directory_t *new);
 page_t *get_page(uint32_t address, int make, page_directory_t *dir);
 
 void page_fault(x86_iframe_t* regs);
+void alloc_frame(page_t *page, int is_kernel, int is_writeable);
+void free_frame(page_t *page);

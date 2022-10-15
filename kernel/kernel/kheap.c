@@ -13,14 +13,14 @@ heap_t *kheap = 0;
 
 uint32_t kmalloc_internal(uint32_t size, int align, uint32_t *physical){
   log(LOG_SERIAL, false, "test %p\n", placement_address);
-  if (kheap != 0){
+  /*if (kheap != 0){
       void *addr = alloc(size, (uint8_t)align, kheap);
 		if (physical != 0) {
 			page_t *page = get_page( (uint32_t)addr, 0, kernel_directory );
 			*physical = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
 		}
 		return (uint32_t)addr;
-  } else {
+  } else {*/
   if (align == 1 && (placement_address & 0x00000FFF)){
     placement_address &= 0xFFFFF000;
     placement_address += 0x1000;
@@ -32,7 +32,7 @@ uint32_t kmalloc_internal(uint32_t size, int align, uint32_t *physical){
   placement_address += size;
   log(LOG_SERIAL, false, "fin kmalloc %p\n", placement_address);
   return tmp;
-  }
+  //}
 } 
 
 void kfree(void *p)
@@ -88,9 +88,10 @@ static void expand(uint32_t new_size, heap_t *heap){
 static uint32_t contract(uint32_t new_size, heap_t *heap)
 {
 	// Sanity check.
-	if (!(new_size < heap->end_address - heap->start_address)){
-    return;
-  }
+	if (new_size < heap->end_address - heap->start_address){
+	log(LOG_SERIAL, false, "new size too small in contract for kheap \n");
+    abort();
+  	}
 
 	// Get the nearest following page boundary.
 	if (new_size & 0x1000) {
@@ -124,7 +125,7 @@ static int32 find_smallest_hole(uint32_t size, uint8_t page_align, heap_t *heap)
 			// Page-align the starting point of this header.
 			uint32_t location	= (uint32_t)header;
 			int32 offset	= 0;
-			if ( (location + sizeof(header_t)) & 0xFFFFF000 != 0 )
+			if ((location + sizeof(header_t) & 0xFFFFF000) != 0)
 				offset = 0x1000 /* page size */ - (location + sizeof(header_t))%0x1000;
 			int32 hole_size = (int32)header->size - offset;
 			// Can we fit now?
@@ -153,12 +154,14 @@ heap_t *create_heap(uint32_t start, uint32_t end_addr, uint32_t max, uint8_t sup
   log(LOG_SERIAL, false, "%p\n", heap);
 
 	// All our assumptions are made on startAddress and endAddress being page-aligned.
-	if(!(start%0x1000 == 0)){
-    return;
-  }
-	if (!(end_addr%0x1000 == 0)){
-    return;
-  }
+	if(start%0x1000 != 0){
+    log(LOG_SERIAL, false, "heap start adress not aligned\n");
+	abort();
+  	}
+	if (end_addr%0x1000 != 0){
+    log(LOG_SERIAL, false, "heap end adress not aligned\n");
+	abort();
+  	}
 	// Initialize the index.
 	heap->index = place_ordered_array( (void*)start, HEAP_INDEX_SIZE, &header_t_less_than );
 
@@ -192,7 +195,7 @@ void *alloc(uint32_t size, uint8_t page_align, heap_t *heap){
 	// Make sure we take the size of header/footer into account.
 	uint32_t new_size = size + sizeof(header_t) + sizeof(footer_t);
 	// Find the smallest hole that will fit.
-	uint32_t iterator = find_smallest_hole(new_size, page_align, heap);
+	int32 iterator = find_smallest_hole(new_size, page_align, heap);
 
 	if (iterator == -1) { // If we didn't find a suitable hole
 		// Save some previous data.

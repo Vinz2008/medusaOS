@@ -1,3 +1,5 @@
+#include <types.h>
+
 struct tar_header
 {
     char filename[100];
@@ -9,6 +11,10 @@ struct tar_header
     char checksum[8];
     char typeflag[1];
 };
+
+typedef struct {
+   uint32_t nfiles; // The number of files in the ramdisk.
+} initrd_header_t;
 
 
 unsigned int getsize(const char *in);

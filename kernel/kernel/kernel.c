@@ -22,6 +22,7 @@
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
 extern uint32_t end;
+extern uint32_t placement_address;
 
 multiboot_info_t *mb_info;
 multiboot_module_t *mod;
@@ -58,16 +59,28 @@ void kernel_main(multiboot_info_t* mbd) {
 	log(LOG_SERIAL, false, "SSE initialized\n");
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
-	//paging_enable();
-	//initialise_paging();
-	//log(LOG_SERIAL, false, "Paging enabled\n");
+	if (mb_info->mods_count > 0){
+		mod = (multiboot_module_t *) mb_info->mods_addr;
+		uint32_t initrd_location = *((uint32_t*)mb_info->mods_addr);
+   		uint32_t initrd_end = *(uint32_t*)(mb_info->mods_addr+4);
+		placement_address = initrd_end;
+		write_serialf("module loaded\n");
+		write_serialf("disk image: Module starts at %p and ends at %p\n",initrd_location, initrd_end);
+		//write_serialf("number of files : %d\n", initrd_get_number_files(mod->mod_start));
+	}
+	write_serialf("modules %d\n", mb_info->mods_count);
+	unsigned int* modules = (unsigned int*)mb_info->mods_addr;
+	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);
 	int* test = kmalloc(sizeof(int));
+	*test = 2;
+	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
+	//paging_enable();
+	/*initialise_paging();
+	log(LOG_SERIAL, false, "Paging enabled\n");*/
 	int* test2 = kmalloc(sizeof(int));
 	int* test3 = kmalloc(sizeof(int));
-	*test = 2;
 	*test2 = 4;
 	*test3 = 6;
-	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
 	log(LOG_SERIAL, false, "end of the kernel : %p\n", &end);
@@ -85,17 +98,6 @@ void kernel_main(multiboot_info_t* mbd) {
 	/*if (CHECK_FLAG (mb_info->flags, 2)){
     printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 	}*/
-	if (mb_info->mods_count > 0){
-		mod = (multiboot_module_t *) mb_info->mods_addr;
-		write_serialf("module loaded\n");
-		write_serialf("disk image: Module starts at %p and ends at %p\n", (int)mod->mod_start, (int)mod->mod_end);
-		write_serialf("number of files : %d\n", initrd_get_number_files(mod->mod_start));
-	}
-	write_serialf("modules %d\n", mb_info->mods_count);
-	unsigned int* modules = (unsigned int*)mbd->mods_addr;
-	write_serialf("addr %p\n", mb_info->mods_addr);
-	
-	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);
 	//printf("\x9B1;31m\n");
 	printf("> ");
 	while(1);

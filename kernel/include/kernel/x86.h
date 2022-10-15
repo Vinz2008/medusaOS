@@ -30,5 +30,4 @@ static inline void x86_halt(void){
 		    "hlt");
 }
 
-extern shutdown;
 #endif

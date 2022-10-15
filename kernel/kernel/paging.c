@@ -113,6 +113,7 @@ void paging_enable(){
 void initialise_paging(){
    // The size of physical memory. For the moment we
    // assume it is 16MB big.
+   log(LOG_SERIAL, false, "placement_address : %p\n", placement_address);
    uint32_t mem_end_page = 0x1000000;
 
    nframes = mem_end_page / 0x1000;
