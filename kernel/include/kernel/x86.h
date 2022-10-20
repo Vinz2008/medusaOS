@@ -3,7 +3,7 @@
 #ifndef __x86_H__
 #define __x86_H__
 typedef struct x86_32_iframe {
-    uint32_t di, si, bp, sp, bx, dx, cx, ax; 
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; 
     uint32_t ds, es, fs, gs;                        
     uint32_t vector;                                 
     uint32_t err_code;                                
@@ -12,6 +12,8 @@ typedef struct x86_32_iframe {
 } x86_iframe_t ;
 
 typedef x86_iframe_t registers_t;
+
+uint8_t interrupt_x86(int interrupt_num, registers_t* regs);
 
 static uint64_t ticks = 0;
 

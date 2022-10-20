@@ -284,6 +284,8 @@ void launch_command(){
 		printf("help : print this help\n");
 	} else if (startswith("arch", line_cli)){
 		printf("\ni386");
+	} else if (startswith("gui", line_cli)){
+		
 	} else if (startswith("reboot", line_cli)){
 		reboot();
 	} else if (startswith("thirdtemple", line_cli)){

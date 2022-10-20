@@ -4,11 +4,11 @@
 
 
 void syscall_handler(x86_iframe_t * frame){
-    switch (frame->ax){
+    switch (frame->eax){
     case SYS_READ:
         break;
     case SYS_WRITE:
-        vfs_write_fd(frame->di, frame->si, frame->dx);
+        vfs_write_fd(frame->edi, frame->esi, frame->edx);
         break;
     
     default:

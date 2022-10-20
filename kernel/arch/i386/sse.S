@@ -1,10 +1,10 @@
 .global sse_available
 
 sse_available:
-    mov $0x1, %eax
+    movl $0x1, %eax
     cpuid
     test %edx, 1 << 25
-    mov $0x1, %eax
+    movl $0x1, %eax
     jnz good
     mov $0, %eax
 

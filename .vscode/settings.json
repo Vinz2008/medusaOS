@@ -17,7 +17,8 @@
     "io.h": "c",
     "vfs.h": "c",
     "ordered_array.h": "c",
-    "serial.h": "c"
+    "serial.h": "c",
+    "*.tcc": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",
