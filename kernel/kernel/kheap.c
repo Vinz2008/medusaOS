@@ -13,14 +13,14 @@ heap_t *kheap = 0;
 
 uint32_t kmalloc_internal(uint32_t size, int align, uint32_t *physical){
   log(LOG_SERIAL, false, "test %p\n", placement_address);
-  /*if (kheap != 0){
+  if (kheap != 0){
       void *addr = alloc(size, (uint8_t)align, kheap);
 		if (physical != 0) {
 			page_t *page = get_page( (uint32_t)addr, 0, kernel_directory );
 			*physical = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
 		}
 		return (uint32_t)addr;
-  } else {*/
+  } else {
   if (align == 1 && (placement_address & 0x00000FFF)){
     placement_address &= 0xFFFFF000;
     placement_address += 0x1000;
@@ -32,7 +32,7 @@ uint32_t kmalloc_internal(uint32_t size, int align, uint32_t *physical){
   placement_address += size;
   log(LOG_SERIAL, false, "fin kmalloc %p\n", placement_address);
   return tmp;
-  //}
+  }
 } 
 
 void kfree(void *p)

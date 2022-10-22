@@ -93,7 +93,6 @@ void handle_exception(uint32_t vector)
 {
     printf("Exception raised: ");
     printf(exception_messages[vector]);
-
     x86_halt();
 }
 
