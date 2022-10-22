@@ -202,7 +202,7 @@ void page_fault(x86_iframe_t* regs){
    if (rw) {printf("read-only ");}
    if (us) {printf("user-mode ");}
    if (reserved) {printf("reserved ");}
-   printf(") at 0x%p\n", faulting_address);
+   printf(") at %p\n", faulting_address);
    log(LOG_ALL, 0,"Page fault");
    x86_halt();
 } 
