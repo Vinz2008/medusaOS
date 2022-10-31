@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <multiboot.h>
+#include <kernel/config.h>
+#include <kernel/gui.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
@@ -11,7 +13,6 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/nmi.h>
-#include <kernel/tty.h>
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/rtc.h>
@@ -29,7 +30,11 @@ multiboot_module_t *mod;
 
 void kernel_main(multiboot_info_t* mbd) {
 	mb_info = mbd;
+#if GUI_MODE
+	init_gui();
+#else
 	terminal_initialize();
+#endif
 	init_serial();
 	write_serial("LOG START\n");
 	descriptor_tables_initialize();
@@ -44,6 +49,8 @@ void kernel_main(multiboot_info_t* mbd) {
     log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
     irq_register_handler(1, sys_key_handler);
     log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");
+#if GUI_MODE
+#else
 	char timer_str[] = "System timer is ticking\n";
     terminal_tick_init(sizeof(timer_str));
 	terminal_enable_tick();
@@ -52,6 +59,7 @@ void kernel_main(multiboot_info_t* mbd) {
     terminal_keypress_init(sizeof(key_str));
 	terminal_enable_keypress();
     puts(key_str);
+#endif
 	x86_enable_int();
 	NMI_enable();
 	log(LOG_SERIAL, false, "NMI enabled\n");
@@ -88,17 +96,23 @@ void kernel_main(multiboot_info_t* mbd) {
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
     //uint32_t do_page_fault = *ptr;
 	int i = 1233;
+#if GUI_MODE
+#else
 	printf("Welcome to kernel %i\n", i);
 	printf("This kernel is made using the osdev wiki\n");
 	printf("Press ESC to reboot\n");
 	alert("error : %s\n", "string");
 	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
+#endif
 	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");
 	read_rtc_date();
 	/*if (CHECK_FLAG (mb_info->flags, 2)){
     printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 	}*/
 	//printf("\x9B1;31m\n");
+#if GUI_MODE
+#else
 	printf("> ");
+#endif
 	while(1);
 }
