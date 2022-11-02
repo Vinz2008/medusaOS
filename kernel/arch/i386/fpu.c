@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <kernel/fpu.h>
 
 void fpu_init() {
