@@ -19,7 +19,6 @@
 #include <kernel/kheap.h>
 #include <kernel/syscall.h>
 
-#define SYSTEM_TICKS_PER_SEC 100
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
 extern uint32_t end;
@@ -48,7 +47,7 @@ void kernel_main(multiboot_info_t* mbd) {
     irq_register_handler(0, sys_tick_handler);
     log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
     irq_register_handler(1, sys_key_handler);
-    log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");
+    log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");	
 #if GUI_MODE
 #else
 	char timer_str[] = "System timer is ticking\n";

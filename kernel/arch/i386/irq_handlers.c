@@ -46,9 +46,9 @@ void handle_platform_irq(x86_iframe_t* frame){
 }
 
 void sys_tick_handler(x86_iframe_t* frame){
+    ++ticks;
     if (tick_animation_enabled == true){
-    const char ticks_anim_chars[] = {'-', '/', '|', '\\'};
-    ++ticks; 
+    const char ticks_anim_chars[] = {'-', '/', '|', '\\'}; 
     size_t ti = ticks%4;
     terminal_tick(ticks_anim_chars[ti]);
     }

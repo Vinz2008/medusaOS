@@ -38,6 +38,8 @@ stdio/fputs.o \
 stdio/modes.o \
 stdio/log.o \
 stdlib/abort.o \
+stdlib/atoi.o \
+stdlib/strtol.o \
 stdlib/stack_chk.o \
 string/memcmp.o \
 string/memcpy.o \
@@ -53,6 +55,7 @@ string/startswith.o \
 string/strcpy.o \
 errno/perror.o \
 syscalls/syscalls.o \
+ctype/ctype.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
