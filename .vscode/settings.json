@@ -18,7 +18,8 @@
     "vfs.h": "c",
     "ordered_array.h": "c",
     "serial.h": "c",
-    "*.tcc": "c"
+    "*.tcc": "c",
+    "speaker.C": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

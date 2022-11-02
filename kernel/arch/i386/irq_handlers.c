@@ -8,6 +8,7 @@
 #include <kernel/misc.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
+#include <kernel/pit.h>
 #include <kernel/tty.h>
 
 extern bool tick_animation_enabled;
@@ -53,6 +54,16 @@ void sys_tick_handler(x86_iframe_t* frame){
     terminal_tick(ticks_anim_chars[ti]);
     }
     pic_send_EOI(IRQ_PIT);
+}
+
+void sys_sleep(int seconds){
+    log(LOG_SERIAL, false, "seconds to wait : %d\n", seconds);
+    uint64_t sleep_ticks = ticks + (seconds * SYSTEM_TICKS_PER_SEC);
+    log(LOG_SERIAL, false, "start tick : %d\n", ticks);
+    log(LOG_SERIAL, false, "end tick : %d\n", sleep_ticks);
+    while(ticks < sleep_ticks){
+        log(LOG_SERIAL, false, "tick : %d\n", ticks);
+    }
 }
 
 void sys_key_handler(x86_iframe_t* frame){

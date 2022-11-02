@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <multiboot.h>
 #include <kernel/tty.h>
 #include <kernel/io.h>
@@ -281,6 +283,8 @@ void launch_command(){
 		printf("echo : print string\n");
 		printf("ls : list directory and files\n");
 		printf("clear : clear screen\n");
+		printf("reboot : reboot the computer\n");
+		printf("thirdtemple : ...\n");
 		printf("help : print this help\n");
 	} else if (startswith("arch", line_cli)){
 		printf("\ni386");
@@ -288,6 +292,21 @@ void launch_command(){
 		
 	} else if (startswith("reboot", line_cli)){
 		reboot();
+	} else if (startswith("beep", line_cli)){
+		beep();
+	} else if (startswith("sleep", line_cli)){
+		char temp[95];
+		int i2 = 6;
+		for (int i = 0; i < strlen(line_cli); i++){
+			if (!isalnum(line_cli[i2])){
+				break;
+			}
+			printf("\nc[%d] : %c\n", i2, line_cli[i2]);
+			temp[i] = line_cli[i2];
+			i2++;
+		}
+		int seconds = atoi(temp);
+		sys_sleep(seconds);
 	} else if (startswith("thirdtemple", line_cli)){
 		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
 	} else {

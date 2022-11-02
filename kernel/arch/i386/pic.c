@@ -8,6 +8,13 @@
 
 #define PIC_ICW_1 0x11
 
+#define PIC_WAIT() do {         \
+        asm ("jmp 1f\n\t"       \
+                "1:\n\t"        \
+                "    jmp 2f\n\t"\
+                "2:");          \
+    } while (0)
+
 void pic_init(void){
     // ICW #1
     outb(PIC_MASTER_REG, PIC_ICW_1);
