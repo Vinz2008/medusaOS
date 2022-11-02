@@ -13,6 +13,7 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/nmi.h>
+#include <kernel/fpu.h>
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/rtc.h>
@@ -64,6 +65,8 @@ void kernel_main(multiboot_info_t* mbd) {
 	log(LOG_SERIAL, false, "NMI enabled\n");
 	sse_init();
 	log(LOG_SERIAL, false, "SSE initialized\n");
+	fpu_init();
+	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
 	if (mb_info->mods_count > 0){
