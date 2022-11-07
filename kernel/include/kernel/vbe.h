@@ -1,3 +1,5 @@
+#include <types.h>
+
 
 #ifndef VBE_HEADER_
 #define VBE_HEADER_

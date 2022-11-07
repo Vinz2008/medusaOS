@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <kernel/x86.h>
 
-VbeInfoBlock *vib;
+struct VbeInfoBlock *vib;
 
 void vbe_controller_info(){
     

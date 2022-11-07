@@ -1,0 +1,1 @@
+cmake -DARCH:STRING=i386 -G Ninja .
