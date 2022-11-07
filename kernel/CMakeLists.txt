@@ -3,19 +3,8 @@ PROJECT(kernel)
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libc/include)
 
-SET(FIRST_PART_HOST "i686")
 
-if(ARCH STREQUAL "i386")
-SET(FIRST_PART_HOST "i686")
-endif()
 
-SET(HOST "${FIRST_PART_HOST}-elf")
-
-set(CMAKE_C_COMPILER "${HOST}-gcc")
-message("${CMAKE_C_COMPILER}")
-SET(CMAKE_C_LINK_EXECUTABLE "${HOST}-ld")
-
-set(CMAKE_SYSROOT "${CMAKE_SOURCE_DIR}/sysroot")
 
 
 #set(CMAKE_C_COMPILER "${CMAKE_C_COMPILER} --sysroot=${SYSROOT}")
@@ -27,16 +16,23 @@ set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -g -ffreestanding -Wall -Wextra")
 SET(CMAKE_CXX_FLAGS "{CMAKE_CXX_FLAGS} -D__is_kernel -Iinclude")
-link_libraries( "-nostdlib -lk -lgcc")
+link_libraries( "-nostdlib -lgcc")
 
-SET(KERNEL_BIN "kernel.kernel")
+SET(KERNEL_BIN "kernel")
 
 FILE(GLOB KERNEL_C_ARCH_MODULES "arch/${ARCH}/*.c")
+FILE(GLOB KERNEL_ASM_ARCH_MODULES "arch/${ARCH}/*.S")
+list(REMOVE_ITEM KERNEL_ASM_ARCH_MODULES "arch/${ARCH}/boot.S")
 FILE(GLOB KERNEL_C_MODULES "kernel/*.c")
 
 ADD_LIBRARY(${KERNEL_BIN} STATIC
     ${KERNEL_C_ARCH_MODULES}
     ${KERNEL_C_MODULES}
+    ${KERNEL_ASM_ARCH_MODULES}
 )
 
-set_target_properties(${KERNEL_BIN} PROPERTIES LINK_FLAGS "-n -T${CMAKE_SOURCE_DIR}/arch/${ARCH}/linker.ld")
+#set_target_properties(${KERNEL_BIN} PROPERTIES LINK_FLAGS "-n -T${CMAKE_SOURCE_DIR}/arch/${ARCH}/linker.ld")
+
+#ADD_CUSTOM_COMMAND (TARGET ${KERNEL_BIN}
+#	POST_BUILD
+#	COMMAND "${CMAKE_C_COMPILER} -T${CMAKE_SOURCE_DIR}/arch/${ARCH}/linker.ld -o ${KERNEL_BIN} ${CMAKE_BINARY_DIR}/libkernel.img.a")
