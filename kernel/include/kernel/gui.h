@@ -13,3 +13,5 @@ void init_gui();
 void draw_line_horizontal(int x0, int x1, int y, uint32_t col);
 void draw_line_vertical(int x, int y0, int y1, uint32_t col);
 void draw_line(int x0, int y0, int x1, int y1, uint32_t col);
+void draw_char(char c, int x, int y, uint32_t col);
+void draw_string(const char* str, int x, int y, uint32_t col);

@@ -207,7 +207,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 
 #if GUI_MODE
 	init_gui();
-	draw_line_vertical(100, 10, 250, 0xFFFFFF);
+	//draw_line_vertical(100, 10, 250, 0xFFFFFF);
+	draw_string("MEDUSAOS", 100, 250, 0xFFFFFF);
 #else
 	terminal_initialize();
 #endif

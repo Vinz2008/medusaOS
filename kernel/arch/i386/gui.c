@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <math.h>
 #include <kernel/fb.h>
 #include <kernel/gui.h>
 #include <kernel/font.h>
@@ -124,7 +126,7 @@ void draw_line(int x0, int y0, int x1, int y1, uint32_t col){
     }
 }
 
-void draw_psf(char c, int x, int y, uint32_t col){
+void draw_char(char c, int x, int y, uint32_t col){
     uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
     for (int i = 0; i < 16; i ++){
         for (int j = 0; j < 8; j++){
@@ -132,5 +134,12 @@ void draw_psf(char c, int x, int y, uint32_t col){
                 draw_pixel(x + 8 - j, y + i, col);
             }
         }
+    }
+}
+
+void draw_string(const char* str, int x, int y, uint32_t col){
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len; i++) {
+        draw_char(str[i], x + 8*i, y, col);
     }
 }
