@@ -22,6 +22,6 @@ int atexit(void (*func)(void));
 int atoi(const char *str);
 char *getenv(const char *name);
 void *calloc(size_t nitems, size_t size);
-int abs(int x);
+//int abs(int x);
 
 #endif

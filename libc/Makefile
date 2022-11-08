@@ -56,6 +56,7 @@ string/strcpy.o \
 errno/perror.o \
 syscalls/syscalls.o \
 ctype/ctype.o \
+math/math.o \
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \

@@ -1,1 +1,5 @@
- bochs -f bochsrc.txt -q
+#!/bin/sh
+set -e
+. ./iso.sh
+
+bochs -f bochsrc.txt -q

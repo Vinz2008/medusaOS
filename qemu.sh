@@ -2,7 +2,7 @@
 set -e
 . ./iso.sh
 
-qemu-system-$(./target-triplet-to-arch.sh $HOST) \
+qemu-system-$(./target-triplet-to-arch.sh $HOST) -s \
  -boot order=d \
  -drive file=disk.img,format=raw,media=disk,if=ide \
  -drive file=kernel.iso,media=cdrom,readonly=on \

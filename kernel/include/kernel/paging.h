@@ -1,43 +1,37 @@
 #include <kernel/descriptors_tables.h>
 #include <kernel/x86.h>
 
-typedef struct page
-{
-   uint32_t present    : 1;   // Page present in memory
-   uint32_t rw         : 1;   // Read-only if clear, readwrite if set
-   uint32_t user       : 1;   // Supervisor level only if clear
-   uint32_t accessed   : 1;   // Has the page been accessed since last refresh?
-   uint32_t dirty      : 1;   // Has the page been written to since last refresh?
-   uint32_t unused     : 7;   // Amalgamation of unused and reserved bits
-   uint32_t frame      : 20;  // Frame address (shifted right 12 bits)
-} page_t;
 
-typedef struct page_table
-{
-   page_t pages[1024];
-} page_table_t;
+#define PHYS_TO_VIRT(addr) ((addr) + KERNEL_BASE_VIRT)
+#define VIRT_TO_PHYS(addr) ((addr) - KERNEL_BASE_VIRT)
 
-typedef struct page_directory
-{
-   /* Array of pointers to pagetables. */
-   page_table_t *tables[1024];
-   /* Array of pointers to the pagetables above, but gives their *physical*
-      location, for loading into the CR3 register. */
-   uint32_t tablesPhysical[1024];
-   /* The physical address of tablesPhysical. This comes into play
-      when we get our kernel heap allocated and the directory
-      may be in a different location in virtual memory. */
-   uint32_t physicalAddr;
-} page_directory_t;
+typedef uint32_t directory_entry_t;
+typedef uint32_t page_t;
 
-void initialise_paging();
+void init_paging(uint32_t addr);
+uintptr_t paging_get_kernel_directory();
+page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags);
+void paging_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags);
+void paging_unmap_page(uintptr_t virt);
+void paging_map_pages(uintptr_t phys, uintptr_t virt, uint32_t num, uint32_t flags);
+void paging_unmap_pages(uintptr_t virt, uint32_t num);
+void paging_switch_directory(uintptr_t dir_phys);
+void paging_invalidate_cache();
+void paging_invalidate_page(uintptr_t virt);
+void paging_fault_handler(registers_t* regs);
+void* paging_alloc_pages(uint32_t virt, uint32_t num);
+void paging_free_pages(uintptr_t virt, uint32_t num);
+uintptr_t paging_virt_to_phys(uintptr_t virt);
 
-void paging_enable();
+#define KERNEL_BASE_VIRT 0xC0000000
+#define KERNEL_END_MAP 0xC0400000
+#define KERNEL_HEAP_BEGIN KERNEL_END_MAP
+#define KERNEL_HEAP_SIZE 0x1E00000
 
-void switch_page_directory(page_directory_t *new);
+#define PAGE_PRESENT 1
+#define PAGE_RW      2
+#define PAGE_USER    4
+#define PAGE_LARGE   128
 
-page_t *get_page(uint32_t address, int make, page_directory_t *dir);
-
-void page_fault(x86_iframe_t* regs);
-void alloc_frame(page_t *page, int is_kernel, int is_writeable);
-void free_frame(page_t *page);
+#define PAGE_FRAME   0xFFFFF000
+#define PAGE_FLAGS   0x00000FFF

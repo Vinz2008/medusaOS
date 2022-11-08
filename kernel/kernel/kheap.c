@@ -5,8 +5,9 @@
 #include <stdio.h>
 
 
-extern uint32_t end;
-uint32_t placement_address = (uint32_t)&end /*+ 0x1000*/;
+
+extern uint32_t KERNEL_END;
+uint32_t placement_address = (uint32_t)&KERNEL_END /*+ 0x1000*/;
 extern page_directory_t *kernel_directory;
 heap_t *kheap = 0;
 //uint32_t placement_address = (uint32_t)0x10000;
@@ -16,8 +17,8 @@ uint32_t kmalloc_internal(uint32_t size, int align, uint32_t *physical){
   if (kheap != 0){
       void *addr = alloc(size, (uint8_t)align, kheap);
 		if (physical != 0) {
-			page_t *page = get_page( (uint32_t)addr, 0, kernel_directory );
-			*physical = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
+			//page_t *page = get_page( (uint32_t)addr, 0, kernel_directory );
+			//*physical = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
 		}
 		return (uint32_t)addr;
   } else {
@@ -78,7 +79,7 @@ static void expand(uint32_t new_size, heap_t *heap){
 
 	uint32_t i = old_size;
 	while (i < new_size) {
-		alloc_frame(get_page(heap->start_address + i, 1, kernel_directory), (heap->supervisor) ? 1 : 0, (heap->readonly) ? 0 : 1 );
+		//alloc_frame(get_page(heap->start_address + i, 1, kernel_directory), (heap->supervisor) ? 1 : 0, (heap->readonly) ? 0 : 1 );
 		i += 0x1000 /* page_size*/;
 	}
 
@@ -106,7 +107,7 @@ static uint32_t contract(uint32_t new_size, heap_t *heap)
 	uint32_t old_size = heap->end_address - heap->start_address;
 	uint32_t i = old_size - 0x1000;
 	while (new_size < i) {
-		free_frame(get_page(heap->start_address + i, 0, kernel_directory) );
+		//free_frame(get_page(heap->start_address + i, 0, kernel_directory) );
 		i -=0x1000;
 	}
 

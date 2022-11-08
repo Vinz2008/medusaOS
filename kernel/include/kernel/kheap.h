@@ -1,5 +1,6 @@
 #include <types.h>
 
+/*
 #include <kernel/ordered_array.h>
 
 
@@ -41,3 +42,4 @@ uint32_t kmalloc_physical(uint32_t size, uint32_t *physical); // returns a physi
 uint32_t kmalloc_aligned_physical(uint32_t size, uint32_t *physical); // page aligned and returns a physical address.
 uint32_t kmalloc(uint32_t size); // vanilla (normal). 
 void kfree(void *p); // General deallocation function.
+*/

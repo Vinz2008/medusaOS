@@ -10,3 +10,5 @@ memtest86plus
 build/
 sysroot-x86_64
 iso-x86_64
+bochs-serial.log
+bochs.log

@@ -19,7 +19,14 @@
     "ordered_array.h": "c",
     "serial.h": "c",
     "*.tcc": "c",
-    "speaker.C": "cpp"
+    "speaker.C": "cpp",
+    "gui.h": "c",
+    "multiboot2.h": "c",
+    "syscall.h": "c",
+    "multiboot2_internal.h": "c",
+    "string.h": "c",
+    "math.h": "c",
+    "fb.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",
@@ -50,5 +57,6 @@
     "**/.*/**",
     "**/.vscode",
     "**/.vscode/**"
-  ]
+  ],
+  "cmake.configureOnOpen": false
 }

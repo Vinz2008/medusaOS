@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <multiboot.h>
+#include <multiboot2.h>
 #include <kernel/config.h>
 #include <kernel/gui.h>
 #include <kernel/tty.h>
@@ -17,30 +17,207 @@
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/rtc.h>
-#include <kernel/kheap.h>
+#include <kernel/fb.h>
+#include <kernel/pmm.h>
 #include <kernel/syscall.h>
 
+#define _KERNEL_
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
-extern uint32_t end;
+extern uint32_t KERNEL_BEGIN_PHYS;
+extern uint32_t KERNEL_END_PHYS;
+extern uint32_t KERNEL_SIZE;
+
+
+extern uint32_t KERNEL_END;
 extern uint32_t placement_address;
 
-multiboot_info_t *mb_info;
-multiboot_module_t *mod;
+//multiboot_info_t *mb_info;
+//multiboot_module_t *mod;
+struct multiboot_tag *tag;
 
-void kernel_main(multiboot_info_t* mbd) {
-	mb_info = mbd;
+void kernel_main(uint32_t addr, uint32_t magic) {
+	init_serial();
+	write_serial("LOG START\n");
+	init_pmm(addr);
+    init_paging(addr);
+	log(LOG_SERIAL, false, "MedusaOS\n");
+	log(LOG_SERIAL, false, "kernel is %d KiB large\n", ((uint32_t) &KERNEL_SIZE) >> 0);
+	//mb_info = mbd;
+	struct multiboot_tag *tag;
+	unsigned size;
+	if (magic != MULTIBOOT2_BOOTLOADER_MAGIC){
+		log(LOG_SERIAL, false, "Invalid magic number %x\n", magic);
+
+	}
+	if (addr & 7){
+      log(LOG_SERIAL, false, "Unaligned mbi: %p\n", addr);
+      return;
+    }
+	size = *(unsigned *) addr;
+	log(LOG_SERIAL, false, "Annonced mbi size: %x\n", size);
+	for (tag = (struct multiboot_tag *)(addr+8); tag->type != MULTIBOOT_TAG_TYPE_END; tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag + ((tag->size + 7) & ~7))){
+		log(LOG_SERIAL, false, "Tag %x, Size %x\n", tag->type, tag->size);
+		switch (tag->type)
+		{
+		case MULTIBOOT_TAG_TYPE_CMDLINE:
+			log(LOG_SERIAL, false, "Command line = %s\n",((struct multiboot_tag_string *) tag)->string);
+			break;
+		case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
+          log(LOG_SERIAL, false, "Boot loader name = %s\n", ((struct multiboot_tag_string *) tag)->string);
+          break;
+		case MULTIBOOT_TAG_TYPE_MODULE:
+          log(LOG_SERIAL, false,"Module at %x-%x. Command line %s\n",
+                  ((struct multiboot_tag_module *) tag)->mod_start,
+                  ((struct multiboot_tag_module *) tag)->mod_end,
+                  ((struct multiboot_tag_module *) tag)->cmdline);
+          break;
+		case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
+          log(LOG_SERIAL, false,"mem_lower = %dKB, mem_upper = %dKB\n",
+                  ((struct multiboot_tag_basic_meminfo *) tag)->mem_lower,
+                  ((struct multiboot_tag_basic_meminfo *) tag)->mem_upper);
+          break;
+		case MULTIBOOT_TAG_TYPE_BOOTDEV:
+          log(LOG_SERIAL, false, "Boot device %x,%d,%d\n",
+                  ((struct multiboot_tag_bootdev *) tag)->biosdev,
+                  ((struct multiboot_tag_bootdev *) tag)->slice,
+                  ((struct multiboot_tag_bootdev *) tag)->part);
+          break;
+		case MULTIBOOT_TAG_TYPE_MMAP:
+          {
+            multiboot_memory_map_t *mmap;
+
+            log(LOG_SERIAL, false, "mmap\n");
+      
+            for (mmap = ((struct multiboot_tag_mmap *) tag)->entries;
+                 (multiboot_uint8_t *) mmap 
+                   < (multiboot_uint8_t *) tag + tag->size;
+                 mmap = (multiboot_memory_map_t *) 
+                   ((unsigned long) mmap
+                    + ((struct multiboot_tag_mmap *) tag)->entry_size))
+              log(LOG_SERIAL, false, " base_addr = %x%x,"
+                      " length = %x%x, type = %x\n",
+                      (unsigned) (mmap->addr >> 32),
+                      (unsigned) (mmap->addr & 0xffffffff),
+                      (unsigned) (mmap->len >> 32),
+                      (unsigned) (mmap->len & 0xffffffff),
+                      (unsigned) mmap->type);
+          }
+          break;
+		case MULTIBOOT_TAG_TYPE_FRAMEBUFFER:
+          {
+            multiboot_uint32_t color;
+            unsigned i;
+			
+            struct multiboot_tag_framebuffer *tagfb
+              = (struct multiboot_tag_framebuffer *) tag;
+            void *fb = (void *) (unsigned long) tagfb->common.framebuffer_addr;
+			log(LOG_SERIAL, false, "framebuffer type : %d\n", tagfb->common.framebuffer_type);
+			init_fb(tagfb);
+
+            /*switch (tagfb->common.framebuffer_type)
+              {
+              case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
+                {
+                  unsigned best_distance, distance;
+                  struct multiboot_color *palette;
+            
+                  palette = tagfb->framebuffer_palette;
+
+                  color = 0;
+                  best_distance = 4*256*256;
+            
+                  for (i = 0; i < tagfb->framebuffer_palette_num_colors; i++)
+                    {
+                      distance = (0xff - palette[i].blue) 
+                        * (0xff - palette[i].blue)
+                        + palette[i].red * palette[i].red
+                        + palette[i].green * palette[i].green;
+                      if (distance < best_distance)
+                        {
+                          color = i;
+                          best_distance = distance;
+                        }
+                    }
+                }
+                break;
+			  case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
+                color = ((1 << tagfb->framebuffer_blue_mask_size) - 1) 
+                  << tagfb->framebuffer_blue_field_position;
+                break;
+
+              case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
+                color = '\\' | 0x0100;
+                break;
+
+              default:
+                color = 0xffffffff;
+                break;
+              }
+			for (i = 0; i < tagfb->common.framebuffer_width
+                   && i < tagfb->common.framebuffer_height; i++)
+              {
+                switch (tagfb->common.framebuffer_bpp)
+                  {
+                  case 8:
+                    {
+                      multiboot_uint8_t *pixel = fb
+                        + tagfb->common.framebuffer_pitch * i + i;
+                      *pixel = color;
+                    }
+                    break;
+                  case 15:
+                  case 16:
+                    {
+                      multiboot_uint16_t *pixel
+                        = fb + tagfb->common.framebuffer_pitch * i + 2 * i;
+                      *pixel = color;
+                    }
+                    break;
+                  case 24:
+                    {
+                      multiboot_uint32_t *pixel
+                        = fb + tagfb->common.framebuffer_pitch * i + 3 * i;
+                      *pixel = (color & 0xffffff) | (*pixel & 0xff000000);
+                    }
+                    break;
+
+                  case 32:
+                    {
+                      multiboot_uint32_t *pixel
+                        = fb + tagfb->common.framebuffer_pitch * i + 4 * i;
+                      *pixel = color;
+                    }
+                    break;
+                  }
+              }*/
+            break;
+          } 	
+
+		}
+
+	}
+	log(LOG_SERIAL, false, "TEST\n");
+	tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
+                                  + ((tag->size + 7) & ~7));
+  	log(LOG_SERIAL, false, "Total mbi size 0x%x\n", (unsigned) tag - addr);
+
+
+
+
 #if GUI_MODE
 	init_gui();
+	draw_line_vertical(100, 10, 250, 0xFFFFFF);
 #else
 	terminal_initialize();
 #endif
-	init_serial();
-	write_serial("LOG START\n");
 	descriptor_tables_initialize();
+#if GUI_MODE
+#else
 	putchar(' ');
 	log(LOG_ALL, true, "gdt initialized\n");
 	log(LOG_ALL, true, "idt initialized\n");
+#endif
 	pit_init(SYSTEM_TICKS_PER_SEC);
 	log(LOG_ALL, true, "i8253 (PIT) initialized @%d hz\n", SYSTEM_TICKS_PER_SEC);
     pic_init();
@@ -69,7 +246,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
-	if (mb_info->mods_count > 0){
+	/*if (mb_info->mods_count > 0){
 		mod = (multiboot_module_t *) mb_info->mods_addr;
 		uint32_t initrd_location = *((uint32_t*)mb_info->mods_addr);
    		uint32_t initrd_end = *(uint32_t*)(mb_info->mods_addr+4);
@@ -80,7 +257,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	}
 	write_serialf("modules %d\n", mb_info->mods_count);
 	unsigned int* modules = (unsigned int*)mb_info->mods_addr;
-	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);
+	log(LOG_SERIAL, false, "available memory from bios : %d\n",mb_info->mem_lower);*/
 	int* test = kmalloc(sizeof(int));
 	*test = 2;
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test);
@@ -93,7 +270,7 @@ void kernel_main(multiboot_info_t* mbd) {
 	*test3 = 6;
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
-	log(LOG_SERIAL, false, "end of the kernel : %p\n", &end);
+	log(LOG_SERIAL, false, "end of the kernel : %p\n", &KERNEL_END);
 	//log(LOG_ALL, true, "Paging enabled\n");
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
     //uint32_t do_page_fault = *ptr;

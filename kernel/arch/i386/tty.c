@@ -10,16 +10,19 @@
 #include <kernel/io.h>
 #include <kernel/serial.h>
 #include <kernel/initrd.h>
+#include <kernel/paging.h>
 #include <kernel/misc.h>
+#include <kernel/fb.h>
 #include "vga.h"
 
 
 extern char keyboard_us[];
-extern multiboot_module_t *mod;
+//extern multiboot_module_t *mod;
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
-static uint16_t* const VGA_MEMORY = (uint16_t*) 0xB8000;
+//static uint16_t* const VGA_MEMORY = (uint16_t*) PHYS_TO_VIRT(0xB8000);
+static uint16_t* VGA_MEMORY = (uint16_t*) 0xB8000;
 
 static size_t terminal_row;
 static size_t terminal_column;
@@ -132,6 +135,10 @@ void terminal_clear(){
 
 
 void terminal_initialize() {
+	//VGA_MEMORY = (uint16_t*) PHYS_TO_VIRT(0xB8000);
+	//fb_t fb = fb_get_info();
+	//VGA_MEMORY = (uint16_t*) fb.address;
+	log(LOG_SERIAL, false, "vga memory : %p\n", VGA_MEMORY);
 	enable_cursor(0,0);
 	terminal_clear();
 	//update_cursor(3, 17);
@@ -277,7 +284,7 @@ void launch_command(){
 		}
 		printf("\n%s", temp);
 	} else if (startswith("ls", line_cli)){
-		initrd_list_filenames(mod->mod_start);
+		//initrd_list_filenames(mod->mod_start);
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");
