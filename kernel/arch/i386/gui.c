@@ -4,7 +4,15 @@
 #include <stdio.h>
 #include <kernel/fb.h>
 #include <kernel/gui.h>
+#include <kernel/font.h>
 #include <kernel/x86.h>
+
+typedef struct {
+    uint8_t magic[2];
+    uint8_t mode;
+    uint8_t height;
+} font_header_t;
+
 
 static fb_t fb;
 
@@ -112,6 +120,17 @@ void draw_line(int x0, int y0, int x1, int y1, uint32_t col){
             draw_line_high(x1, y1, x0, y0, col);
         } else {
             draw_line_high(x0, y0, x1, y1, col);
+        }
+    }
+}
+
+void draw_psf(char c, int x, int y, uint32_t col){
+    uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
+    for (int i = 0; i < 16; i ++){
+        for (int j = 0; j < 8; j++){
+            if (offset[i] & (1 << j)){
+                draw_pixel(x + 8 - j, y + i, col);
+            }
         }
     }
 }
