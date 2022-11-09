@@ -23,6 +23,7 @@ void reverse(char *str1);
 char *strcat(char *dest, const char *src);
 bool startswith(char str[], char code[]);
 char* strcpy(char* dst, const char* src);
+int strcmp(const char* s1, const char* s2);
 
 // Uninmplemented declarations for hosted cross compiler
 

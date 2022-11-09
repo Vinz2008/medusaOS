@@ -27,7 +27,10 @@
     "string.h": "c",
     "math.h": "c",
     "fb.h": "c",
-    "font.h": "c"
+    "font.h": "c",
+    "pmm.h": "c",
+    "ps2.h": "c",
+    "mouse.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

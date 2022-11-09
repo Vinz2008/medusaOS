@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <kernel/kmalloc.h>
 #include <kernel/vfs.h>
 
 static bool fprint(file_descriptor_t file, const char* data, size_t length) {
@@ -65,6 +66,30 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 			if (!fprint(file, str, len))
 				return -1;
 			written += len;
+			
+
+		} else if (*format == 'd') {
+			format++;
+			char i2[10];
+			memset(i2, 0, sizeof(i2));
+			//char* i2;
+			int i = va_arg(parameters, int);
+			int_to_ascii(i, i2);
+			int length = strlen(i2);
+			//log(LOG_SERIAL, false, "\nlength  i2 : %i\n", length);
+			char* i3 = NULL;
+			//i3 = kmalloc(length * sizeof(char));
+			//log(LOG_SERIAL, false, "\npointer i3 : %p\n", i3);
+			//strcpy(i3, i2);
+			//i3 = i2;
+			if (!maxrem) {
+				// TODO: Set errno to EOVERFLOW.
+				return -1;
+			}
+			if (!fprint(file, &i2, sizeof(i2) - (10 - length))) {
+				return -1;
+			}
+			written++;
 		} else if (*format == 'i') {
 			format++;
 			char i2[10];
@@ -72,27 +97,14 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
+			int length = strlen(i2);
+			//strcpy(i3, i2);
+			//i3 = i2;
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!fprint(file, &i2, sizeof(i2))) {
-				return -1;
-			}
-			written++;
-
-		} else if (*format == 'd') {
-			format++;
-			char i2[10];
-			memset(i2, 0, 10);
-			//char* i2;
-			int i = va_arg(parameters, int);
-			int_to_ascii(i, i2);
-			if (!maxrem) {
-				// TODO: Set errno to EOVERFLOW.
-				return -1;
-			}
-			if (!fprint(file, &i2, sizeof(i2))) {
+			if (!fprint(file, &i2, sizeof(i2) - (10 - length))) {
 				return -1;
 			}
 			written++;
@@ -103,11 +115,12 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 			//char* i2;
 			int i = va_arg(parameters, int);
 			int_to_ascii_base(i, i2, 16);
+			int length = strlen(i2);
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
 			}
-			if (!fprint(file, &i2, sizeof(i2))) {
+			if (!fprint(file, &i2, sizeof(i2) - (10 - length))) {
 				return -1;
 			}
 			written++;

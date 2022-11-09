@@ -10,6 +10,7 @@
 #include <kernel/keyboard.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/irq_handlers.h>
+#include <kernel/multiboot2_internal.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/nmi.h>
@@ -17,6 +18,7 @@
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/rtc.h>
+#include <kernel/ps2.h>
 #include <kernel/fb.h>
 #include <kernel/pmm.h>
 #include <kernel/syscall.h>
@@ -67,11 +69,18 @@ void kernel_main(uint32_t addr, uint32_t magic) {
           log(LOG_SERIAL, false, "Boot loader name = %s\n", ((struct multiboot_tag_string *) tag)->string);
           break;
 		case MULTIBOOT_TAG_TYPE_MODULE:
-          log(LOG_SERIAL, false,"Module at %x-%x. Command line %s\n",
-                  ((struct multiboot_tag_module *) tag)->mod_start,
-                  ((struct multiboot_tag_module *) tag)->mod_end,
-                  ((struct multiboot_tag_module *) tag)->cmdline);
-          break;
+            struct multiboot_tag_module* mod = (struct multiboot_tag_module*) tag;
+            log(LOG_SERIAL, false,"Module at %x-%x. Command line %s\n", mod->mod_start, mod->mod_end, mod->cmdline);
+            uint32_t size = mod->mod_end - mod->mod_start;
+            uint8_t* data = (uint8_t*) kmalloc(size);
+            memcpy(data, (void*) mod->mod_start, size);
+            if (strcmp(mod->cmdline, "initrd") == 0){
+                set_initrd_address(data);
+                initrd_list_filenames(data);
+            } else {
+
+            }
+            break;
 		case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
           log(LOG_SERIAL, false,"mem_lower = %dKB, mem_upper = %dKB\n",
                   ((struct multiboot_tag_basic_meminfo *) tag)->mem_lower,
@@ -225,8 +234,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_ALL, true, "i8259 (PIC) initialized\n");
     irq_register_handler(0, sys_tick_handler);
     log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
-    irq_register_handler(1, sys_key_handler);
-    log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");	
+    init_ps2();
+    //init_keyboard();
 #if GUI_MODE
 #else
 	char timer_str[] = "System timer is ticking\n";

@@ -284,7 +284,8 @@ void launch_command(){
 		}
 		printf("\n%s", temp);
 	} else if (startswith("ls", line_cli)){
-		//initrd_list_filenames(mod->mod_start);
+		uint32_t addr = get_initrd_address();
+		initrd_list_filenames(addr);
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");

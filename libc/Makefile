@@ -53,6 +53,7 @@ string/hex_to_ascii.o \
 string/strncat.o \
 string/startswith.o \
 string/strcpy.o \
+string/strcmp.o \
 errno/perror.o \
 syscalls/syscalls.o \
 ctype/ctype.o \

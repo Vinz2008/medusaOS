@@ -18,7 +18,10 @@ CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
 #LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
+LDFLAGS:=$(LDFLAGS) -Tmod.ld
+
 OBJS=\
+start.o \
 test_module.o \
 
 .PHONY: all clean install
@@ -31,8 +34,8 @@ $(LDFLAGS) \
 $(LIBS) \
 
 test_module.bin: $(OBJS) 
-# $(LD) -T linker.ld --oformat binary -o $@ $(OBJS)
-	objcopy -O binary -j .text $(OBJS) $@
+	$(LD) $(LDFLAGS) $(OBJS) -o $@
+# objcopy -O binary -j .text $(OBJS) $@
 
 
 .S.o: 

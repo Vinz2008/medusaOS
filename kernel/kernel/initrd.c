@@ -18,7 +18,18 @@ int nroot_nodes;                    // Number of file nodes.
 
 struct dirent dirent; 
 
-bool isInitrdInitialized = false;;
+bool isInitrdInitialized = false;
+
+static uint32_t initrd_adress;
+
+void set_initrd_address(uint32_t addr){
+    initrd_adress = addr;
+}
+
+uint32_t get_initrd_address(){
+    return initrd_adress;
+}
+
 
 unsigned int getsize(const char *in){
     unsigned int size = 0;

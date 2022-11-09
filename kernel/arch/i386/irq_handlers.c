@@ -4,10 +4,12 @@
 #include <stddef.h>
 #include <kernel/io.h>
 #include <kernel/x86.h>
+#include <kernel/ps2.h>
 #include <kernel/pic.h>
 #include <kernel/misc.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
+#include <kernel/mouse.h>
 #include <kernel/pit.h>
 #include <kernel/tty.h>
 
@@ -65,6 +67,7 @@ void sys_sleep(int seconds){
         log(LOG_SERIAL, false, "tick : %d\n", ticks);
     }
 }
+
 
 void sys_key_handler(x86_iframe_t* frame){
     // scan code https://wiki.osdev.org/PS/2_Keyboard

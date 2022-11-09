@@ -20,3 +20,6 @@ typedef struct {
 unsigned int getsize(const char *in);
 unsigned int initrd_get_number_files(unsigned int address);
 void initrd_list_filenames(unsigned int address);
+
+void set_initrd_adress(uint32_t addr);
+uint32_t get_initrd_adress();
