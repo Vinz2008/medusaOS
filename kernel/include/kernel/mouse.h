@@ -28,5 +28,7 @@ typedef struct {
     bool middle_pressed;
 } mouse_t;
 
+typedef void (*mouse_callback_t)(mouse_t);
+
 void mouse_handle_packet();
 void init_mouse(uint32_t dev);

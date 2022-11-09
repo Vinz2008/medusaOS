@@ -30,7 +30,8 @@
     "font.h": "c",
     "pmm.h": "c",
     "ps2.h": "c",
-    "mouse.h": "c"
+    "mouse.h": "c",
+    "kmalloc.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

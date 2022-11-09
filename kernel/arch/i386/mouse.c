@@ -7,7 +7,7 @@
 
 uint32_t device;
 mouse_t mouse_state;
-
+mouse_callback_t callback;
 
 uint32_t current_byte = 0;
 int32 bytes_per_packet = 3;
@@ -23,6 +23,18 @@ void sys_mouse_handler(x86_iframe_t* frame){
     if (current_byte == 0) {
         mouse_handle_packet();
     }
+}
+
+void mouse_set_callback(mouse_callback_t cb) {
+    callback = cb;
+}
+
+
+bool mouse_states_equal(mouse_t* a, mouse_t* b) {
+    return a->x == b->x && a->y == b->y &&
+           a->left_pressed == b->left_pressed &&
+           a->middle_pressed == b->middle_pressed &&
+           a->right_pressed == b->right_pressed;
 }
 
 
@@ -55,6 +67,10 @@ void mouse_handle_packet(){
 
     mouse_state.x += delta_x;
     mouse_state.y -= delta_y; // Point the y-axis downward
+    log(LOG_SERIAL, false, "mouse x : %d, y : %d", mouse_state.x, mouse_state.y);
+    if (!mouse_states_equal(&old_state, &mouse_state) && callback) {
+        callback(mouse_state);
+    }
 }
 
 void mouse_set_sample_rate(uint8_t rate) {

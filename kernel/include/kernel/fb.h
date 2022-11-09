@@ -1,5 +1,8 @@
 #include <multiboot2.h>
 
+#ifndef _FB_HEADER_
+#define _FB_HEADER_
+
 typedef struct {
     uintptr_t address;
     uint32_t pitch;
@@ -10,3 +13,4 @@ typedef struct {
 
 void init_fb(struct multiboot_tag_framebuffer *tagfb);
 fb_t fb_get_info();
+#endif

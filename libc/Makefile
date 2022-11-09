@@ -54,6 +54,7 @@ string/strncat.o \
 string/startswith.o \
 string/strcpy.o \
 string/strcmp.o \
+string/strdup.o \
 errno/perror.o \
 syscalls/syscalls.o \
 ctype/ctype.o \

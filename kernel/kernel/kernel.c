@@ -5,6 +5,7 @@
 #include <multiboot2.h>
 #include <kernel/config.h>
 #include <kernel/gui.h>
+#include <kernel/graphics.h>
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
@@ -217,7 +218,10 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 #if GUI_MODE
 	init_gui();
 	//draw_line_vertical(100, 10, 250, 0xFFFFFF);
-	draw_string("MEDUSAOS", 100, 250, 0xFFFFFF);
+    fb_t fb = fb_get_info();
+	draw_string(fb, "MEDUSAOS", 100, 250, 0xFFFFFF);
+    window_t* win = open_window("test window", 100, 100, 0);
+    draw_window(win);
 #else
 	terminal_initialize();
 #endif
