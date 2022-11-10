@@ -6,14 +6,175 @@
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/mouse.h>
+#include <kernel/list.h>
 #include <kernel/kmalloc.h>
 #include <kernel/x86.h>
 
+#define WM_EVENT_QUEUE_SIZE 5
 
 void wm_mouse_callback(mouse_t curr);
 
+static uint32_t id_count = 0;
+static list_t windows;
 static fb_t fb;
 static mouse_t mouse;
+static wm_window_t* focused;
+
+void wm_assign_z_orders() {
+    list_t* iter;
+    wm_window_t* win;
+    list_for_each(iter, win, &windows) {
+        if (win->flags & WM_BACKGROUND) {
+            list_del(iter);
+            list_add_front(&windows, win);
+            break;
+        }
+    }
+
+    list_for_each(iter, win, &windows) {
+        if (win->flags & WM_FOREGROUND) {
+            list_del(iter);
+            list_add(&windows, win);
+            break;
+        }
+    }
+}
+
+rect_t rect_from_window(wm_window_t* win) {
+    return (rect_t) {
+        .top = win->pos.y,
+        .left = win->pos.x,
+        .bottom = win->pos.y + win->kfb.height - 1,
+        .right = win->pos.x + win->kfb.width - 1
+    };
+}
+
+
+void wm_raise_window(wm_window_t* win) {
+    list_t* win_iter;
+    wm_window_t* win_bis;
+    wm_event_t event;
+    // Find the window's list_t* to maybe move it around
+    list_for_each(win_iter, win_bis, &windows) {
+        if (win_bis == win) {
+            break;
+        }
+    }
+    // This is the first window to be opened
+    if (!focused) {
+        focused = win;
+        event.type = WM_EVENT_GAINED_FOCUS;
+        ringbuffer_write(win->events, sizeof(wm_event_t), (uint8_t*)&event);
+        return;
+    }
+    // Nothing to do
+    if (win->flags & WM_BACKGROUND || focused == win) {
+        return;
+    }
+    // Change focus only then
+    event.type = WM_EVENT_LOST_FOCUS;
+    ringbuffer_write(focused->events, sizeof(wm_event_t), (uint8_t*)&event);
+    event.type = WM_EVENT_GAINED_FOCUS;
+    ringbuffer_write(win->events, sizeof(wm_event_t), (uint8_t*)&event);
+    focused = win;
+    list_t* topmost;
+    wm_window_t* w;
+    /* Find the top most non-foreground window; we'll move the raised window
+     * after it */
+    list_for_each_entry_rev(topmost, w, &windows) {
+        if (!(w->flags & WM_FOREGROUND)) {
+            break;
+        }
+    }
+    list_move(win_iter, topmost);
+    // Redraw if possible. Not sure this is this function's responsibility.
+    if (!(win->flags & WM_NOT_DRAWN)) {
+        //wm_draw_window(win, rect_from_window(win));
+    }
+}
+
+uint32_t wm_open_window(fb_t* buff, uint32_t flags) {
+    wm_window_t* win = (wm_window_t*) kmalloc(sizeof(wm_window_t));
+    *win = (wm_window_t) {
+        .ufb = *buff,
+        .kfb = *buff,
+        .id = ++id_count,
+        .flags = flags | WM_NOT_DRAWN,
+        .events = ringbuffer_new(WM_EVENT_QUEUE_SIZE * sizeof(wm_event_t))
+    };
+    win->kfb.address = (uintptr_t) kmalloc(buff->height*buff->pitch);
+    list_add_front(&windows, win);
+    //wm_assign_position(win);
+    wm_assign_z_orders();
+    //wm_raise_window(win);
+    return win->id;
+}
+
+void wm_draw_window(wm_window_t* win, rect_t rect) {
+/*
+    rect_t win_rect = rect_from_window(win);
+    
+    list_t* clip_windows = wm_get_windows_above(win);
+    list_t clip_rects = LIST_HEAD_INIT(clip_rects);
+
+    rect_add_clip_rect(&clip_rects, rect);
+
+    // Convert covering windows to clipping rects
+    while (!list_empty(clip_windows)) {
+        wm_window_t* cw = list_first_entry(clip_windows, wm_window_t);
+        list_del(list_first(clip_windows));
+        rect_t clip = rect_from_window(cw);
+        rect_subtract_clip_rect(&clip_rects, clip);
+    }
+
+    kfree(clip_windows);
+
+    // Draw what's left
+    rect_t* clip;
+    list_for_each_entry(clip, &clip_rects) {
+        if (rect_intersect(*clip, win_rect)) {
+            wm_partial_draw_window(win, *clip);
+        }
+    }
+
+    // Redraw the mouse
+    //rect_t mouse_rect = wm_mouse_to_rect(mouse);
+    //wm_draw_mouse(mouse_rect);
+
+    rect_clear_clipped(&clip_rects);*/
+}
+
+void wm_refresh_partial(rect_t clip) {
+    wm_window_t* win;
+	list_for_each_entry(win, &windows) {
+		rect_t rect = rect_from_window(win);
+
+		/*if (rect_intersect(&clip, &rect)) {
+			wm_draw_window(win, clip);
+		}*/
+	}
+
+	//fb_render(fb);
+}
+
+void render_window(window_t* win){
+    fb_t* wfb = &win->fb;
+    uintptr_t fb_off = fb.address + fb.pitch + fb.bpp/8;
+    memcpy(fb.address, wfb->address, sizeof(wfb->height*wfb->pitch));
+}
+
+void wm_render_window(uint32_t win_id, rect_t* clip) {
+	/*wm_window_t* win = wm_get_window(win_id);
+
+	if (!win) {
+		log(LOG_SERIAL, false, "[WM] Render called by invalid window, id %d\n", win_id);
+		return;
+	}
+	// Copy the window's buffer in the kernel
+	uint32_t win_size = win->ufb.height*win->ufb.pitch;
+	memcpy((void*) win->kfb.address, (void*) win->ufb.address, win_size);
+	wm_refresh_partial(rect_from_window(win));*/
+}
 
 window_t* open_window(const char* title, int width, int height, uint32_t flags){
     window_t* win = (window_t*) kmalloc(sizeof(window_t));
@@ -43,14 +204,17 @@ void draw_window(window_t* win){
     uint32_t border_color = 0x000000;
     uint32_t text_color = 0xFFFFFF;
     uint32_t border_color2 = 0x121212;
-    draw_rectangle(win->fb, 0, 0, win->width, win->height, bg_color);
+    log(LOG_SERIAL, false, "Drawing window\n");
+    draw_rectangle(win->fb, 10, 10, win->width, win->height, bg_color);
     draw_string(win->fb, win->title, 8, WM_TB_HEIGHT / 3, text_color);
-    draw_border(win->fb, 0, 0, win->width, win->height, border_color2);
+    draw_border(win->fb, 10, 10, win->width, win->height, border_color2);
 }
+
 
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
+    windows = LIST_HEAD_INIT(windows);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
     //mouse_set_callback(wm_mouse_callback);

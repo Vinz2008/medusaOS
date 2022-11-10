@@ -39,6 +39,8 @@ kernel/fb.o \
 kernel/multiboot2.o \
 kernel/pmm.o \
 kernel/kmalloc.o \
+kernel/list.o \
+kernel/ringbuffer.o \
 
 
 OBJS=\
