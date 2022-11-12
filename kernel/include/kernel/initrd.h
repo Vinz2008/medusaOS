@@ -1,4 +1,5 @@
 #include <types.h>
+#include <kernel/vfs.h>
 
 struct tar_header
 {
@@ -17,9 +18,19 @@ typedef struct {
 } initrd_header_t;
 
 
+typedef struct
+{
+	uint8_t	magic;		// Magic number, for error checking.
+	int8 name[64];	// Filename.
+	uint32_t	offset;		// Offset in the initrd that the file starts.
+	uint32_t	length;		// Length of the file.
+} initrd_file_header_t;
+
 unsigned int getsize(const char *in);
 unsigned int initrd_get_number_files(unsigned int address);
 void initrd_list_filenames(unsigned int address);
 
 void set_initrd_adress(uint32_t addr);
 uint32_t get_initrd_adress();
+
+fs_node_t *initialise_initrd(uint32_t location);

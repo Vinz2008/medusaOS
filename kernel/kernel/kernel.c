@@ -77,7 +77,9 @@ void kernel_main(uint32_t addr, uint32_t magic) {
             memcpy(data, (void*) mod->mod_start, size);
             if (strcmp(mod->cmdline, "initrd") == 0){
                 set_initrd_address(data);
-                initrd_list_filenames(data);
+                fs_root = initialise_initrd(data);
+                //initrd_list_filenames(data);
+
             } else {
 
             }
