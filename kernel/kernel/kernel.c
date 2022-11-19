@@ -7,6 +7,7 @@
 #include <kernel/gui.h>
 #include <kernel/graphics.h>
 #include <kernel/tty.h>
+#include <kernel/tty_framebuffer.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
 #include <kernel/descriptors_tables.h>
@@ -14,6 +15,8 @@
 #include <kernel/multiboot2_internal.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
+#include <kernel/pci.h>
+#include <kernel/ahci.h>
 #include <kernel/nmi.h>
 #include <kernel/fpu.h>
 #include <kernel/vfs.h>
@@ -35,6 +38,8 @@ extern uint32_t KERNEL_SIZE;
 extern uint32_t KERNEL_END;
 extern uint32_t placement_address;
 
+extern int32_t syscall3(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
+
 //multiboot_info_t *mb_info;
 //multiboot_module_t *mod;
 struct multiboot_tag *tag;
@@ -43,7 +48,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	init_serial();
 	write_serial("LOG START\n");
 	init_pmm(addr);
-    init_paging(addr);
+  init_paging(addr);
 	log(LOG_SERIAL, false, "MedusaOS\n");
 	log(LOG_SERIAL, false, "kernel is %d KiB large\n", ((uint32_t) &KERNEL_SIZE) >> 0);
 	//mb_info = mbd;
@@ -209,7 +214,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 		}
 
 	}
-	log(LOG_SERIAL, false, "TEST\n");
 	tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
                                   + ((tag->size + 7) & ~7));
   	log(LOG_SERIAL, false, "Total mbi size 0x%x\n", (unsigned) tag - addr);
@@ -227,11 +231,15 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   draw_border(fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0xFFFFFF);
   //draw_string(win->fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
   //draw_border(win->fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0x00);
-  draw_window(win);
-  render_window(win);
+  //draw_window(win);
+  //render_window(win);
   //render_window(win);
 #else
-	terminal_initialize();
+	//terminal_initialize();
+  terminal_framebuffer_initialize();
+  terminal_framebuffer_putc('a');
+  terminal_framebuffer_putc('\n');
+  terminal_framebuffer_putc('b');
 #endif
 	descriptor_tables_initialize();
 #if GUI_MODE
@@ -242,11 +250,11 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 #endif
 	pit_init(SYSTEM_TICKS_PER_SEC);
 	log(LOG_ALL, true, "i8253 (PIT) initialized @%d hz\n", SYSTEM_TICKS_PER_SEC);
-    pic_init();
+  pic_init();
 	log(LOG_ALL, true, "i8259 (PIC) initialized\n");
-    irq_register_handler(0, sys_tick_handler);
-    log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
-    init_ps2();
+  irq_register_handler(0, sys_tick_handler);
+  log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
+  init_ps2();
     //init_keyboard();
 #if GUI_MODE
 #else
@@ -268,6 +276,15 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
+  ahci_init();
+  //syscall(SYS_READ);
+  /*char buf[15];
+  strcpy(buf, "test syscall\n");
+  for (int i = 0; i < strlen(buf); i++){
+    char temp = buf[i];
+    log(LOG_SERIAL, false, "char : %c\n", temp);
+    //syscall3(SYS_WRITE, VFS_FD_SERIAL, (uint8_t*)&temp, sizeof(temp));
+  }*/
 	/*if (mb_info->mods_count > 0){
 		mod = (multiboot_module_t *) mb_info->mods_addr;
 		uint32_t initrd_location = *((uint32_t*)mb_info->mods_addr);

@@ -1,21 +1,42 @@
 #include <kernel/syscall.h>
+#include <stdio.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/vfs.h>
 
 
-void syscall_handler(x86_iframe_t * frame){
-    switch (frame->eax){
-    case SYS_READ:
-        break;
-    case SYS_WRITE:
-        vfs_write_fd(frame->edi, frame->esi, frame->edx);
-        break;
-    
-    default:
-        break;
+handler_t syscall_handlers[SYSCALL_NUM] = { 0 };
+
+
+void syscall_handler(x86_iframe_t* frame){
+    if(frame->eax < SYS_MAX){
+        handler_t handler = syscall_handlers[frame->eax];
+        frame->eax = 0;
+        handler(frame);
+    } else {
+        log(LOG_SERIAL, false, "unknown syscall : %d\n", frame->eax);
     }
 }
 
+void syscall_read(x86_iframe_t* frame){
+    log(LOG_SERIAL, false, "syscall read test\n");
+}
+
+void syscall_write(x86_iframe_t* frame){
+    uint32_t fd = frame->ebx;
+    uint8_t* buf = (uint8_t*)frame->ecx;
+    //log(LOG_SERIAL, false, "buf : %c\n", *buf);
+    uint32_t size = frame->edx;
+    frame->eax = vfs_write_fd(fd, buf, size);
+}
+
+void syscall_sbrk(x86_iframe_t* frame){
+
+}
+
 void init_syscalls(){
-    irq_register_handler(0x80, syscall_handler);
+    irq_register_handler(128, syscall_handler); // 128 : 0x80 in hexadecimal
+    log(LOG_SERIAL, false, "TEST\n");
+    syscall_handlers[SYS_READ] = syscall_read;
+    syscall_handlers[SYS_WRITE] = syscall_write;
+    syscall_handlers[SYS_SBRK] = syscall_sbrk;
 }

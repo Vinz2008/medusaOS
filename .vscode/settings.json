@@ -36,7 +36,12 @@
     "typeinfo": "cpp",
     "ringbuffer.h": "c",
     "hash_map": "cpp",
-    "list": "c"
+    "list": "c",
+    "pci.h": "c",
+    "tty_framebuffer.h": "c",
+    "graphics.h": "c",
+    "cmath": "c",
+    "complex": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

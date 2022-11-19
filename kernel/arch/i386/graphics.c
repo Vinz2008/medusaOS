@@ -4,7 +4,10 @@
 #include <stdint.h>
 #include <math.h>
 #include <kernel/fb.h>
+#if GUI_MODE
 #include <kernel/font.h>
+#endif
+
 
 typedef struct {
     uint8_t magic[2];
@@ -113,7 +116,10 @@ void draw_line(fb_t fb, int x0, int y0, int x1, int y1, uint32_t col){
     }
 }
 
+
 void draw_char(fb_t fb, char c, int x, int y, uint32_t col){
+#if GUI_MODE
+    log(LOG_SERIAL, "draw character: %c\n", c);
     uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
     for (int i = 0; i < 16; i ++){
         for (int j = 0; j < 8; j++){
@@ -122,7 +128,9 @@ void draw_char(fb_t fb, char c, int x, int y, uint32_t col){
             }
         }
     }
+#endif
 }
+
 
 void draw_string(fb_t fb, const char* str, int x, int y, uint32_t col){
     size_t len = strlen(str);
