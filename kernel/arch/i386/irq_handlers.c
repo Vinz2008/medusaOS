@@ -71,7 +71,10 @@ void sys_sleep(int seconds){
 
 void sys_key_handler(x86_iframe_t* frame){
     // scan code https://wiki.osdev.org/PS/2_Keyboard
-    uint8_t scan_code = inb(0x60);
+    //uint8_t scan_code = inb(0x60);
+    uint8_t scan_code = ps2_read(PS2_DATA);
+    
+    log(LOG_SERIAL, false, "scan code : %d\n", scan_code);
     if(scan_code == ESC_KEY){ // ESC - pressed
         reboot();
     }
