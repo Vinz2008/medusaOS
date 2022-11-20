@@ -17,9 +17,10 @@ static bool print(const char* data, size_t length) {
 int printf(const char* restrict format, ...){
 	va_list parameters;
 	va_start(parameters, format);
-	vprintf(format, parameters);
+	return vprintf(format, parameters);
+	
 }
 
 int vprintf(const char* restrict format, va_list parameters) {
-	vfprintf(VFS_FD_STDOUT,  format, parameters);
+	return vfprintf(VFS_FD_STDOUT,  format, parameters);
 }

@@ -12,12 +12,10 @@
 #include <kernel/mouse.h>
 #include <kernel/keyboard.h>
 #include <kernel/pit.h>
-#include <kernel/tty.h>
+#include <kernel/tty_framebuffer.h>
 
 extern uint32_t simple_sc_to_kc[];
 extern bool tick_animation_enabled;
-static bool key_states[256] = { false };
-static kbd_event_t next_event;
 static uint32_t device;
 static kbd_context_t context;
 static void *irq_routines[16] = {0};

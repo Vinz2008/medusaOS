@@ -3,6 +3,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <kernel/kheap.h>
 #include <kernel/pmm.h>
 #include <kernel/misc.h>

@@ -1,5 +1,8 @@
 // I looked at this to implement it https://github.com/ozkl/soso/blob/master/kernel/descriptortables.h
 
+#ifndef _DESCRIPTOR_TABLES_HEADER_
+#define _DESCRIPTOR_TABLES_HEADER_
+
 #include <types.h>
 #include <kernel/x86.h>
 
@@ -24,3 +27,5 @@ struct gdt_ptr
 } __attribute__((packed));
 
 extern void gdt_flush();
+
+#endif

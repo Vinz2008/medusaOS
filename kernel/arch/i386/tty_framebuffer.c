@@ -3,8 +3,11 @@
 #include <types.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
+#include <kernel/misc.h>
+#include <kernel/speaker.h>
 #include <kernel/config.h>
 
 #if GUI_MODE
@@ -13,7 +16,7 @@
 #endif
 
 extern char keyboard_us[];
-
+extern void sys_sleep(int seconds);
 typedef struct {
     uint8_t magic[2];
     uint8_t mode;
@@ -140,6 +143,6 @@ void terminal_framebuffer_setcolor(uint32_t col){
     color = col;
 }
 
-void terminal_framebuffer_reset_color(uint32_t col){
+void terminal_framebuffer_reset_color(){
     color = old_color;
 }

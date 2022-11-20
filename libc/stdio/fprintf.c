@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <kernel/serial.h>
 #include <kernel/kmalloc.h>
 #include <kernel/vfs.h>
 
@@ -17,7 +18,7 @@ static bool fprint(file_descriptor_t file, const char* data, size_t length) {
 int fprintf(file_descriptor_t file, const char* format, ...){
 	va_list parameters;
 	va_start(parameters, format);
-	vfprintf(file, format, parameters);
+	return vfprintf(file, format, parameters);
 }
 
 int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
@@ -75,7 +76,6 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
 			int length = strlen(i2);
-			char* i3 = NULL;
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;
@@ -91,7 +91,6 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters){
 			int i = va_arg(parameters, int);
 			int_to_ascii(i, i2);
 			int length = strlen(i2);
-			char* i3 = NULL;
 			if (!maxrem) {
 				// TODO: Set errno to EOVERFLOW.
 				return -1;

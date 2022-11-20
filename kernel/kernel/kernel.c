@@ -25,6 +25,8 @@
 #include <kernel/ps2.h>
 #include <kernel/fb.h>
 #include <kernel/pmm.h>
+#include <kernel/paging.h>
+#include <kernel/kmalloc.h>
 #include <kernel/syscall.h>
 
 #define _KERNEL_
@@ -40,6 +42,7 @@ extern uint32_t placement_address;
 
 extern int32_t syscall3(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 
+extern void sse_init();
 //multiboot_info_t *mb_info;
 //multiboot_module_t *mod;
 struct multiboot_tag *tag;

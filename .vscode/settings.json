@@ -41,7 +41,9 @@
     "tty_framebuffer.h": "c",
     "graphics.h": "c",
     "cmath": "c",
-    "complex": "c"
+    "complex": "c",
+    "tty.h": "c",
+    "pit.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

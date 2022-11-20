@@ -17,7 +17,7 @@ void open_fs(fs_node_t *node, uint8_t read, uint8_t write){
   if (node->open != 0)
     return node->open(node);
   else
-    return 0;
+    return;
 } 
 
 void close_fs(fs_node_t *node){
@@ -25,7 +25,7 @@ void close_fs(fs_node_t *node){
   if (node->read != 0)
     return node->close(node);
   else
-    return 0;
+    return;
 } 
 
 uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer){

@@ -30,7 +30,7 @@ unsigned int getsize(const char *in);
 unsigned int initrd_get_number_files(unsigned int address);
 void initrd_list_filenames(unsigned int address);
 
-void set_initrd_adress(uint32_t addr);
-uint32_t get_initrd_adress();
+void set_initrd_address(uint32_t addr);
+uint32_t get_initrd_address();
 
 fs_node_t *initialise_initrd(uint32_t location);

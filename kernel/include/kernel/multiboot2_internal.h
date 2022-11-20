@@ -46,3 +46,5 @@ typedef struct mb2_t {
     /* Not an array: just points to the first tag */
     mb2_tag_t tags[];
 } mb2_t __attribute__((packed));
+
+mb2_tag_t* mb2_find_tag(mb2_t* boot, uint32_t tag_type);
