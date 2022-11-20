@@ -237,19 +237,15 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 #else
 	//terminal_initialize();
   terminal_framebuffer_initialize();
-  terminal_framebuffer_putc('a');
-  terminal_framebuffer_putc('\n');
-  terminal_framebuffer_putc('b');
 #endif
 	descriptor_tables_initialize();
 #if GUI_MODE
 #else
-	putchar(' ');
 	log(LOG_ALL, true, "gdt initialized\n");
 	log(LOG_ALL, true, "idt initialized\n");
 #endif
 	pit_init(SYSTEM_TICKS_PER_SEC);
-	log(LOG_ALL, true, "i8253 (PIT) initialized @%d hz\n", SYSTEM_TICKS_PER_SEC);
+	log(LOG_ALL, true, "i8253 (PIT) initialized @%i hz\n", SYSTEM_TICKS_PER_SEC);
   pic_init();
 	log(LOG_ALL, true, "i8259 (PIC) initialized\n");
   irq_register_handler(0, sys_tick_handler);

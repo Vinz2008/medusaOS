@@ -1,4 +1,8 @@
+#include <kernel/tty_framebuffer.h>
 #include <stdio.h>
+#include <types.h>
+#include <ctype.h>
+#include <string.h>
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/config.h>
@@ -20,6 +24,10 @@ static fb_t fb;
 int row = 0;
 int column = 0;
 uint32_t color = 0xFFFFFF;
+uint32_t old_color;
+
+static char line_cli[100];
+static char last_line_cli[100];
 
 
 void terminal_framebuffer_initialize(){
@@ -55,9 +63,83 @@ void terminal_framebuffer_putc(char c){
 #endif
 }
 
+void terminal_framebuffer_clear(){
+    row = 0;
+    column = 0;
+    for (uint32_t i = 0; i < fb.width; i++){
+        for (uint32_t j = 0; j < fb.height; j++){
+            draw_pixel(fb, i, j, BLACK);
+        }
+    }
+}
+
 void terminal_framebuffer_keypress(uint8_t scan_code){
-    char c;
-    c = keyboard_us[scan_code];
+    char c = keyboard_us[scan_code];
+    append(line_cli, c);
     log(LOG_SERIAL, false, "char after scancode converting : %c\n", c);
     putchar(c);
+}
+
+void empty_line_cli_framebuffer(){
+    memset(line_cli, 0, 100);
+}
+
+void launch_command_framebuffer(){
+    if (startswith("clear", line_cli)){
+		terminal_framebuffer_clear();
+	} else if (startswith("echo", line_cli)){
+		char temp[95];
+		int i2 = 5;
+		for (int i = 0; i < strlen(line_cli); i++){
+			temp[i] = line_cli[i2];
+			i2++;
+		}
+		printf("\n%s", temp);
+	} else if (startswith("ls", line_cli)){
+		uint32_t addr = get_initrd_address();
+		initrd_list_filenames(addr);
+	} else if (startswith("help", line_cli)){
+		printf("\nusage help : \n");
+		printf("echo : print string\n");
+		printf("ls : list directory and files\n");
+		printf("clear : clear screen\n");
+		printf("reboot : reboot the computer\n");
+		printf("thirdtemple : ...\n");
+		printf("help : print this help\n");
+	} else if (startswith("arch", line_cli)){
+		printf("\ni386");
+	} else if (startswith("gui", line_cli)){
+		
+	} else if (startswith("reboot", line_cli)){
+		reboot();
+	} else if (startswith("beep", line_cli)){
+		beep();
+	} else if (startswith("sleep", line_cli)){
+		char temp[95];
+		int i2 = 6;
+		for (int i = 0; i < strlen(line_cli); i++){
+			if (!isalnum(line_cli[i2])){
+				break;
+			}
+			printf("\nc[%d] : %c\n", i2, line_cli[i2]);
+			temp[i] = line_cli[i2];
+			i2++;
+		}
+		int seconds = atoi(temp);
+		sys_sleep(seconds);
+	} else if (startswith("thirdtemple", line_cli)){
+		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
+	} else {
+		printf("\ncommand not found");
+	}
+	strcpy(last_line_cli, line_cli);
+}
+
+void terminal_framebuffer_setcolor(uint32_t col){
+    old_color = color;
+    color = col;
+}
+
+void terminal_framebuffer_reset_color(uint32_t col){
+    color = old_color;
 }

@@ -111,11 +111,13 @@ void sys_key_handler(x86_iframe_t* frame){
         reboot();
     }
     if (scan_code == ENTER_KEY){ // ENTER - pressed
-        launch_command();
-        empty_line_cli();
+        //launch_command();
+        launch_command_framebuffer();
+        empty_line_cli_framebuffer();
+        //empty_line_cli();
         printf("\n> ");
     } else if (scan_code == DELETE_KEY || scan_code == BACKSPACE_KEY){ // DELETE - pressed
-        //write_serialf("delete pressed\n");
+        write_serialf("delete pressed\n");
         //remove_character();
         //bug with delete character (wrong keycode)
     } else if (scan_code == CURSOR_LEFT_KEY) {
