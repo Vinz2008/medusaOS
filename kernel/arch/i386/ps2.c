@@ -2,6 +2,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <kernel/x86.h>
+#include <kernel/io.h>
 #include <kernel/keyboard.h>
 #include <kernel/mouse.h>
 
@@ -203,8 +204,8 @@ void init_ps2(){
                 case PS2_MOUSE:
                 case PS2_MOUSE_SCROLL_WHEEL:
                 case PS2_MOUSE_FIVE_BUTTONS:
-                    log(LOG_SERIAL, false, "mouse\n");
-                    init_mouse(i);
+                    //log(LOG_SERIAL, false, "mouse\n");
+                    //init_mouse(i);
                     break;
                 default:
                     driver_called = false;

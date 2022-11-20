@@ -8,6 +8,8 @@
 #include <kernel/font.h>
 #endif
 
+extern char keyboard_us[];
+
 typedef struct {
     uint8_t magic[2];
     uint8_t mode;
@@ -18,6 +20,7 @@ static fb_t fb;
 int row = 0;
 int column = 0;
 uint32_t color = 0xFFFFFF;
+
 
 void terminal_framebuffer_initialize(){
     log(LOG_SERIAL, false, "Starting terminal framebuffer\n");
@@ -42,5 +45,19 @@ void terminal_framebuffer_putc(char c){
         }
     }
     column += 8;
+    if (column >= fb.width){
+        column = 0;
+        row  += 12;
+        if (row == fb.height){
+            row = 0;
+        }
+    }
 #endif
+}
+
+void terminal_framebuffer_keypress(uint8_t scan_code){
+    char c;
+    c = keyboard_us[scan_code];
+    log(LOG_SERIAL, false, "char after scancode converting : %c\n", c);
+    putchar(c);
 }

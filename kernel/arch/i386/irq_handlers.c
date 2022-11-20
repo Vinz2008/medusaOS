@@ -10,12 +10,21 @@
 #include <kernel/tty.h>
 #include <kernel/serial.h>
 #include <kernel/mouse.h>
+#include <kernel/keyboard.h>
 #include <kernel/pit.h>
 #include <kernel/tty.h>
 
+extern uint32_t simple_sc_to_kc[];
 extern bool tick_animation_enabled;
-
+static bool key_states[256] = { false };
+static kbd_event_t next_event;
+static uint32_t device;
+static kbd_context_t context;
 static void *irq_routines[16] = {0};
+extern char scan_code_table[128];
+
+
+bool key_pressed[128];
 
 void irq_register_handler(int irq, void (*handler)(x86_iframe_t*)){
 
@@ -68,13 +77,36 @@ void sys_sleep(int seconds){
     }
 }
 
+void init_keyboard(uint32_t dev){
+  device = dev;
+  context = (kbd_context_t) {
+    .alt = false,
+    .alt_gr = false,
+    .shift = false,
+    .super = false,
+    .control = false
+  };
+  irq_register_handler(1, sys_key_handler);
+  log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");	
+}
+
 
 void sys_key_handler(x86_iframe_t* frame){
     // scan code https://wiki.osdev.org/PS/2_Keyboard
-    //uint8_t scan_code = inb(0x60);
-    uint8_t scan_code = ps2_read(PS2_DATA);
-    
+    // https://github.com/29jm/SnowflakeOS/blob/master/kernel/src/devices/kbd.c
+    uint8_t scan_code = inb(0x60);
+    //uint8_t scan_code = ps2_read(PS2_DATA);
     log(LOG_SERIAL, false, "scan code : %d\n", scan_code);
+    bool pressed = 1;
+    if (scan_code >= 128){
+        pressed = false;
+        scan_code -= 128;
+    }
+    key_pressed[scan_code] = pressed;
+    if (!pressed) {
+        return;
+    }
+
     if(scan_code == ESC_KEY){ // ESC - pressed
         reboot();
     }
@@ -82,7 +114,7 @@ void sys_key_handler(x86_iframe_t* frame){
         launch_command();
         empty_line_cli();
         printf("\n> ");
-    } else if (scan_code == DELETE_KEY){ // DELETE - pressed
+    } else if (scan_code == DELETE_KEY || scan_code == BACKSPACE_KEY){ // DELETE - pressed
         //write_serialf("delete pressed\n");
         //remove_character();
         //bug with delete character (wrong keycode)
@@ -91,6 +123,7 @@ void sys_key_handler(x86_iframe_t* frame){
     } else if (scan_code == CURSOR_UP_KEY){
         //terminal_print_last_command();
     } else if (scan_code < 0x81){
-        terminal_keypress(scan_code);
+        //terminal_keypress(scan_code);
+        terminal_framebuffer_keypress(scan_code);
     }
 }

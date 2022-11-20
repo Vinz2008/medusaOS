@@ -39,7 +39,7 @@ bool keypress_animation_enabled = true;
 int x_pos_cursor;
 int y_pos_cursor;
 
-char line_cli[100];
+static char line_cli[100];
 char last_line_cli[100];
 
 void empty_line_cli(){

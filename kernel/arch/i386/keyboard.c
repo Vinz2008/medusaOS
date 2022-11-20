@@ -1,28 +1,10 @@
 #include <kernel/keyboard.h>
 #include <types.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/ps2.h>
 #include <kernel/io.h>
-
-static uint32_t device;
-
-void init_keyboard(uint32_t dev){
-  device = dev;
-
-  irq_register_handler(1, sys_key_handler);
-  log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");	
-  ps2_write_device(device, KBD_SSC_CMD);
-  ps2_expect_ack();
-  ps2_write_device(device, KBD_SSC_GET);
-  ps2_expect_ack();
-  uint8_t scancode_set = ps2_read(PS2_DATA);
-  if (scancode_set != KBD_SSC_2) {
-    log(LOG_SERIAL, false, "wrong scancode set (%d), TODO", scancode_set);
-  }
-  ps2_write_device(device, PS2_DEV_ENABLE_SCAN);
-  ps2_expect_ack();
-}
 
 #define KBD_DATA_PORT   0x60
 
@@ -30,6 +12,7 @@ void init_keyboard(uint32_t dev){
 uint8_t read_scan_code(void){
     return inb(KBD_DATA_PORT);
 }
+
 
 char keyboard_us [128] =
 {
@@ -65,3 +48,36 @@ char keyboard_us [128] =
     0,  /* F12 Key */
     0,  /* All other keys are undefined */
 };
+
+char kbd_make_shift(char c) {
+    if (c >= 'a' && c <= 'z') {
+        return toupper(c);
+    }
+    switch (c) {
+        case '`': return '~';
+        case '1': return '!';
+        case '2': return '@';
+        case '3': return '#';
+        case '4': return '$';
+        case '5': return '%';
+        case '6': return '^';
+        case '7': return '&';
+        case '8': return '*';
+        case '9': return '(';
+        case '0': return ')';
+        case '-': return '_';
+        case '=': return '+';
+        case '[': return '{';
+        case ']': return '}';
+        case ';': return ':';
+        case '\'': return '"';
+        case ',': return '<';
+        case '.': return '>';
+        case '/': return '?';
+        case '\\': return '|';
+    }
+    return c;
+}
+
+
+

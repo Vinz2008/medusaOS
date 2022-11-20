@@ -254,8 +254,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_ALL, true, "i8259 (PIC) initialized\n");
   irq_register_handler(0, sys_tick_handler);
   log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
-  init_ps2();
-    //init_keyboard();
+  //init_ps2();
+  init_keyboard(0);
 #if GUI_MODE
 #else
 	char timer_str[] = "System timer is ticking\n";
