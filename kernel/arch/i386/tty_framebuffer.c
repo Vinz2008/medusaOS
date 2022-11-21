@@ -29,8 +29,8 @@ int column = 0;
 uint32_t color = 0xFFFFFF;
 uint32_t old_color;
 
-static char line_cli[100];
-static char last_line_cli[100];
+static char line_cli[300];
+static char last_line_cli[300];
 
 
 void terminal_framebuffer_initialize(){
@@ -84,7 +84,7 @@ void terminal_framebuffer_keypress(uint8_t scan_code){
 }
 
 void empty_line_cli_framebuffer(){
-    memset(line_cli, 0, 100);
+    memset(line_cli, 0, 300);
 }
 
 void launch_command_framebuffer(){
