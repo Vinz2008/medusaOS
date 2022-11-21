@@ -14,6 +14,7 @@ void abort(void);
 long strtol(const char *nptr, char **endptr, int base);
 
 void* malloc(size_t size);
+void* realloc(void *ptr, size_t size);
 
 #ifdef __cplusplus
 }
