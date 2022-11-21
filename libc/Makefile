@@ -39,6 +39,8 @@ stdio/modes.o \
 stdio/log.o \
 stdlib/abort.o \
 stdlib/atoi.o \
+stdlib/calloc.o \
+stdlib/malloc.o \
 stdlib/strtol.o \
 stdlib/stack_chk.o \
 string/memcmp.o \

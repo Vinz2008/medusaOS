@@ -13,13 +13,14 @@ void abort(void);
 
 long strtol(const char *nptr, char **endptr, int base);
 
+void* malloc(size_t size);
+
 #ifdef __cplusplus
 }
 #endif
 
 // Uninmplemented declarations for hosted cross compiler
 void free(void* ptr);
-void* malloc(size_t size);
 int atexit(void (*func)(void));
 int atoi(const char *str);
 char *getenv(const char *name);

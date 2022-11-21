@@ -79,7 +79,7 @@ void terminal_framebuffer_clear(){
 void terminal_framebuffer_keypress(uint8_t scan_code){
     char c = keyboard_us[scan_code];
     append(line_cli, c);
-    log(LOG_SERIAL, false, "char after scancode converting : %c\n", c);
+    //log(LOG_SERIAL, false, "char after scancode converting : %c\n", c);
     putchar(c);
 }
 

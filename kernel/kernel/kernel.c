@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <math.h>
 #include <multiboot2.h>
 #include <kernel/config.h>
 #include <kernel/gui.h>

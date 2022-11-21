@@ -148,14 +148,15 @@ fs_node_t *initialise_initrd(uint32_t location){
     for (int i = 0; i < initrd_header->nfiles; i++){
         file_headers[i].offset += location;
         strcpy(root_nodes[i].name, &file_headers[i].name);
+        log(LOG_SERIAL, false, "root_nodes[i].name : %s\n", (char*)&file_headers[i].name);
 		root_nodes[i].mask	= root_nodes[i].uid = root_nodes[i].gid = 0;
 		root_nodes[i].length = file_headers[i].length;
 		root_nodes[i].inode	= i;
 		root_nodes[i].flags	= FS_FILE;
 		root_nodes[i].read	= &initrd_read;
 		root_nodes[i].write	= 0;
-		root_nodes[i].readdir	= 0;
-		root_nodes[i].finddir	= 0;
+		root_nodes[i].readdir = 0;
+		root_nodes[i].finddir = 0;
 		root_nodes[i].open	= 0;
 		root_nodes[i].close	= 0;
 		root_nodes[i].impl	= 0;

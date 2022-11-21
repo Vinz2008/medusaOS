@@ -24,6 +24,7 @@ char *strcat(char *dest, const char *src);
 bool startswith(char str[], char code[]);
 char* strcpy(char* dst, const char* src);
 int strcmp(const char* s1, const char* s2);
+int strncmp(const char* s1, const char* s2, size_t n);
 char* strdup(const char* s);
 
 // Uninmplemented declarations for hosted cross compiler

@@ -94,7 +94,7 @@ void sys_key_handler(x86_iframe_t* frame){
     // https://github.com/29jm/SnowflakeOS/blob/master/kernel/src/devices/kbd.c
     uint8_t scan_code = inb(0x60);
     //uint8_t scan_code = ps2_read(PS2_DATA);
-    log(LOG_SERIAL, false, "scan code : %d\n", scan_code);
+    //log(LOG_SERIAL, false, "scan code : %d\n", scan_code);
     bool pressed = 1;
     if (scan_code >= 128){
         pressed = false;

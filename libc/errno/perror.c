@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-int errno;
+int errno = 0;
 
 void strerror(int error){
     switch (error)
