@@ -9,3 +9,5 @@ void draw_string(fb_t fb, const char* str, int x, int y, uint32_t col);
 void draw_rectangle(fb_t fb, int x, int y, int w, int h, uint32_t col);
 void draw_border(fb_t fb, int x, int y, int w, int h, uint32_t col);
 void draw_pixel(fb_t fb, int x, int y, uint32_t col);
+
+#define RGB(r, g, b) (uint32_t)(r << 16 | g << 8 | b )

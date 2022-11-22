@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <kernel/fb.h>
+#include <kernel/config.h>
 #if GUI_MODE
 #include <kernel/font.h>
 #endif
@@ -119,7 +120,7 @@ void draw_line(fb_t fb, int x0, int y0, int x1, int y1, uint32_t col){
 
 
 void draw_char(fb_t fb, char c, int x, int y, uint32_t col){
-    log(LOG_SERIAL, false, "draw character: %c\n", c);
+    log(LOG_SERIAL, false, "draw character: %c x : %d y : %d col : %d\n", c, x, y, col);
 #if GUI_MODE
     uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
     for (int i = 0; i < 16; i ++){

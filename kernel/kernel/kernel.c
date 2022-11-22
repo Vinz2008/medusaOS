@@ -230,14 +230,14 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	init_gui();
 	//draw_line_vertical(100, 10, 250, 0xFFFFFF);
   fb_t fb = fb_get_info();
-	//draw_string(fb, "MEDUSAOS", 100, 250, 0xFFFFFF);
+	draw_string(fb, "MEDUSAOS", 100, 250, 0xFFFFFF);
   window_t* win = open_window("test window", 100, 100, 0);
-  draw_string(fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
-  draw_border(fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0xFFFFFF);
-  //draw_string(win->fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
-  //draw_border(win->fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0x00);
+  //draw_string(fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
+  //draw_border(fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0xFFFFFF);
+  draw_string(win->fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
+  draw_border(win->fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0x00);
   //draw_window(win);
-  //render_window(win);
+  render_window(win);
   //render_window(win);
 #else
 	//terminal_initialize();

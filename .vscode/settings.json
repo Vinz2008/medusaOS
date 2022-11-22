@@ -43,7 +43,8 @@
     "cmath": "c",
     "complex": "c",
     "tty.h": "c",
-    "pit.h": "c"
+    "pit.h": "c",
+    "source_location": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

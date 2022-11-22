@@ -160,7 +160,9 @@ void wm_refresh_partial(rect_t clip) {
 void render_window(window_t* win){
     fb_t* wfb = &win->fb;
     uintptr_t fb_off = fb.address + fb.pitch + fb.bpp/8;
-    memcpy(fb.address, wfb->address, sizeof(wfb->height*wfb->pitch));
+    //memcpy(fb.address, wfb->address, sizeof(wfb->height*wfb->pitch));
+    log(LOG_SERIAL, false, "size window when rendering : %d\n", wfb->height*wfb->width*wfb->bpp/8);
+    memcpy(fb.address, wfb->address, wfb->height*wfb->pitch);
 }
 
 void wm_render_window(uint32_t win_id, rect_t* clip) {
@@ -172,7 +174,7 @@ void wm_render_window(uint32_t win_id, rect_t* clip) {
 	}
 	// Copy the window's buffer in the kernel
 	uint32_t win_size = win->ufb.height*win->ufb.pitch;
-	memcpy((void*) win->kfb.address, (void*) win->ufb.address, win_size);
+	memcpy((void*) win->kfb.address, (void*) win->ufb.address, sizeof(win->ufb.address));
 	wm_refresh_partial(rect_from_window(win));*/
 }
 
@@ -183,7 +185,7 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
     win->width = width;
     win->height = height;
     win->fb = (fb_t) {
-        .address = (uintptr_t) zalloc(width*height*bpp/8),
+        .address = (uintptr_t) zalloc(height*width*bpp/8),
         .pitch = width*bpp/8,
         .width = width,
         .height = height,
