@@ -1,5 +1,7 @@
 #include <kernel/x86.h>
 
+#define SYSCALL_INTERRUPT "$0x80" // for inline assembly
+
 #define SYS_READ 0
 #define SYS_WRITE 1
 #define SYS_OPEN 2

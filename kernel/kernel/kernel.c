@@ -47,6 +47,7 @@ extern void sse_init();
 //multiboot_info_t *mb_info;
 //multiboot_module_t *mod;
 struct multiboot_tag *tag;
+extern uint32_t syscall(uint32_t id);
 
 void kernel_main(uint32_t addr, uint32_t magic) {
 	init_serial();

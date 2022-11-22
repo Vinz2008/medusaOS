@@ -15,6 +15,8 @@ long strtol(const char *nptr, char **endptr, int base);
 
 void* malloc(size_t size);
 void* realloc(void *ptr, size_t size);
+void* calloc(size_t count, size_t size);
+int atoi(const char *str);
 
 #ifdef __cplusplus
 }
@@ -23,9 +25,7 @@ void* realloc(void *ptr, size_t size);
 // Uninmplemented declarations for hosted cross compiler
 void free(void* ptr);
 int atexit(void (*func)(void));
-int atoi(const char *str);
 char *getenv(const char *name);
-void *calloc(size_t nitems, size_t size);
 //int abs(int x);
 
 #endif
