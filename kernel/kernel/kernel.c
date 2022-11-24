@@ -14,6 +14,7 @@
 #include <kernel/descriptors_tables.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/multiboot2_internal.h>
+#include <kernel/sound-blaster-16.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/pci.h>
@@ -278,6 +279,9 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
   ahci_init();
+  log(LOG_SERIAL, true, "AHCI initialized\n");
+  init_sound_blaster_16();
+  log(LOG_SERIAL, true, "Sound Blaster 16 initialized\n");
   //syscall(SYS_READ);
   /*char buf[15];
   strcpy(buf, "test syscall\n");

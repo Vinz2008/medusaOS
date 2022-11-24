@@ -1,0 +1,1 @@
+void init_sound_blaster_16();
