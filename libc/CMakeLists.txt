@@ -1,4 +1,3 @@
-project(libc)
 
 INCLUDE_DIRECTORIES("include")
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/kernel/include)
@@ -23,7 +22,7 @@ FILE(GLOB LIBC_TIME_MODULES "time/*.c")
 
 message(${CMAKE_C_COMPILER})
 
-ADD_LIBRARY(libc STATIC
+add_library(libc STATIC
     ${LIBC_CTYPE_MODULES}
     ${LIBC_ERRNO_MODULES}
     ${LIBC_STDIO_MODULES}
@@ -32,3 +31,5 @@ ADD_LIBRARY(libc STATIC
     ${LIBC_SYSCALLS_MODULES}
     ${LIBC_TIME_MODULES}
 )
+
+install(TARGETS libc LIBRARY)

@@ -32,7 +32,6 @@ $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
 kernel/vfs.o \
 kernel/syscall.o \
-kernel/ordered_array.o \
 kernel/paging.o \
 kernel/initrd.o \
 kernel/fb.o \

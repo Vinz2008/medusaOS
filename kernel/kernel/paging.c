@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <kernel/kheap.h>
 #include <kernel/pmm.h>
 #include <kernel/misc.h>
 #include <kernel/multiboot2_internal.h>
