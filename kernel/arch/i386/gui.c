@@ -15,30 +15,10 @@
 void wm_mouse_callback(mouse_t curr);
 
 static uint32_t id_count = 0;
-static list_t windows;
 static fb_t fb;
 static mouse_t mouse;
 static wm_window_t* focused;
 
-void wm_assign_z_orders() {
-    list_t* iter;
-    wm_window_t* win;
-    list_for_each(iter, win, &windows) {
-        if (win->flags & WM_BACKGROUND) {
-            list_del(iter);
-            list_add_front(&windows, win);
-            break;
-        }
-    }
-
-    list_for_each(iter, win, &windows) {
-        if (win->flags & WM_FOREGROUND) {
-            list_del(iter);
-            list_add(&windows, win);
-            break;
-        }
-    }
-}
 
 rect_t rect_from_window(wm_window_t* win) {
     return (rect_t) {
@@ -50,48 +30,6 @@ rect_t rect_from_window(wm_window_t* win) {
 }
 
 
-void wm_raise_window(wm_window_t* win) {
-    list_t* win_iter;
-    wm_window_t* win_bis;
-    wm_event_t event;
-    // Find the window's list_t* to maybe move it around
-    list_for_each(win_iter, win_bis, &windows) {
-        if (win_bis == win) {
-            break;
-        }
-    }
-    // This is the first window to be opened
-    if (!focused) {
-        focused = win;
-        event.type = WM_EVENT_GAINED_FOCUS;
-        ringbuffer_write(win->events, sizeof(wm_event_t), (uint8_t*)&event);
-        return;
-    }
-    // Nothing to do
-    if (win->flags & WM_BACKGROUND || focused == win) {
-        return;
-    }
-    // Change focus only then
-    event.type = WM_EVENT_LOST_FOCUS;
-    ringbuffer_write(focused->events, sizeof(wm_event_t), (uint8_t*)&event);
-    event.type = WM_EVENT_GAINED_FOCUS;
-    ringbuffer_write(win->events, sizeof(wm_event_t), (uint8_t*)&event);
-    focused = win;
-    list_t* topmost;
-    wm_window_t* w;
-    /* Find the top most non-foreground window; we'll move the raised window
-     * after it */
-    list_for_each_entry_rev(topmost, w, &windows) {
-        if (!(w->flags & WM_FOREGROUND)) {
-            break;
-        }
-    }
-    list_move(win_iter, topmost);
-    // Redraw if possible. Not sure this is this function's responsibility.
-    if (!(win->flags & WM_NOT_DRAWN)) {
-        //wm_draw_window(win, rect_from_window(win));
-    }
-}
 
 uint32_t wm_open_window(fb_t* buff, uint32_t flags) {
     wm_window_t* win = (wm_window_t*) kmalloc(sizeof(wm_window_t));
@@ -103,9 +41,8 @@ uint32_t wm_open_window(fb_t* buff, uint32_t flags) {
         .events = ringbuffer_new(WM_EVENT_QUEUE_SIZE * sizeof(wm_event_t))
     };
     win->kfb.address = (uintptr_t) kmalloc(buff->height*buff->pitch);
-    list_add_front(&windows, win);
     //wm_assign_position(win);
-    wm_assign_z_orders();
+    //wm_assign_z_orders();
     //wm_raise_window(win);
     return win->id;
 }
@@ -144,18 +81,6 @@ void wm_draw_window(wm_window_t* win, rect_t rect) {
     rect_clear_clipped(&clip_rects);*/
 }
 
-void wm_refresh_partial(rect_t clip) {
-    wm_window_t* win;
-	list_for_each_entry(win, &windows) {
-		rect_t rect = rect_from_window(win);
-
-		/*if (rect_intersect(&clip, &rect)) {
-			wm_draw_window(win, clip);
-		}*/
-	}
-
-	//fb_render(fb);
-}
 
 void render_window(window_t* win){
     fb_t* wfb = &win->fb;
@@ -216,12 +141,8 @@ void draw_window(window_t* win){
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
-    windows = LIST_HEAD_INIT(windows);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
     //mouse_set_callback(wm_mouse_callback);
     //kbd_set_callback(wm_kbd_callback);
-
-
-
 }

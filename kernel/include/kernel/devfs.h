@@ -1,0 +1,1 @@
+void devfs_initialize();

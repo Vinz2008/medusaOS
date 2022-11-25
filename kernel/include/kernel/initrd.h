@@ -1,6 +1,14 @@
 #include <types.h>
 #include <kernel/vfs.h>
 
+#define FILE_TAR_TYPE            '0'
+#define HARD_LINK_TAR_TYPE       '1'
+#define SYM_LINK_TAR_TYPE        '2'
+#define CHAR_DEVICE_TAR_TYPE     '3'
+#define BLOCK_DEVICE_TAR_TYPE    '4'
+#define DIRECTORY_TAR_TYPE       '5'
+#define NAMED_PIPE_TAR_TYPE      '6'
+
 struct tar_header
 {
     char filename[100];
@@ -25,6 +33,13 @@ typedef struct
 	uint32_t	offset;		// Offset in the initrd that the file starts.
 	uint32_t	length;		// Length of the file.
 } initrd_file_header_t;
+
+
+typedef struct {
+    struct tar_header** headers;
+    size_t used;
+    size_t size;
+} initrd_list_header_t;
 
 unsigned int getsize(const char *in);
 unsigned int initrd_get_number_files(unsigned int address);

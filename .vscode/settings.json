@@ -44,7 +44,12 @@
     "complex": "c",
     "tty.h": "c",
     "pit.h": "c",
-    "source_location": "c"
+    "source_location": "c",
+    "array": "c",
+    "bitset": "c",
+    "string_view": "c",
+    "initializer_list": "c",
+    "*.inc": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

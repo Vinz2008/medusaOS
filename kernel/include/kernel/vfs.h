@@ -20,12 +20,25 @@ typedef int file_descriptor_t;
 #define FS_SYMLINK     0x06
 #define FS_MOUNTPOINT  0x08 // Is the file an active mountpoint?
 
+typedef enum FileType
+{
+    FT_File               = 1,
+    FT_CharacterDevice    = 2,
+    FT_BlockDevice        = 3,
+    FT_Pipe               = 4,
+    FT_SymbolicLink       = 5,
+    FT_Directory          = 128,
+    FT_MountPoint         = 256
+} FileType;
+
 typedef uint32_t (*read_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
 typedef uint32_t (*write_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
 typedef void (*open_type_t)(struct fs_node*);
 typedef void (*close_type_t)(struct fs_node*);
-typedef struct dirent * (*readdir_type_t)(struct fs_node*,uint32_t);
-typedef struct fs_node * (*finddir_type_t)(struct fs_node*,char *name); 
+typedef struct dirent* (*readdir_type_t)(struct fs_node*,uint32_t);
+typedef struct fs_node* (*finddir_type_t)(struct fs_node*,char *name); 
+typedef int32 (*read_block_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
+typedef int32 (*write_block_type_t)(struct fs_node*, uint32_t block_number, uint32_t count, uint8_t* buffer);
 
 typedef struct fs_node
 {
@@ -43,7 +56,12 @@ typedef struct fs_node
   close_type_t close;
   readdir_type_t readdir; // Returns the n'th child of a directory.
   finddir_type_t finddir; // Try to find a child in a directory by name.
-  struct fs_node *ptr; // Used by mountpoints and symlinks.
+  read_block_type_t read_block;
+  write_block_type_t write_block;
+  struct fs_node* mount_point; // Used by mountpoints and symlinks.
+  struct fs_node* parent;
+  void* private_node_data;
+  uint32_t node_type;
 } fs_node_t; 
 
 struct dirent // One of these is returned by the readdir call, according to POSIX.
@@ -60,6 +78,9 @@ void close_fs(fs_node_t *node);
 struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name); 
 
+fs_node_t* fs_get_root_node();
+
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size);
+
 
 #endif
