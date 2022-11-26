@@ -3,7 +3,7 @@ set -e
 . ./build.sh
 
 cd initrd
-tar -cvf ../sysroot/boot/initrd.tar test.txt test2.txt
+tar -cvf ../sysroot/boot/initrd.tar *
 cd ..
 
 dd if=/dev/zero of=disk.img bs=1M count=2

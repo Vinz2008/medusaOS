@@ -49,3 +49,4 @@ void set_initrd_address(uint32_t addr);
 uint32_t get_initrd_address();
 
 fs_node_t *initialise_initrd(uint32_t location);
+fs_node_t* get_initrd_root();

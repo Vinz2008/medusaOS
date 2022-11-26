@@ -34,7 +34,7 @@ void syscall_sbrk(x86_iframe_t* frame){
 }
 
 void init_syscalls(){
-    irq_register_handler(128, syscall_handler); // 128 : 0x80 in hexadecimal
+    irq_register_handler(0x80, syscall_handler);
     syscall_handlers[SYS_READ] = syscall_read;
     syscall_handlers[SYS_WRITE] = syscall_write;
     syscall_handlers[SYS_SBRK] = syscall_sbrk;

@@ -44,12 +44,12 @@ extern uint32_t KERNEL_END;
 extern uint32_t placement_address;
 
 extern int32_t syscall3(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
+extern uint32_t syscall(uint32_t id);
 
 extern void sse_init();
 //multiboot_info_t *mb_info;
 //multiboot_module_t *mod;
 struct multiboot_tag *tag;
-extern uint32_t syscall(uint32_t id);
 
 void kernel_main(uint32_t addr, uint32_t magic) {
 	init_serial();
@@ -90,15 +90,18 @@ void kernel_main(uint32_t addr, uint32_t magic) {
             if (strcmp(mod->cmdline, "initrd") == 0){
                 set_initrd_address(data);
                 fs_root = initialise_initrd(data);
-                log(LOG_SERIAL, false, "fs root function readdir_fs : %p\n", fs_root->readdir);
                 struct dirent* dir = NULL;
                 int i = 0;
-                if (readdir_fs(fs_root, 0) == NULL){
-                  log(LOG_SERIAL, false, "NULL\n");
+                while ((dir = readdir_fs(fs_root, i))!=NULL){
+                  log(LOG_SERIAL, false, "found file %s\n", dir->name);
+                  fs_node_t* node = finddir_fs(fs_root, dir->name);
+                  if (node->node_type != FT_Directory){
+                    uint8_t buffer[node->length];
+                    read_fs(node, 0, node->length, buffer);
+                    log(LOG_SERIAL, false, "file %s content %s\n", node->name,  buffer);
+                  }
+                  i++;
                 }
-                /*while ((dir = readdir_fs(fs_root, i))!=NULL){
-                  log(LOG_SERIAL, false, "found file %s", dir->name);
-                }*/
                 devfs_initialize();
                 //initrd_list_filenames(data);
 

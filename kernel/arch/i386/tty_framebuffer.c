@@ -7,6 +7,8 @@
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/misc.h>
+#include <kernel/vfs.h>
+#include <kernel/initrd.h>
 #include <kernel/speaker.h>
 #include <kernel/config.h>
 
@@ -99,8 +101,36 @@ void launch_command_framebuffer(){
 		}
 		printf("\n%s", temp);
 	} else if (startswith("ls", line_cli)){
-		uint32_t addr = get_initrd_address();
-		initrd_list_filenames(addr);
+		fs_node_t* root = get_initrd_root();
+		struct dirent* dir = NULL;
+		int i = 0;
+		while ((dir = readdir_fs(fs_root, i))!=NULL){
+        	printf("\nfilename [%i] : %s\n",i, dir->name);
+        	i++;
+        }
+		/*uint32_t addr = get_initrd_address();
+		initrd_list_filenames(addr);*/
+	} else if (startswith("cat", line_cli)){
+		char filename[20];
+		int i2 = 4;
+		for (int i = 0; i < strlen(line_cli); i++){
+			filename[i] = line_cli[i2];
+			i2++;
+		}
+		fs_node_t* root = get_initrd_root();
+		struct dirent* dir = NULL;
+		int i = 0;
+		while ((dir = readdir_fs(fs_root, i))!=NULL){
+        	if (strcmp(filename, dir->name) == 0){
+				fs_node_t* node = finddir_fs(fs_root, dir->name);
+				if (node->node_type != FT_Directory){
+                    uint8_t buffer[node->length];
+                    read_fs(node, 0, node->length, buffer);
+                    printf("\n%s\n", buffer);
+                }
+			}
+        	i++;
+        }
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");

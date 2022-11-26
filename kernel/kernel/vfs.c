@@ -42,7 +42,6 @@ struct dirent *readdir_fs(fs_node_t *node, uint32_t index){
 		return node->readdir(node, index);
 	else
 		return 0;*/
-  log(LOG_SERIAL, false, "pointer function readdir_fs : %p\n", node->readdir);
   if (node->readdir == 0){
     return 0;
   }

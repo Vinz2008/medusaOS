@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <kernel/x86.h>
 
 #define SYSCALL_INTERRUPT "$0x80" // for inline assembly

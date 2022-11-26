@@ -94,11 +94,6 @@ unsigned int initrd_get_number_files(unsigned int address){
 }
 
 
-char* get_file_content(struct tar_header *header){
-    
-
-}
-
 void initrd_list_filenames(unsigned int address){
     unsigned int i = 0;
     while (i <= initrd_get_number_files(address)){
@@ -133,31 +128,37 @@ static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
 		dirent.ino = 0;
 		return &dirent;
 	}*/
-
+    if (index >= nroot_nodes){
+        return NULL;
+    }
+    return &root_nodes[index];
     uint32_t dir_depth = vfs_get_depth(dir->name);
     uint32_t n_child = 0;
     log(LOG_SERIAL, false, "nroot_nodes : %d\n", nroot_nodes);
     for (size_t i = 0; i < nroot_nodes; i++){
         uint32_t child_depth = vfs_get_depth(root_nodes[i].name);
-        if (strstr(root_nodes[i].name, dir->name) == NULL){
-            log(LOG_SERIAL, false, "strstr(root_nodes[i].name, dir->name)\n");
+        /*if (strstr(root_nodes[i].name, dir->name) == NULL){
+            log(LOG_SERIAL, false, "strstr(%s, %s)\n", root_nodes[i].name, dir->name);
         }
         if(strstr(root_nodes[i].name, dir->name) != NULL) {
-         /* A file will have the same depth */
+         // A file will have the same depth 
          if(root_nodes[i].node_type == FT_File && child_depth == dir_depth){
             ++n_child;
          }
-         /* A sub-directory's name contains one more '/' so it will
-            have +1 depth compare to the directory */
+         // A sub-directory's name contains one more '/' so it will have +1 depth compare to the directory
          else if(root_nodes[i].node_type == FT_Directory && child_depth == dir_depth + 1){
             ++n_child;
          }
          log(LOG_SERIAL, false, "n_child : %d\n", n_child);
         }
-    if(n_child == index){
+        if(n_child == index){
         log(LOG_SERIAL, false, "returned node pointer %p\n", &root_nodes[i]);
         return &root_nodes[i];
-    }
+        }*/
+        if (strcmp(dir->name, root_nodes[i].name) == 0){
+            return &root_nodes[i];
+        }
+
     }
 	return NULL;
 }
@@ -189,8 +190,6 @@ fs_node_t *initialise_initrd(uint32_t location){
     initrd_root->close = 0;
     initrd_root->readdir = &initrd_readdir;
     initrd_root->finddir = &initrd_finddir;
-    initrd_root->readdir = 0;
-    initrd_root->finddir = 0;
     initrd_dev = (fs_node_t*)kmalloc(sizeof(fs_node_t));
     strcpy(initrd_dev->name, "dev");
     initrd_dev->mask = initrd_dev->uid = initrd_dev->gid = initrd_dev->inode = initrd_dev->length = 0;
@@ -201,8 +200,6 @@ fs_node_t *initialise_initrd(uint32_t location){
     initrd_dev->close = 0;
     initrd_dev->readdir = &initrd_readdir;
     initrd_dev->finddir = &initrd_finddir;
-    initrd_dev->readdir = 0;
-    initrd_dev->finddir = 0;
     initrd_dev->mount_point = 0;
     initrd_dev->impl = 0;
     root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * initrd_header->nfiles);
@@ -231,12 +228,11 @@ fs_node_t *initialise_initrd(uint32_t location){
                 break;
         }
     }
-
-
     isInitrdInitialized = true;
-    log(LOG_SERIAL, false, "pointer readdir function : %p\n", initrd_readdir);
-    log(LOG_SERIAL, false, "pointer readdir function : %p\n", initrd_root->readdir);
-    log(LOG_SERIAL, false, "pointer initrd_root : %p\n", initrd_root);
     log(LOG_SERIAL, false, "initrd initialized\n");
+    return initrd_root;
+}
+
+fs_node_t* get_initrd_root(){
     return initrd_root;
 }
