@@ -174,6 +174,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 	return 0;
 }
 
+
 fs_node_t *initialise_initrd(uint32_t location){
     //initrd_header = (initrd_header_t*) location;
     //file_headers = (initrd_file_header_t*) (location + sizeof(initrd_header_t));
@@ -184,7 +185,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     strcpy(initrd_root->name, "/");
     initrd_root->mask = initrd_root->uid = initrd_root->gid = initrd_root->inode = initrd_root->length = 0;
     initrd_root->flags = FS_DIRECTORY;
-    initrd_root->read = 0;
+    initrd_root->read = &initrd_read;;
     initrd_root->write = 0;
     initrd_root->open = 0;
     initrd_root->close = 0;

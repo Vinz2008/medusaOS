@@ -120,17 +120,15 @@ void launch_command_framebuffer(){
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
-		while ((dir = readdir_fs(fs_root, i))!=NULL){
-        	if (strcmp(filename, dir->name) == 0){
-				fs_node_t* node = finddir_fs(fs_root, dir->name);
-				if (node->node_type != FT_Directory){
-                    uint8_t buffer[node->length];
-                    read_fs(node, 0, node->length, buffer);
-                    printf("\n%s\n", buffer);
-                }
-			}
-        	i++;
-        }
+		fs_node_t* file = vfs_open(filename, "r");
+		if (file == NULL){
+			printf("\nfile not found: %s\n", filename);
+		} else {
+		uint8_t buffer[file->length];
+        read_fs(file, 0, file->length, buffer);
+		printf("\n%s\n", buffer);
+		}
+		close_fs(file);
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");

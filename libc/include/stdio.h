@@ -10,8 +10,6 @@
 #define LOG_SERIAL 1
 #define LOG_ALL 3
 
-
-
 #define EOF (-1)
 
 #ifdef __cplusplus

@@ -31,6 +31,7 @@ extern unsigned char _ctype[];
 #define ispunct(c)	((_ctype + 1)[(unsigned char)(c)] & (CT_PUN))
 #define isspace(c)	((_ctype + 1)[(unsigned char)(c)] & (CT_WHT))
 #define isupper(c)	((_ctype + 1)[(unsigned char)(c)] & (CT_UP))
+#define isblank(c)	((_ctype + 1)[(unsigned char)(c)] & (CT_SP) || (c == '\t') || (c == ' '))
 #define isxdigit(c)	((_ctype + 1)[(unsigned char)(c)] & (CT_DIG | CT_HEX))
 #define isascii(c)	((unsigned)(c) <= 0x7F)
 #define tolower(c)	(isupper(c) ? c + 'a' - 'A' : c)

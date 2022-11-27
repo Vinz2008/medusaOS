@@ -31,6 +31,9 @@ typedef enum FileType
     FT_MountPoint         = 256
 } FileType;
 
+#define READ_MODE 1
+#define WRITE_MODE 2
+
 typedef uint32_t (*read_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
 typedef uint32_t (*write_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
 typedef void (*open_type_t)(struct fs_node*);
@@ -46,6 +49,7 @@ typedef struct fs_node
   uint32_t mask;        // The permissions mask.
   uint32_t uid;         // The owning user.
   uint32_t gid;         // The owning group.
+  uint32_t mode;
   uint32_t flags;       // Includes the node type (Directory, file etc).
   uint32_t inode;       // This is device-specific - provides a way for a filesystem to identify files.
   uint32_t length;      // Size of the file, in bytes.
@@ -81,6 +85,6 @@ fs_node_t *finddir_fs(fs_node_t *node, char *name);
 fs_node_t* fs_get_root_node();
 
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size);
-
+fs_node_t* vfs_open(const char* path, const char* mode);
 
 #endif
