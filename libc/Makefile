@@ -58,6 +58,8 @@ string/strcpy.o \
 string/strcmp.o \
 string/strdup.o \
 string/strstr.o \
+string/strchr.o \
+string/strtok.o \
 errno/perror.o \
 syscalls/syscalls.o \
 ctype/ctype.o \

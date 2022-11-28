@@ -90,6 +90,25 @@ void empty_line_cli_framebuffer(){
 }
 
 void launch_command_framebuffer(){
+	char line_cli_copy[300];
+	char* token;
+	strcpy(line_cli_copy, line_cli);
+	char* command = strtok(line_cli_copy, " ");
+	log(LOG_SERIAL, false,"command: %s\n", command);
+	char** argv = kmalloc(sizeof(char*) * 20);
+	int i = 0;
+	token = strtok(NULL, " ");
+	log(LOG_SERIAL, false, "token : %s\n", token);
+	argv[i] = token;
+	log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
+	i++;
+	while (token != NULL){
+		token = strtok(NULL, " ");
+		log(LOG_SERIAL, false, "token : %s\n", token);
+		argv[i] = token;
+		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
+		i++;
+	}
     if (startswith("clear", line_cli)){
 		terminal_framebuffer_clear();
 	} else if (startswith("echo", line_cli)){
