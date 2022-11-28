@@ -90,63 +90,61 @@ void empty_line_cli_framebuffer(){
 }
 
 void launch_command_framebuffer(){
+	printf("\n");
 	char line_cli_copy[300];
 	char* token;
 	strcpy(line_cli_copy, line_cli);
 	char* command = strtok(line_cli_copy, " ");
-	log(LOG_SERIAL, false,"command: %s\n", command);
-	char** argv = kmalloc(sizeof(char*) * 20);
-	int i = 0;
-	token = strtok(NULL, " ");
-	log(LOG_SERIAL, false, "token : %s\n", token);
-	argv[i] = token;
-	log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
-	i++;
-	while (token != NULL){
-		token = strtok(NULL, " ");
-		log(LOG_SERIAL, false, "token : %s\n", token);
-		argv[i] = token;
-		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
-		i++;
+	char* args = kmalloc((strlen(line_cli) - strlen(command) + 1) * sizeof(char));
+	int i2 = 0;
+	for (int i = strlen(command) + 1; i < strlen(line_cli); i++){
+		args[i2] = line_cli[i];
+		i2++;
 	}
-	int argc = i + 1;
+	log(LOG_SERIAL, false,"command: %s\n", command);
+	log(LOG_SERIAL, false,"args: %s\n", args);
+	char *buf = strdup(args);
+	char** argv = calloc(1, sizeof(char*));
+	char *delim;
+	int argc = 1;
+	argv[0] = buf;
+    while (delim = strchr(argv[argc - 1], ' ')) {
+        argv = krealloc(argv, (argc + 1) * sizeof (char *));
+        argv[argc] = delim + 1;
+        *delim = 0x00;
+        argc++;
+    }
+	for (int i = 0; i < argc; i++){
+		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
+	}
+	
     if (startswith("clear", line_cli)){
 		terminal_framebuffer_clear();
 	} else if (startswith("echo", line_cli)){
-		char temp[95];
-		int i2 = 5;
-		for (int i = 0; i < strlen(line_cli); i++){
-			temp[i] = line_cli[i2];
-			i2++;
+		for (int i = 0; i < argc; i++){
+			printf("%s ", argv[i]);
 		}
-		printf("\n%s", temp);
+		printf("\n");
 	} else if (startswith("ls", line_cli)){
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
 		while ((dir = readdir_fs(fs_root, i))!=NULL){
-        	printf("\nfilename [%i] : %s\n",i, dir->name);
+        	printf("filename [%i] : %s\n",i, dir->name);
         	i++;
         }
-		/*uint32_t addr = get_initrd_address();
-		initrd_list_filenames(addr);*/
 	} else if (startswith("cat", line_cli)){
-		char filename[20];
-		int i2 = 4;
-		for (int i = 0; i < strlen(line_cli); i++){
-			filename[i] = line_cli[i2];
-			i2++;
-		}
+		char*  filename = argv[0];
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
 		fs_node_t* file = vfs_open(filename, "r");
 		if (file == NULL){
-			printf("\nfile not found: %s\n", filename);
+			printf("file not found: %s\n", filename);
 		} else {
 		uint8_t buffer[file->length];
         read_fs(file, 0, file->length, buffer);
-		printf("\n%s\n", buffer);
+		printf("%s\n", buffer);
 		}
 		close_fs(file);
 	} else if (startswith("help", line_cli)){
@@ -158,7 +156,7 @@ void launch_command_framebuffer(){
 		printf("thirdtemple : ...\n");
 		printf("help : print this help\n");
 	} else if (startswith("arch", line_cli)){
-		printf("\ni386");
+		printf("i386\n");
 	} else if (startswith("gui", line_cli)){
 		
 	} else if (startswith("reboot", line_cli)){
@@ -179,9 +177,9 @@ void launch_command_framebuffer(){
 		int seconds = atoi(temp);
 		sys_sleep(seconds);
 	} else if (startswith("thirdtemple", line_cli)){
-		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
+		printf("If you search the third temple of god, you are in the wrong OS. \n Install TempleOS\n");
 	} else {
-		printf("\ncommand not found");
+		printf("command not found\n");
 	}
 	strcpy(last_line_cli, line_cli);
 }
