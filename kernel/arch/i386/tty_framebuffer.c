@@ -109,6 +109,7 @@ void launch_command_framebuffer(){
 		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
 		i++;
 	}
+	int argc = i + 1;
     if (startswith("clear", line_cli)){
 		terminal_framebuffer_clear();
 	} else if (startswith("echo", line_cli)){
