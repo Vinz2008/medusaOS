@@ -52,7 +52,7 @@ string/append.o \
 string/reverse.o \
 string/int_to_ascii.o \
 string/hex_to_ascii.o \
-string/strncat.o \
+string/strcat.o \
 string/startswith.o \
 string/strcpy.o \
 string/strcmp.o \

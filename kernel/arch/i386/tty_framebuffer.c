@@ -33,7 +33,7 @@ uint32_t old_color;
 
 static char line_cli[300];
 static char last_line_cli[300];
-
+char directory[100] = {'\0'};
 
 void terminal_framebuffer_initialize(){
     log(LOG_SERIAL, false, "Starting terminal framebuffer\n");
@@ -89,19 +89,20 @@ void empty_line_cli_framebuffer(){
     memset(line_cli, 0, 300);
 }
 
+
 void launch_command_framebuffer(){
 	printf("\n");
 	char line_cli_copy[300];
 	char* token;
 	strcpy(line_cli_copy, line_cli);
 	char* command = strtok(line_cli_copy, " ");
+	log(LOG_SERIAL, false,"command: %s\n", command);
 	char* args = kmalloc((strlen(line_cli) - strlen(command) + 1) * sizeof(char));
 	int i2 = 0;
 	for (int i = strlen(command) + 1; i < strlen(line_cli); i++){
 		args[i2] = line_cli[i];
 		i2++;
 	}
-	log(LOG_SERIAL, false,"command: %s\n", command);
 	log(LOG_SERIAL, false,"args: %s\n", args);
 	char *buf = strdup(args);
 	char** argv = calloc(1, sizeof(char*));
@@ -129,24 +130,80 @@ void launch_command_framebuffer(){
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
+		bool print = false;
 		while ((dir = readdir_fs(fs_root, i))!=NULL){
-        	printf("filename [%i] : %s\n",i, dir->name);
+			if (strcmp(directory, "\0") != 0){
+				if (startswith(directory, dir->name)){
+					print = true;
+				}
+			} else {
+        	print = true;
+			}
+			if (print){
+			printf("filename [%i] : %s\n",i, dir->name);
+			}
         	i++;
+			print = false;
         }
 	} else if (startswith("cat", line_cli)){
 		char*  filename = argv[0];
+		char temp[100];
+		strcpy(temp, directory);
+		strcat(temp, filename);
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
-		fs_node_t* file = vfs_open(filename, "r");
+		fs_node_t* file = vfs_open(temp, "r");
 		if (file == NULL){
-			printf("file not found: %s\n", filename);
+			printf("file not found: %s\n", temp);
 		} else {
 		uint8_t buffer[file->length];
         read_fs(file, 0, file->length, buffer);
 		printf("%s\n", buffer);
 		}
 		close_fs(file);
+	} else if (startswith("cd", line_cli)){
+		char* dir = argv[0];
+		log(LOG_SERIAL, false, "length dir %d\n",strlen(dir));
+		char temp[100];
+		char temp_directory[100];
+		int i;
+		if (strcmp(dir, "..") == 0){
+			int pos = 0;
+			log(LOG_SERIAL, false, "directory : %s\n", directory);
+			log(LOG_SERIAL, false, "length directory %d\n",strlen(directory));
+			for (i = strlen(temp_directory) - 2; i >= 0; i--){
+				log(LOG_SERIAL, false, "directory %d : %c\n",i, directory[i]);
+				if (directory[i] == '/'){
+					log(LOG_SERIAL, false, "pos :  %d\n",i);
+					pos = i;
+					break;
+				}
+			}
+			if (pos != 0){
+			for (i = 0; i < pos; i++){
+				log(LOG_SERIAL, false, "temp_directory %d : %c\n",i, temp_directory[i]);
+				temp_directory[i] = directory[i];
+			}
+			}
+			temp_directory[i+1] = '\0';
+			printf("moved one directory up\n");
+		} else {
+		strcpy(temp_directory, directory);
+		strcpy(temp, dir);
+		log(LOG_SERIAL, false, "temp : %s\n", temp);
+		log(LOG_SERIAL, false, "directory : %s\n", directory);
+		if (strcmp(temp_directory, "\0") == 0){
+			strcpy(temp_directory, temp);
+		} else {
+		strcat(temp_directory, temp);
+		}
+		strcat(temp_directory, "/");
+		}
+		log(LOG_SERIAL, false, "temp_directory : %s\n", temp_directory);
+		strcpy(directory, temp_directory);		
+	} else if (startswith("pwd", line_cli)){
+		printf("%s\n", directory);
 	} else if (startswith("help", line_cli)){
 		printf("\nusage help : \n");
 		printf("echo : print string\n");
