@@ -50,7 +50,8 @@
     "string_view": "c",
     "initializer_list": "c",
     "*.inc": "c",
-    "sstream": "c"
+    "sstream": "c",
+    "speaker.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

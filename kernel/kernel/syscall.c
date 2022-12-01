@@ -8,6 +8,7 @@ handler_t syscall_handlers[SYSCALL_NUM] = { 0 };
 
 
 void syscall_handler(x86_iframe_t* frame){
+    log(LOG_SERIAL, false, "test syscall handler\n");
     if(frame->eax < SYS_MAX){
         handler_t handler = syscall_handlers[frame->eax];
         frame->eax = 0;

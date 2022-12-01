@@ -301,7 +301,7 @@ void launch_command(){
 	} else if (startswith("reboot", line_cli)){
 		reboot();
 	} else if (startswith("beep", line_cli)){
-		beep();
+		//beep();
 	} else if (startswith("sleep", line_cli)){
 		char temp[95];
 		int i2 = 6;
@@ -314,7 +314,7 @@ void launch_command(){
 			i2++;
 		}
 		int seconds = atoi(temp);
-		sys_sleep(seconds);
+		//sys_sleep(seconds);
 	} else if (startswith("thirdtemple", line_cli)){
 		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");
 	} else {

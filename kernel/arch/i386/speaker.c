@@ -1,21 +1,28 @@
 #include <kernel/speaker.h>
-#include <kernel/io.h>
-#include <kernel/x86.h>
 #include <types.h>
+#include <stdio.h>
+#include <kernel/io.h>
+#include <kernel/pit.h>
+#include <kernel/x86.h>
  
-static void play_sound(uint32_t nFrequence) {
-    uint32_t div;
-    uint8_t tmp;
-    //Set the PIT to the desired frequency
- 	div = 1193180 / nFrequence;
- 	outb(0x43, 0xb6);
- 	outb(0x42, (uint8_t) (div) );
- 	outb(0x42, (uint8_t) (div >> 8));
-    //And play the sound using the PC speaker
- 	tmp = inb(0x61);
-  	if (tmp != (tmp | 3)) {
- 		outb(0x61, tmp | 3);
-    }
+void pit_phase_c2(uint32_t hz) {
+  uint32_t divisor = 1193180 / hz;
+  outb(0x43, 0xB6);
+  outb(0x42, (uint8_t)divisor & 0xFF);
+  outb(0x42, (uint8_t)(divisor >> 8) & 0xFF);
+}
+
+void pcspkr_tone_on(uint32_t hz) {
+  pit_phase_c2(hz);
+  uint8_t tmp = inb(0x61);
+  if (tmp != (tmp | 3))
+    outb(0x61, tmp | 3);
+}
+
+void pcspkr_tone_off() {
+  uint8_t tmp = inb(0x61) & 0xFC;
+  outb(0x61, tmp);
+  pit_phase_c2(1);
 }
  
  //make it shutup
@@ -25,10 +32,15 @@ static void nosound() {
 }
  
  //Make a beep
- void beep() {
- 	play_sound(1000);
-    x86_halt();
- 	//timer_wait(10);
- 	nosound();
-    //set_PIT_2(old_frequency);
- }
+void pcspkr_beep(uint32_t mst, uint16_t hz) {
+	pcspkr_tone_on(hz);
+	log(LOG_SERIAL, false, "before sleep\n");
+ 	//pit_sleep(mst);
+	pit_mdelay(mst);
+	log(LOG_SERIAL, false, "after sleep\n");
+	pcspkr_tone_off();
+}
+
+void init_speaker(){
+	outb(0x61, inb(0x61) | 0x1);
+}

@@ -15,7 +15,6 @@
 #include <kernel/tty_framebuffer.h>
 
 extern uint32_t simple_sc_to_kc[];
-extern bool tick_animation_enabled;
 static uint32_t device;
 static kbd_context_t context;
 static void *irq_routines[16] = {0};
@@ -55,17 +54,8 @@ void handle_platform_irq(x86_iframe_t* frame){
     pic_send_EOI(irq);
 }
 
-void sys_tick_handler(x86_iframe_t* frame){
-    ++ticks;
-    if (tick_animation_enabled == true){
-    const char ticks_anim_chars[] = {'-', '/', '|', '\\'}; 
-    size_t ti = ticks%4;
-    terminal_tick(ticks_anim_chars[ti]);
-    }
-    pic_send_EOI(IRQ_PIT);
-}
 
-void sys_sleep(int seconds){
+/*void sys_sleep(int seconds){
     log(LOG_SERIAL, false, "seconds to wait : %d\n", seconds);
     uint64_t sleep_ticks = ticks + (seconds * SYSTEM_TICKS_PER_SEC);
     log(LOG_SERIAL, false, "start tick : %d\n", ticks);
@@ -73,7 +63,7 @@ void sys_sleep(int seconds){
     while(ticks < sleep_ticks){
         log(LOG_SERIAL, false, "tick : %d\n", ticks);
     }
-}
+}*/
 
 void init_keyboard(uint32_t dev){
   device = dev;

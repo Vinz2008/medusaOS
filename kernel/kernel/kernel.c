@@ -15,6 +15,7 @@
 #include <kernel/irq_handlers.h>
 #include <kernel/multiboot2_internal.h>
 #include <kernel/sound-blaster-16.h>
+#include <kernel/speaker.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/pci.h>
@@ -45,6 +46,7 @@ extern uint32_t placement_address;
 
 extern int32_t syscall3(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 extern uint32_t syscall(uint32_t id);
+extern int syscall_c(int function, int param1, int param2, int param3);
 
 extern void sse_init();
 //multiboot_info_t *mb_info;
@@ -294,9 +296,10 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_ALL, true, "Syscalls enabled\n");
   ahci_init();
   log(LOG_SERIAL, true, "AHCI initialized\n");
+  init_speaker();
   init_sound_blaster_16();
   log(LOG_SERIAL, true, "Sound Blaster 16 initialized\n");
-  //syscall(SYS_READ);
+  //syscall_c(SYS_READ, 0, 0, 0);
   /*char buf[15];
   strcpy(buf, "test syscall\n");
   for (int i = 0; i < strlen(buf); i++){

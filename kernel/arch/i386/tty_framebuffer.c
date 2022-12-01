@@ -8,6 +8,8 @@
 #include <kernel/graphics.h>
 #include <kernel/misc.h>
 #include <kernel/vfs.h>
+#include <kernel/pit.h>
+#include <kernel/kmalloc.h>
 #include <kernel/initrd.h>
 #include <kernel/speaker.h>
 #include <kernel/config.h>
@@ -92,12 +94,21 @@ void empty_line_cli_framebuffer(){
 
 void launch_command_framebuffer(){
 	printf("\n");
-	char line_cli_copy[300];
+	char* line_cli_copy = kmalloc(sizeof(char) * 300);
+	memset(line_cli_copy, 0, sizeof(line_cli_copy));
+	log(LOG_SERIAL, false,"line_cli_copy: %s\n", line_cli_copy);
+	log(LOG_SERIAL, false,"line_cli: %s\n", line_cli);
 	char* token;
 	strcpy(line_cli_copy, line_cli);
 	char* command = strtok(line_cli_copy, " ");
+	if (command == NULL){
+		command = kmalloc(strlen(line_cli_copy) * sizeof(char));
+		strcpy(command, line_cli_copy);
+	}
 	log(LOG_SERIAL, false,"command: %s\n", command);
+	//log(LOG_SERIAL, false,"command ptr: %p\n", command);
 	char* args = kmalloc((strlen(line_cli) - strlen(command) + 1) * sizeof(char));
+	memset(args, 0, sizeof(args));
 	int i2 = 0;
 	for (int i = strlen(command) + 1; i < strlen(line_cli); i++){
 		args[i2] = line_cli[i];
@@ -119,14 +130,14 @@ void launch_command_framebuffer(){
 		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
 	}
 	
-    if (startswith("clear", line_cli)){
+    if (strcmp("clear", command) == 0){
 		terminal_framebuffer_clear();
-	} else if (startswith("echo", line_cli)){
+	} else if (strcmp("echo", command) == 0){
 		for (int i = 0; i < argc; i++){
 			printf("%s ", argv[i]);
 		}
 		printf("\n");
-	} else if (startswith("ls", line_cli)){
+	} else if (strcmp("ls", command) == 0){
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
@@ -145,7 +156,7 @@ void launch_command_framebuffer(){
         	i++;
 			print = false;
         }
-	} else if (startswith("cat", line_cli)){
+	} else if (strcmp("cat", command) == 0){
 		char*  filename = argv[0];
 		char temp[100];
 		strcpy(temp, directory);
@@ -162,7 +173,7 @@ void launch_command_framebuffer(){
 		printf("%s\n", buffer);
 		}
 		close_fs(file);
-	} else if (startswith("cd", line_cli)){
+	} else if (strcmp("cd", command) == 0){
 		char* dir = argv[0];
 		log(LOG_SERIAL, false, "length dir %d\n",strlen(dir));
 		char temp[100];
@@ -202,43 +213,41 @@ void launch_command_framebuffer(){
 		}
 		log(LOG_SERIAL, false, "temp_directory : %s\n", temp_directory);
 		strcpy(directory, temp_directory);		
-	} else if (startswith("pwd", line_cli)){
+	} else if (strcmp("pwd", command) == 0){
 		printf("%s\n", directory);
-	} else if (startswith("help", line_cli)){
-		printf("\nusage help : \n");
+	} else if (strcmp("help", command) == 0){
+		printf("usage help : \n");
 		printf("echo : print string\n");
 		printf("ls : list directory and files\n");
+		printf("cd : change directory\n");
+		printf("pwd : print directory\n");
 		printf("clear : clear screen\n");
 		printf("reboot : reboot the computer\n");
+		printf("arch : print arch of the computer\n");
 		printf("thirdtemple : ...\n");
 		printf("help : print this help\n");
-	} else if (startswith("arch", line_cli)){
+	} else if (strcmp("arch", command) == 0){
 		printf("i386\n");
-	} else if (startswith("gui", line_cli)){
-		
-	} else if (startswith("reboot", line_cli)){
+	} else if (strcmp("reboot", command) == 0){
 		reboot();
-	} else if (startswith("beep", line_cli)){
-		beep();
-	} else if (startswith("sleep", line_cli)){
-		char temp[95];
-		int i2 = 6;
-		for (int i = 0; i < strlen(line_cli); i++){
-			if (!isalnum(line_cli[i2])){
-				break;
-			}
-			printf("\nc[%d] : %c\n", i2, line_cli[i2]);
-			temp[i] = line_cli[i2];
-			i2++;
-		}
-		int seconds = atoi(temp);
-		sys_sleep(seconds);
-	} else if (startswith("thirdtemple", line_cli)){
+	} else if (strcmp("beep", command) == 0){
+		pcspkr_beep(1000, 100);
+		pcspkr_beep(1000, 10);
+		pcspkr_beep(1000, 300);
+	} else if (strcmp("sleep", command) == 0){
+		int seconds = atoi(argv[0]);
+		pit_mdelay(1000 * seconds);
+	} else if (strcmp("thirdtemple", command) == 0){
 		printf("If you search the third temple of god, you are in the wrong OS. \n Install TempleOS\n");
 	} else {
 		printf("command not found\n");
 	}
 	strcpy(last_line_cli, line_cli);
+	empty_line_cli_framebuffer();
+	kfree(command);
+	kfree(args);
+	kfree(argv);
+	kfree(buf);
 }
 
 void terminal_framebuffer_setcolor(uint32_t col){

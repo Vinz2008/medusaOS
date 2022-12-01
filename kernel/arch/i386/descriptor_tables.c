@@ -18,7 +18,7 @@ extern void idt_initialize();
 static void gdt_initialize();
 
 
-struct gdt_entry gdt[3];
+struct gdt_entry gdt[6];
 struct gdt_ptr gdt_p;
 
 static void set_gdt_entry(int32 index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
@@ -30,11 +30,13 @@ void descriptor_tables_initialize(){
 
 
 static void gdt_initialize(){
-    gdt_p.limit = (sizeof(struct gdt_entry) * 3) - 1;
+    gdt_p.limit = (sizeof(struct gdt_entry) * 6) - 1;
     gdt_p.base = (unsigned int) gdt;
     set_gdt_entry(0, 0, 0, 0, 0); // Null
     set_gdt_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code 
     set_gdt_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
+    set_gdt_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // ring 3 code
+    set_gdt_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // ring 3 data
     flush_gdt();
 }
 

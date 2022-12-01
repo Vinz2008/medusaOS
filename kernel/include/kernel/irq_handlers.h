@@ -19,3 +19,4 @@ void handle_platform_irq(x86_iframe_t* frame);
 void irq_register_handler(int irq, void (*handler)(x86_iframe_t*));
 void sys_key_handler(x86_iframe_t* frame);
 void sys_mouse_handler(x86_iframe_t* frame);
+void sys_tick_handler(x86_iframe_t* frame);

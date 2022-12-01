@@ -62,6 +62,13 @@ flush_gdt:
 
 1: ret
 
+.global flush_tss
+flush_tss:
+    mov (5 * 8) | 0, %ax
+    ltr %ax
+    ret
+
+
 .global flush_idt
 
 flush_idt:
