@@ -107,13 +107,22 @@ void launch_command_framebuffer(){
 	}
 	log(LOG_SERIAL, false,"command: %s\n", command);
 	//log(LOG_SERIAL, false,"command ptr: %p\n", command);
-	char* args = kmalloc((strlen(line_cli) - strlen(command) + 1) * sizeof(char));
-	memset(args, 0, sizeof(args));
+	char* args = kmalloc((strlen(line_cli) - strlen(command)) * sizeof(char));
+	memset(args, 0, 300);
 	int i2 = 0;
+	log(LOG_SERIAL, false, "strlen(command) : %d\n", strlen(command));
+	/*for (int i = 0; i < 300; i++){
+		log(LOG_SERIAL, false, "before args[%d] : %c\n", i, args[i]);
+	}*/
 	for (int i = strlen(command) + 1; i < strlen(line_cli); i++){
+		//log(LOG_SERIAL, false, "line_cli[%d] : %c\n", i, line_cli[i]);
+		if (line_cli[i] != '\0'){
 		args[i2] = line_cli[i];
+		}
+		//log(LOG_SERIAL, false, "args[%d] : %c\n", i2, args[i2]);
 		i2++;
 	}
+	log(LOG_SERIAL, false, "AFTER END args[%d] : %c\n", i2, args[i2]);
 	log(LOG_SERIAL, false,"args: %s\n", args);
 	char *buf = strdup(args);
 	char** argv = calloc(1, sizeof(char*));
@@ -157,14 +166,18 @@ void launch_command_framebuffer(){
 			print = false;
         }
 	} else if (strcmp("cat", command) == 0){
+		log(LOG_SERIAL, false, "test cat cmd\n");
 		char*  filename = argv[0];
-		char temp[100];
+		char temp = kmalloc(200 * sizeof(char));
+		memset(temp, 0, sizeof(temp));
 		strcpy(temp, directory);
 		strcat(temp, filename);
 		fs_node_t* root = get_initrd_root();
 		struct dirent* dir = NULL;
 		int i = 0;
+		log(LOG_SERIAL, false, "TEST\n");
 		fs_node_t* file = vfs_open(temp, "r");
+		log(LOG_SERIAL, false, "TEST2\n");
 		if (file == NULL){
 			printf("file not found: %s\n", temp);
 		} else {
@@ -173,6 +186,7 @@ void launch_command_framebuffer(){
 		printf("%s\n", buffer);
 		}
 		close_fs(file);
+		kfree(temp);
 	} else if (strcmp("cd", command) == 0){
 		char* dir = argv[0];
 		log(LOG_SERIAL, false, "length dir %d\n",strlen(dir));
@@ -215,6 +229,33 @@ void launch_command_framebuffer(){
 		strcpy(directory, temp_directory);		
 	} else if (strcmp("pwd", command) == 0){
 		printf("%s\n", directory);
+	} else if (strcmp("chown", command) == 0){
+		char* user = argv[0];
+		char* group = NULL;
+		char sep = ';';
+		int pos = 0;
+		char* temp = NULL;
+		if (strchr(user, sep) != NULL){
+			temp = strdup(user);
+			for (int i = 0; i < strlen(temp); i++){
+				if (temp[i] == sep){
+					pos = i;
+				}
+			}
+			log(LOG_SERIAL, false, "pos : %d\n", pos);
+			group = temp + pos + 1;
+			temp[pos] = '\0';
+			char* user2 = temp;
+			log(LOG_SERIAL, false, "user : %s, group : %s\n", user2, group);
+		}
+		char* file = argv[1];
+		fs_node_t* node = vfs_open(file, "w");
+		close_fs(file);
+		if (temp != NULL){
+			kfree(temp);
+		}
+
+
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");

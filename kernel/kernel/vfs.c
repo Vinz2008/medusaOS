@@ -99,30 +99,44 @@ int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size){
 
 }
 
-fs_node_t* vfs_search_node(fs_node_t* parent, const char* path){
+fs_node_t* vfs_search_node(fs_node_t* parent, const char* path, size_t index_child){
 	if (parent == NULL){
 		return NULL;
 	}
+  log(LOG_SERIAL, false, "TEST VFS\n");
 	fs_node_t* child;
-	size_t index_child = 1;
+	//size_t index_child = 1;
 	while ((child = readdir_fs(parent, index_child)) != NULL){
+    log(LOG_SERIAL, false, "strcmp child->name %s path %s : %d\n", child->name, path, strcmp(child->name, path));
+    log(LOG_SERIAL, false, "readdir_fs(fs_get_root_node(), 3)->name %s\n", readdir_fs(fs_get_root_node(), 3)->name);
+    log(LOG_SERIAL, false, "index_child : %d\n", index_child);
 		if (strcmp(child->name, path) == 0){
+      log(LOG_SERIAL, false, "return child\n");
 			return child;
 		}
 		if (child->node_type == FT_Directory){
-			fs_node_t* recursive_child = vfs_search_node(child, path);
+      log(LOG_SERIAL, false, "directory\n");
+      index_child++;
+			fs_node_t* recursive_child = vfs_search_node(child, path, index_child);
 			if (recursive_child != NULL){
 				return recursive_child;
 			}
-		}
+		} else {
 		++index_child;
+    }
 	}
 	return NULL;
 }
 
 fs_node_t* vfs_open(const char* path, const char* mode){
-	fs_node_t* file = vfs_search_node(fs_get_root_node(), path);
+  fs_node_t* root  = fs_get_root_node();
+  if (root == NULL){
+    log(LOG_SERIAL, false, "Couldn't find root node\n");
+    return NULL;
+  }
+	fs_node_t* file = vfs_search_node(root, path, 0);
 	if (file == NULL){
+    log(LOG_SERIAL, false, "Couldn't find file vfs_open\n");
 		return NULL;
 	}
 	if (file->node_type != FT_File){

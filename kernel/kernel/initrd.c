@@ -131,16 +131,27 @@ static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
     if (index >= nroot_nodes){
         return NULL;
     }
-    return &root_nodes[index];
     uint32_t dir_depth = vfs_get_depth(dir->name);
-    uint32_t n_child = 0;
+    for (size_t i = 0; i < nroot_nodes; i++){
+        //log(LOG_SERIAL, false, "TEST filename impl : %s\n", root_nodes[i].name);
+        uint32_t child_depth = vfs_get_depth(root_nodes[i].name);
+        //log(LOG_SERIAL, false, "dir_depth : %d, child_depth : %d\n ", dir_depth, child_depth);
+    }
+    //log(LOG_SERIAL, false, "\n");
+
+
+    return &root_nodes[index];
+
+
+    //uint32_t dir_depth = vfs_get_depth(dir->name);
+    //uint32_t n_child = 1;
     log(LOG_SERIAL, false, "nroot_nodes : %d\n", nroot_nodes);
     for (size_t i = 0; i < nroot_nodes; i++){
-        uint32_t child_depth = vfs_get_depth(root_nodes[i].name);
-        /*if (strstr(root_nodes[i].name, dir->name) == NULL){
+        /*uint32_t child_depth = vfs_get_depth(root_nodes[i].name);
+        if (strstr(root_nodes[i].name, dir->name) == NULL){
             log(LOG_SERIAL, false, "strstr(%s, %s)\n", root_nodes[i].name, dir->name);
         }
-        if(strstr(root_nodes[i].name, dir->name) != NULL) {
+        if(strstr(root_nodes[i].name, dir->name) != NULL || dir == get_initrd_root()) {
          // A file will have the same depth 
          if(root_nodes[i].node_type == FT_File && child_depth == dir_depth){
             ++n_child;
@@ -149,15 +160,15 @@ static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
          else if(root_nodes[i].node_type == FT_Directory && child_depth == dir_depth + 1){
             ++n_child;
          }
-         log(LOG_SERIAL, false, "n_child : %d\n", n_child);
         }
+        log(LOG_SERIAL, false, "n_child : %d, index : %d\n ", n_child, index);
         if(n_child == index){
         log(LOG_SERIAL, false, "returned node pointer %p\n", &root_nodes[i]);
         return &root_nodes[i];
-        }*/
+        }
         if (strcmp(dir->name, root_nodes[i].name) == 0){
             return &root_nodes[i];
-        }
+        }*/
 
     }
 	return NULL;
@@ -185,6 +196,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     strcpy(initrd_root->name, "/");
     initrd_root->mask = initrd_root->uid = initrd_root->gid = initrd_root->inode = initrd_root->length = 0;
     initrd_root->flags = FS_DIRECTORY;
+    initrd_root->node_type = FT_Directory;
     initrd_root->read = &initrd_read;;
     initrd_root->write = 0;
     initrd_root->open = 0;
@@ -195,6 +207,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     strcpy(initrd_dev->name, "dev");
     initrd_dev->mask = initrd_dev->uid = initrd_dev->gid = initrd_dev->inode = initrd_dev->length = 0;
     initrd_dev->flags = FS_DIRECTORY;
+    initrd_dev->node_type = FT_Directory;
     initrd_dev->read = 0;
     initrd_dev->write = 0;
     initrd_dev->open = 0;
