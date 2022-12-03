@@ -7,8 +7,9 @@
 
 void terminal_framebuffer_initialize();
 void terminal_framebuffer_putc(char c);
-void terminal_framebuffer_keypress(uint8_t scan_code);
+void terminal_framebuffer_keypress(char c);
 void terminal_framebuffer_setcolor(uint32_t col);
 void terminal_framebuffer_reset_color();
 void empty_line_cli_framebuffer();
 void launch_command_framebuffer();
+char* get_line_cli();

@@ -107,9 +107,9 @@ fs_node_t* vfs_search_node(fs_node_t* parent, const char* path, size_t index_chi
 	fs_node_t* child;
 	//size_t index_child = 1;
 	while ((child = readdir_fs(parent, index_child)) != NULL){
-    log(LOG_SERIAL, false, "strcmp child->name %s path %s : %d\n", child->name, path, strcmp(child->name, path));
-    log(LOG_SERIAL, false, "readdir_fs(fs_get_root_node(), 3)->name %s\n", readdir_fs(fs_get_root_node(), 3)->name);
-    log(LOG_SERIAL, false, "index_child : %d\n", index_child);
+    //log(LOG_SERIAL, false, "strcmp child->name %s path %s : %d\n", child->name, path, strcmp(child->name, path));
+    //log(LOG_SERIAL, false, "readdir_fs(fs_get_root_node(), 3)->name %s\n", readdir_fs(fs_get_root_node(), 3)->name);
+    //log(LOG_SERIAL, false, "index_child : %d\n", index_child);
 		if (strcmp(child->name, path) == 0){
       log(LOG_SERIAL, false, "return child\n");
 			return child;

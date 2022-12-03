@@ -334,7 +334,10 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_SERIAL, false, "end of the kernel : %p\n", &KERNEL_END);
 	//log(LOG_ALL, true, "Paging enabled\n");
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
-    //uint32_t do_page_fault = *ptr;
+  //uint32_t do_page_fault = *ptr;
+  switch_led(KBD_LED_SCROLL_LOCK);
+  switch_led(KBD_LED_NUMBER_LOCK);
+  switch_led(KBD_LED_CAPS_LOCK);
 	int i = 1233;
 #if GUI_MODE
 #else

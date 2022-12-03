@@ -18,9 +18,8 @@ extern uint32_t simple_sc_to_kc[];
 static uint32_t device;
 static kbd_context_t context;
 static void *irq_routines[16] = {0};
-extern char scan_code_table[128];
-
-
+extern char keyboard_us[];
+extern char keyboard_us_shift[];
 bool key_pressed[128];
 
 void irq_register_handler(int irq, void (*handler)(x86_iframe_t*)){
@@ -83,6 +82,9 @@ void sys_key_handler(x86_iframe_t* frame){
     // scan code https://wiki.osdev.org/PS/2_Keyboard
     // https://github.com/29jm/SnowflakeOS/blob/master/kernel/src/devices/kbd.c
     uint8_t scan_code = inb(0x60);
+    if (scan_code == 0xE0){
+        return; // shift pressed
+    }
     //uint8_t scan_code = ps2_read(PS2_DATA);
     //log(LOG_SERIAL, false, "scan code : %d\n", scan_code);
     bool pressed = 1;
@@ -114,6 +116,7 @@ void sys_key_handler(x86_iframe_t* frame){
         //terminal_print_last_command();
     } else if (scan_code < 0x81){
         //terminal_keypress(scan_code);
-        terminal_framebuffer_keypress(scan_code);
+        char c = keyboard_us[scan_code];
+        terminal_framebuffer_keypress(c);
     }
 }

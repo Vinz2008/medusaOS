@@ -19,7 +19,6 @@
 #include <kernel/font.h>
 #endif
 
-extern char keyboard_us[];
 extern void sys_sleep(int seconds);
 typedef struct {
     uint8_t magic[2];
@@ -80,11 +79,14 @@ void terminal_framebuffer_clear(){
     }
 }
 
-void terminal_framebuffer_keypress(uint8_t scan_code){
-    char c = keyboard_us[scan_code];
+void terminal_framebuffer_keypress(char c){
     append(line_cli, c);
+	putchar(c);
     //log(LOG_SERIAL, false, "char after scancode converting : %c\n", c);
-    putchar(c);
+}
+
+char* get_line_cli(){
+	return strdup(line_cli);
 }
 
 void empty_line_cli_framebuffer(){
@@ -138,7 +140,6 @@ void launch_command_framebuffer(){
 	for (int i = 0; i < argc; i++){
 		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
 	}
-	
     if (strcmp("clear", command) == 0){
 		terminal_framebuffer_clear();
 	} else if (strcmp("echo", command) == 0){

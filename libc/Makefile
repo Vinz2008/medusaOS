@@ -32,6 +32,7 @@ $(ARCH_FREEOBJS) \
 stdio/printf.o \
 stdio/putchar.o \
 stdio/puts.o \
+stdio/getchar.o \
 stdio/fprintf.o \
 stdio/fputchar.o \
 stdio/fputs.o \
