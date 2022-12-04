@@ -32,7 +32,7 @@ enum WM_EVENT {
 
 
 typedef struct {
-    int32 x, y;
+    int32_t x, y;
 } point_t;
 
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct _wm_window_t {
 } wm_window_t;
 
 typedef struct {
-    int32 top, left, bottom, right;
+    int32_t top, left, bottom, right;
 } wm_rect_t;
 
 typedef struct {

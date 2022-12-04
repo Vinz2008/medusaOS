@@ -7,6 +7,7 @@
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/misc.h>
+#include <kernel/cpuid.h>
 #include <kernel/vfs.h>
 #include <kernel/pit.h>
 #include <kernel/kmalloc.h>
@@ -124,7 +125,6 @@ void launch_command_framebuffer(){
 		//log(LOG_SERIAL, false, "args[%d] : %c\n", i2, args[i2]);
 		i2++;
 	}
-	log(LOG_SERIAL, false, "AFTER END args[%d] : %c\n", i2, args[i2]);
 	log(LOG_SERIAL, false,"args: %s\n", args);
 	char *buf = strdup(args);
 	char** argv = calloc(1, sizeof(char*));
@@ -137,7 +137,12 @@ void launch_command_framebuffer(){
         *delim = 0x00;
         argc++;
     }
+	if (argv[0][0] == '\0'){
+		argc = 0;
+	}
+	log(LOG_SERIAL, false, "argc : %d\n", argc);
 	for (int i = 0; i < argc; i++){
+		log(LOG_SERIAL, false, "argv[%d] len : %d\n",i, strlen(argv[i]));
 		log(LOG_SERIAL, false, "argv[%d] : %s\n", i, argv[i]);
 	}
     if (strcmp("clear", command) == 0){
@@ -148,11 +153,36 @@ void launch_command_framebuffer(){
 		}
 		printf("\n");
 	} else if (strcmp("ls", command) == 0){
+		log(LOG_SERIAL, false, "command ptr : %p\n", command);
 		fs_node_t* root = get_initrd_root();
+		fs_node_t* node;
+		if (argc == 0){
+			node = root;
+		} else {
+			log(LOG_SERIAL, false, "node name to find : %s\n", argv[0]);
+			node = finddir_fs(root, argv[0]);
+			if (node == NULL){
+				char* temp = kmalloc(sizeof(char) * (strlen(argv[0]) + 1));
+				strcpy(temp, argv[0]);
+				append(temp, '/');
+				node = finddir_fs(root, temp);
+				if (node == NULL){
+					printf("could not find directory %s\n", temp);
+					goto end_ls;
+				}
+				log(LOG_SERIAL, false, "node->name : %s\n", temp);
+				if (strcmp("dev/", temp) == 0){
+					log(LOG_SERIAL, false, "node dev found\n");
+				}
+			}
+		}
+		log(LOG_SERIAL, false, "node ptr : %p\n", node);
+		log(LOG_SERIAL, false, "node name : %s\n", node->name);
 		struct dirent* dir = NULL;
 		int i = 0;
 		bool print = false;
-		while ((dir = readdir_fs(fs_root, i))!=NULL){
+		while ((dir = readdir_fs(node, i))!=NULL){
+			log(LOG_SERIAL, false, "dir ptr : %p\n", dir);
 			if (strcmp(directory, "\0") != 0){
 				if (startswith(directory, dir->name)){
 					print = true;
@@ -162,10 +192,14 @@ void launch_command_framebuffer(){
 			}
 			if (print){
 			printf("filename [%i] : %s\n",i, dir->name);
+			log(LOG_SERIAL, false,"filename [%i] : %s\n",i, dir->name);
+			log(LOG_SERIAL, false,"filename [%i] ptr : %p\n",i, &dir->name);
+			log(LOG_SERIAL, false,"first char : %c\n",dir->name[0]);
 			}
         	i++;
 			print = false;
         }
+end_ls:
 	} else if (strcmp("cat", command) == 0){
 		log(LOG_SERIAL, false, "test cat cmd\n");
 		char*  filename = argv[0];
@@ -255,8 +289,10 @@ void launch_command_framebuffer(){
 		if (temp != NULL){
 			kfree(temp);
 		}
-
-
+	} else if (strcmp("lscpu", command) == 0){
+		uint32_t brand[12];
+  		get_brand(brand);
+ 	 	printf("brand : %s\n", brand);
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");

@@ -60,7 +60,13 @@ struct dirent *readdir_fs(fs_node_t *node, uint32_t index){
   if (node->readdir == 0){
     return 0;
   }
-  return node->readdir(node, index);
+  struct dirent* dir = node->readdir(node, index);
+  if (strcmp("dev", dir->name) == 0){
+    log(LOG_SERIAL, false, "DEV FOUND\n");
+    return dir;
+  } else {
+    return dir;
+  }
 }
 
 fs_node_t *finddir_fs(fs_node_t *node, char *name){

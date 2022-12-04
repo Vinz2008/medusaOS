@@ -40,8 +40,8 @@ typedef void (*open_type_t)(struct fs_node*);
 typedef void (*close_type_t)(struct fs_node*);
 typedef struct dirent* (*readdir_type_t)(struct fs_node*,uint32_t);
 typedef struct fs_node* (*finddir_type_t)(struct fs_node*,char *name); 
-typedef int32 (*read_block_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
-typedef int32 (*write_block_type_t)(struct fs_node*, uint32_t block_number, uint32_t count, uint8_t* buffer);
+typedef int32_t (*read_block_type_t)(struct fs_node*,uint32_t,uint32_t,uint8_t*);
+typedef int32_t (*write_block_type_t)(struct fs_node*, uint32_t block_number, uint32_t count, uint8_t* buffer);
 
 typedef struct fs_node
 {

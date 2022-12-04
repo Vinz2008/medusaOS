@@ -14,7 +14,7 @@ rm -f disk.img
 rm -f *.img
 rm -f *.iso
 rm -f logs.txt
-rm -rf memtest86plus
+#rm -rf memtest86plus
 rm -rf sysroot
 rm -rf sysroot-x86_64
 rm -rf build

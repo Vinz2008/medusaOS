@@ -1,12 +1,15 @@
+#include <stdint.h>
 #include <types.h>
+#include <sys/types.h>
+
 
 // Uninmplemented declarations for hosted cross compiler
 
-typedef int pid_t;
 typedef int32_t intptr_t;
+typedef signed long long int int64_t;
 
-void fork();
+pid_t fork();
 int execv(const char *path, char *const argv[]);
 int execvp(const char *file, char *const argv[]);
 int execve(const char *filename, char *const argv[],char *const envp[]); 
-void getpid();
+pid_t getpid();

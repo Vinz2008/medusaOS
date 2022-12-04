@@ -50,3 +50,4 @@ uint32_t get_initrd_address();
 
 fs_node_t *initialise_initrd(uint32_t location);
 fs_node_t* get_initrd_root();
+void set_dev_node_initrd();

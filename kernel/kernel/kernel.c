@@ -22,6 +22,8 @@
 #include <kernel/ahci.h>
 #include <kernel/nmi.h>
 #include <kernel/fpu.h>
+#include <kernel/cpuid.h>
+#include <kernel/elf.h>
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/devfs.h>
@@ -105,10 +107,12 @@ void kernel_main(uint32_t addr, uint32_t magic) {
                   i++;
                 }
                 devfs_initialize();
+                set_dev_node_initrd();
+                register_devices_necessary();
                 //initrd_list_filenames(data);
 
             } else {
-
+              elf_load_file(data);
             }
             break;
 		case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
@@ -151,8 +155,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
             struct multiboot_tag_framebuffer *tagfb
               = (struct multiboot_tag_framebuffer *) tag;
             void *fb = (void *) (unsigned long) tagfb->common.framebuffer_addr;
-			log(LOG_SERIAL, false, "framebuffer type : %d\n", tagfb->common.framebuffer_type);
-			init_fb(tagfb);
+			      log(LOG_SERIAL, false, "framebuffer type : %d\n", tagfb->common.framebuffer_type);
+			      init_fb(tagfb);
 
             /*switch (tagfb->common.framebuffer_type)
               {
@@ -240,7 +244,9 @@ void kernel_main(uint32_t addr, uint32_t magic) {
                                   + ((tag->size + 7) & ~7));
   	log(LOG_SERIAL, false, "Total mbi size 0x%x\n", (unsigned) tag - addr);
 
-
+  uint32_t brand[12];
+  get_brand(brand);
+ 	log(LOG_SERIAL, false, "brand : %s\n", brand);
 
 
 #if GUI_MODE
@@ -332,6 +338,10 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test2);
 	log(LOG_SERIAL, false, "pointer returned : %p\n", test3);
 	log(LOG_SERIAL, false, "end of the kernel : %p\n", &KERNEL_END);
+  kfree(test);
+  kfree(test2);
+  kfree(test3);
+  //register_devices_necessary();
 	//log(LOG_ALL, true, "Paging enabled\n");
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
   //uint32_t do_page_fault = *ptr;

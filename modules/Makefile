@@ -2,6 +2,8 @@ DEFAULT_HOST!=../default-host.sh
 HOST?=DEFAULT_HOST
 HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
+CC=i686-elf-gcc
+LD=i686-elf-ld
 CFLAGS?=-O2 -g
 CPPFLAGS?=
 LDFLAGS?=
@@ -33,7 +35,8 @@ LINK_LIST=\
 $(LDFLAGS) \
 $(LIBS) \
 
-test_module.bin: $(OBJS) 
+test_module.bin: $(OBJS)
+# mv test_module.o test_module.bin
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
 # objcopy -O binary -j .text $(OBJS) $@
 

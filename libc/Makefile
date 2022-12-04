@@ -7,6 +7,8 @@ CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
 
+CC=i686-medusaos-gcc
+
 DESTDIR?=
 PREFIX?=/usr/local
 EXEC_PREFIX?=$(PREFIX)
@@ -38,6 +40,7 @@ stdio/fputchar.o \
 stdio/fputs.o \
 stdio/modes.o \
 stdio/log.o \
+stdio/stdio.o \
 stdlib/abort.o \
 stdlib/atoi.o \
 stdlib/calloc.o \

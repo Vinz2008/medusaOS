@@ -6,6 +6,7 @@
 #include <kernel/serial.h>
 #include <kernel/kmalloc.h>
 #include <kernel/vfs.h>
+#include <kernel/devfs.h>
 
 
 initrd_list_header_t list_headers;
@@ -22,6 +23,11 @@ struct dirent dirent;
 bool isInitrdInitialized = false;
 
 static uint32_t initrd_adress;
+
+int pos = -1;
+
+extern struct dirent* devfs_readdir(struct fs_node* node, uint32_t index);
+extern fs_node_t* devfs_finddir(struct fs_node* node, char *name);
 
 void init_header_list(initrd_list_header_t* list, size_t initalSize){
     list->headers = kmalloc(initalSize * sizeof(struct tar_header*));
@@ -122,7 +128,7 @@ static uint32_t initrd_read(fs_node_t *node, uint32_t offset, uint32_t size, uin
 }
 
 static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
-	/*if (node == initrd_root && index == 0) {
+	/*if (dir == initrd_root && index == nroot_nodes) {
 		strcpy(dirent.name, "dev");
 		dirent.name[3] = 0;
 		dirent.ino = 0;
@@ -203,8 +209,8 @@ fs_node_t *initialise_initrd(uint32_t location){
     initrd_root->close = 0;
     initrd_root->readdir = &initrd_readdir;
     initrd_root->finddir = &initrd_finddir;
-    initrd_dev = (fs_node_t*)kmalloc(sizeof(fs_node_t));
-    strcpy(initrd_dev->name, "dev");
+    /*initrd_dev = (fs_node_t*)kmalloc(sizeof(fs_node_t));
+    strcpy(initrd_dev->name, "dev/");
     initrd_dev->mask = initrd_dev->uid = initrd_dev->gid = initrd_dev->inode = initrd_dev->length = 0;
     initrd_dev->flags = FS_DIRECTORY;
     initrd_dev->node_type = FT_Directory;
@@ -212,13 +218,14 @@ fs_node_t *initialise_initrd(uint32_t location){
     initrd_dev->write = 0;
     initrd_dev->open = 0;
     initrd_dev->close = 0;
-    initrd_dev->readdir = &initrd_readdir;
-    initrd_dev->finddir = &initrd_finddir;
+    initrd_dev->readdir = &devfs_readdir;
+    initrd_dev->finddir = &devfs_finddir;
     initrd_dev->mount_point = 0;
-    initrd_dev->impl = 0;
-    root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * initrd_header->nfiles);
+    initrd_dev->impl = 0;*/
+    root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * (initrd_header->nfiles+1));
     nroot_nodes = initrd_header->nfiles;
-    for (int i = 0; i < initrd_header->nfiles; i++){
+    int i;
+    for (i = 0; i < initrd_header->nfiles; i++){
         //file_headers[i].offset += location;
         strcpy(root_nodes[i].name, strdup(list_headers.headers[i]->filename));
         log(LOG_SERIAL, false, "root_nodes[i].name : %s\n",list_headers.headers[i]->filename);
@@ -242,9 +249,16 @@ fs_node_t *initialise_initrd(uint32_t location){
                 break;
         }
     }
+    pos = i;
     isInitrdInitialized = true;
     log(LOG_SERIAL, false, "initrd initialized\n");
     return initrd_root;
+}
+
+void set_dev_node_initrd(){
+    fs_node_t* dev = get_root_devfs();
+    root_nodes[pos] = *dev;
+    nroot_nodes++;
 }
 
 fs_node_t* get_initrd_root(){

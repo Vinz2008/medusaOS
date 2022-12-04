@@ -8,6 +8,7 @@
 
 #define LOG_SCREEN 0
 #define LOG_SERIAL 1
+#define LOG_STDERR 2
 #define LOG_ALL 3
 
 #define EOF (-1)
@@ -36,7 +37,9 @@ void vok_printing_boot(const char* restrict format, va_list parameters);
 
 // Uninmplemented declarations for hosted cross compiler
 
-typedef file_descriptor_t FILE;
+//typedef file_descriptor_t FILE;
+typedef int FILE;
+
 
 #define	F_OK	0
 #define	R_OK	4
@@ -63,11 +66,8 @@ void setbuf(FILE *stream, char *buffer);
 
 int sprintf(char *str, const char *format, ...);
 
-// took the following from dietlibc
-/*
-static FILE __stderr;
-FILE* stderr=&__stderr;
-*/
+extern FILE* stderr;
+
 
 int fflush(FILE *stream);
 

@@ -21,7 +21,7 @@ static void gdt_initialize();
 struct gdt_entry gdt[6];
 struct gdt_ptr gdt_p;
 
-static void set_gdt_entry(int32 index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
+static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
 void descriptor_tables_initialize(){
     gdt_initialize();
@@ -41,7 +41,7 @@ static void gdt_initialize(){
 }
 
 // Set the value of one GDT entry.
-static void set_gdt_entry(int32 index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity){
+static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity){
     gdt[index].base_low = (base & 0xFFFF);
     gdt[index].base_middle = (base >> 16) & 0xFF;
     gdt[index].base_high = (base >> 24) & 0xFF;

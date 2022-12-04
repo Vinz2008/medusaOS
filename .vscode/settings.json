@@ -51,7 +51,9 @@
     "initializer_list": "c",
     "*.inc": "c",
     "sstream": "c",
-    "speaker.h": "c"
+    "speaker.h": "c",
+    "functional": "c",
+    "fstream": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

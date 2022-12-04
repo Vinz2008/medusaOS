@@ -26,6 +26,9 @@ int atoi(const char *str);
 void free(void* ptr);
 int atexit(void (*func)(void));
 char *getenv(const char *name);
+void exit(int status);
+
+#include <math.h> // for macro abs
 //int abs(int x);
 
 #endif
