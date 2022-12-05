@@ -154,3 +154,20 @@ index 2bae9099b6a..3919026813f 100644
  i[3-7]86-*-sysv[45]*)	targ_emul=elf_i386
  			targ_extra_emuls=elf_iamcu
  			;;
+diff --git a/ld/emulparams/elf_i386_medusaos.sh b/ld/emulparams/elf_i386_medusaos.sh
+new file mode 100644
+index 00000000000..08cd1ff020d
+--- /dev/null
++++ b/ld/emulparams/elf_i386_medusaos.sh
+@@ -0,0 +1,2 @@
++source_sh ${srcdir}/emulparams/elf_i386.sh
++TEXT_START_ADDR=0x08000000
+\ No newline at end of file
+diff --git a/ld/emulparams/elf_x86_64_medusaos.sh b/ld/emulparams/elf_x86_64_medusaos.sh
+new file mode 100644
+index 00000000000..1138d5551cb
+--- /dev/null
++++ b/ld/emulparams/elf_x86_64_medusaos.sh
+@@ -0,0 +1 @@
++source_sh ${srcdir}/emulparams/elf_x86_64.sh
+\ No newline at end of file
