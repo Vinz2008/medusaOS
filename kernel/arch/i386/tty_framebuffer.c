@@ -42,6 +42,8 @@ void terminal_framebuffer_initialize(){
     fb = fb_get_info();
 }
 
+
+
 void terminal_framebuffer_putc(char c){
 #if GUI_MODE
 #else
@@ -100,7 +102,6 @@ void launch_command_framebuffer(){
 	memset(line_cli_copy, 0, sizeof(line_cli_copy));
 	log(LOG_SERIAL, false,"line_cli_copy: %s\n", line_cli_copy);
 	log(LOG_SERIAL, false,"line_cli: %s\n", line_cli);
-	char* token;
 	strcpy(line_cli_copy, line_cli);
 	if (strlen(line_cli_copy) != 0){
 		printf("\n");
@@ -133,7 +134,7 @@ void launch_command_framebuffer(){
 	char *delim;
 	int argc = 1;
 	argv[0] = buf;
-    while (delim = strchr(argv[argc - 1], ' ')) {
+    while ((delim = strchr(argv[argc - 1], ' '))) {
         argv = krealloc(argv, (argc + 1) * sizeof (char *));
         argv[argc] = delim + 1;
         *delim = 0x00;
@@ -205,13 +206,10 @@ end_ls:
 	} else if (strcmp("cat", command) == 0){
 		log(LOG_SERIAL, false, "test cat cmd\n");
 		char*  filename = argv[0];
-		char temp = kmalloc(200 * sizeof(char));
+		char* temp = kmalloc(200 * sizeof(char));
 		memset(temp, 0, sizeof(temp));
 		strcpy(temp, directory);
 		strcat(temp, filename);
-		fs_node_t* root = get_initrd_root();
-		struct dirent* dir = NULL;
-		int i = 0;
 		log(LOG_SERIAL, false, "TEST\n");
 		fs_node_t* file = vfs_open(temp, "r");
 		log(LOG_SERIAL, false, "TEST2\n");
@@ -287,7 +285,7 @@ end_ls:
 		}
 		char* file = argv[1];
 		fs_node_t* node = vfs_open(file, "w");
-		close_fs(file);
+		close_fs(node);
 		if (temp != NULL){
 			kfree(temp);
 		}

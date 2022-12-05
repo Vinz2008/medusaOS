@@ -48,7 +48,7 @@ typedef enum {
     PS2_KEYBOARD,
     PS2_KEYBOARD_TRANSLATED,
     PS2_DEVICE_UNKNOWN
-};
+} ps2_device_type;
 
 void init_ps2();
 bool ps2_write_device(uint32_t device, uint8_t b);

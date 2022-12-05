@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 void hex_to_ascii(int n, char str[]) {
-    memset(str, 0, sizeof(str));
+    memset(str, 0, strlen(str) * sizeof(char));
     append(str, '0');
     append(str, 'x');
     char zeros = 0;

@@ -79,6 +79,7 @@ void init_keyboard(uint32_t dev){
 
 
 void sys_key_handler(x86_iframe_t* frame){
+    (void)frame;
     // scan code https://wiki.osdev.org/PS/2_Keyboard
     // https://github.com/29jm/SnowflakeOS/blob/master/kernel/src/devices/kbd.c
     uint8_t scan_code = inb(0x60);

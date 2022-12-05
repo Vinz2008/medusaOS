@@ -124,10 +124,13 @@ void switch_led(int led){
   switch (led){ 
     case KBD_LED_SCROLL_LOCK:
       led_status ^= 1;
+      break;
     case KBD_LED_NUMBER_LOCK:
       led_status ^= 2;
+      break;
     case KBD_LED_CAPS_LOCK:
       led_status ^= 4;
+      break;
   }
   log(LOG_SERIAL, false, "led status : %d\n", led_status);
   outb(0x60, 0xED);

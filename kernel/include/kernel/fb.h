@@ -1,7 +1,7 @@
-#include <multiboot2.h>
-
 #ifndef _FB_HEADER_
 #define _FB_HEADER_
+
+#include <multiboot2.h>
 
 typedef struct {
     uintptr_t address;

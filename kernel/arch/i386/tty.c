@@ -102,14 +102,12 @@ void move_cursor_left(){
 }
 
 void move_cursor_next_line(){
-	uint16_t x = x_pos_cursor;
 	uint16_t y = y_pos_cursor;
 	y++;
 	update_cursor(3, y);
 }
 
 void move_cursor_last_line(){
-	uint16_t x = x_pos_cursor;
 	uint16_t y = y_pos_cursor;
 	y--;
 	update_cursor(3, y);
@@ -201,7 +199,6 @@ void terminal_putchar(char c) {
 
 void terminal_write(const char* data, size_t size) {
 	bool controlSequence = false;
-	char sequence[10];
 	for (size_t i = 0; i < size; i++) {
 		switch (data[i]) {
 		case '\x1B':
@@ -313,7 +310,7 @@ void launch_command(){
 			temp[i] = line_cli[i2];
 			i2++;
 		}
-		int seconds = atoi(temp);
+		//int seconds = atoi(temp);
 		//sys_sleep(seconds);
 	} else if (startswith("thirdtemple", line_cli)){
 		printf("\nIf you search the third temple of god, you are in the wrong OS. \n Install TempleOS");

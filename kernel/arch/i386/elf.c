@@ -220,7 +220,7 @@ void *elf_load_file(void *file) {
 	Elf32_EHeader *header = (Elf32_EHeader *)file;
 	if(!elf_check_supported(header)) {
 		log(LOG_SERIAL, false, "ELF File cannot be loaded.\n");
-		return;
+		return NULL;
 	}
 	switch(header->e_type) {
 		case ET_EXEC:

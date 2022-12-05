@@ -18,3 +18,4 @@ typedef struct Device
 struct dirent* devfs_readdir(struct fs_node* node, uint32_t index);
 fs_node_t* devfs_finddir(struct fs_node* node, char *name);
 fs_node_t* get_root_devfs();
+fs_node_t* devfs_register_device(Device* device);

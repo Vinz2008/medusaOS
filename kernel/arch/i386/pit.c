@@ -3,6 +3,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <kernel/io.h>
+#include <kernel/pic.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/x86.h>
 
@@ -59,6 +60,7 @@ void pit_sleep(uint64_t t) {
 }
 
 void sys_tick_handler(x86_iframe_t* frame){
+    (void)frame;
     ++ticks;
     //log(LOG_SERIAL, false, "ticks in handler: %d\n", ticks);
     if (tick_animation_enabled == true){

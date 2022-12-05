@@ -95,6 +95,7 @@ uint32_t vfs_get_depth(const char *path){
 
 // write a character
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size){
+    (void)size;
     if (file == VFS_FD_STDOUT){
         putchar(*data);
     } else if (file == VFS_FD_SERIAL){

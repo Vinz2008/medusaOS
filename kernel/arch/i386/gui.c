@@ -17,7 +17,7 @@ void wm_mouse_callback(mouse_t curr);
 static uint32_t id_count = 0;
 static fb_t fb;
 static mouse_t mouse;
-static wm_window_t* focused;
+//static wm_window_t* focused;
 
 
 rect_t rect_from_window(wm_window_t* win) {
@@ -87,7 +87,7 @@ void render_window(window_t* win){
     uintptr_t fb_off = fb.address + fb.pitch + fb.bpp/8;
     //memcpy(fb.address, wfb->address, sizeof(wfb->height*wfb->pitch));
     log(LOG_SERIAL, false, "size window when rendering : %d\n", wfb->height*wfb->width*wfb->bpp/8);
-    memcpy(fb.address, wfb->address, wfb->height*wfb->pitch);
+    memcpy((uint32_t*)fb.address, (uint32_t*)wfb->address, wfb->height*wfb->pitch);
 }
 
 void wm_render_window(uint32_t win_id, rect_t* clip) {
@@ -126,9 +126,9 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
 
 void draw_window(window_t* win){
     uint32_t bg_color = 0x353535;
-    uint32_t base_color = 0x222221;
-    uint32_t highlight = 0x030303;
-    uint32_t border_color = 0x000000;
+    //uint32_t base_color = 0x222221;
+    //uint32_t highlight = 0x030303;
+    //uint32_t border_color = 0x000000;
     uint32_t text_color = 0xFFFFFF;
     uint32_t border_color2 = 0x121212;
     log(LOG_SERIAL, false, "Drawing window\n");
