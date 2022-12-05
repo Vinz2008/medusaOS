@@ -96,13 +96,15 @@ void empty_line_cli_framebuffer(){
 
 
 void launch_command_framebuffer(){
-	printf("\n");
 	char* line_cli_copy = kmalloc(sizeof(char) * 300);
 	memset(line_cli_copy, 0, sizeof(line_cli_copy));
 	log(LOG_SERIAL, false,"line_cli_copy: %s\n", line_cli_copy);
 	log(LOG_SERIAL, false,"line_cli: %s\n", line_cli);
 	char* token;
 	strcpy(line_cli_copy, line_cli);
+	if (strlen(line_cli_copy) != 0){
+		printf("\n");
+	}
 	char* command = strtok(line_cli_copy, " ");
 	if (command == NULL){
 		command = kmalloc(strlen(line_cli_copy) * sizeof(char));
@@ -318,10 +320,13 @@ end_ls:
 	} else if (strcmp("thirdtemple", command) == 0){
 		printf("If you search the third temple of god, you are in the wrong OS. \n Install TempleOS\n");
 	} else {
-		printf("command not found\n");
+		if (strlen(line_cli_copy) != 0) {
+			printf("command not found\n");
+		}
 	}
 	strcpy(last_line_cli, line_cli);
 	empty_line_cli_framebuffer();
+	kfree(line_cli_copy);
 	kfree(command);
 	kfree(args);
 	kfree(argv);

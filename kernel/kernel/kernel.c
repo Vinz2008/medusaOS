@@ -27,6 +27,7 @@
 #include <kernel/vfs.h>
 #include <kernel/initrd.h>
 #include <kernel/devfs.h>
+#include <kernel/device.h>
 #include <kernel/rtc.h>
 #include <kernel/ps2.h>
 #include <kernel/fb.h>
