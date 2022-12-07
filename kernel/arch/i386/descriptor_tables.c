@@ -16,12 +16,11 @@ extern void idt_initialize();
 
 
 static void gdt_initialize();
-
+static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
 struct gdt_entry gdt[6];
 struct gdt_ptr gdt_p;
 
-static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
 void descriptor_tables_initialize(){
     gdt_initialize();
@@ -102,7 +101,7 @@ void handle_unknown(void){
 	handle_exception(16);
 }
 
-void  x86_exception_handler(x86_iframe_t* iframe){
+void  x86_exception_handler(registers_t* iframe){
 
     uint32_t vector = iframe->vector;
 

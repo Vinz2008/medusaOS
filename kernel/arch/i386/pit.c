@@ -59,7 +59,7 @@ void pit_sleep(uint64_t t) {
     log(LOG_SERIAL, false, "ticks in loop : %d\n", ticks);
 }
 
-void sys_tick_handler(x86_iframe_t* frame){
+void sys_tick_handler(registers_t* frame){
     (void)frame;
     ++ticks;
     //log(LOG_SERIAL, false, "ticks in handler: %d\n", ticks);

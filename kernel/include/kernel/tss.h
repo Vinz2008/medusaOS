@@ -29,6 +29,6 @@ struct tss_entry_struct {
 	uint32_t ldt;
 	uint16_t trap;
 	uint16_t iomap_base;
-} __packed;
+} __attribute__((packed));
 
 typedef struct tss_entry_struct tss_entry_t;

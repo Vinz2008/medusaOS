@@ -13,7 +13,7 @@
 
 #define SYSCALL_NUM 64
 
-void syscall_handler(x86_iframe_t * frame);
-typedef void (*handler_t)(x86_iframe_t*);
+void syscall_handler(registers_t * frame);
+typedef void (*handler_t)(registers_t*);
 
 void init_syscalls();

@@ -23,3 +23,8 @@ void write_tss(struct gdt_entry* g){
 void set_kernel_stack(uint32_t stack) { // Used when an interrupt occurs
 	tss_entry.esp0 = stack;
 }
+
+void install_tss(){
+    tss_entry.ss0 = 0x10;
+    tss_entry.iomap_base = (uint16_t) sizeof(tss_entry_t);
+}

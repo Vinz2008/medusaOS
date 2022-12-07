@@ -7,7 +7,7 @@
 handler_t syscall_handlers[SYSCALL_NUM] = { 0 };
 
 
-void syscall_handler(x86_iframe_t* frame){
+void syscall_handler(registers_t* frame){
     log(LOG_SERIAL, false, "test syscall handler\n");
     if(frame->eax < SYS_MAX){
         handler_t handler = syscall_handlers[frame->eax];
@@ -18,11 +18,11 @@ void syscall_handler(x86_iframe_t* frame){
     }
 }
 
-void syscall_read(x86_iframe_t* frame){
+void syscall_read(registers_t* frame){
     log(LOG_SERIAL, false, "syscall read test\n");
 }
 
-void syscall_write(x86_iframe_t* frame){
+void syscall_write(registers_t* frame){
     uint32_t fd = frame->ebx;
     uint8_t* buf = (uint8_t*)frame->ecx;
     //log(LOG_SERIAL, false, "buf : %c\n", *buf);
@@ -30,7 +30,7 @@ void syscall_write(x86_iframe_t* frame){
     frame->eax = vfs_write_fd(fd, buf, size);
 }
 
-void syscall_sbrk(x86_iframe_t* frame){
+void syscall_sbrk(registers_t* frame){
 
 }
 

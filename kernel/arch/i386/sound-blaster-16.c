@@ -18,7 +18,7 @@ void reset_sound_blaster_16(){
     outb(RESET_PORT, 0);
 }
 
-void sound_blaster_16_irq_handler(x86_iframe_t* frame){
+void sound_blaster_16_irq_handler(registers_t* frame){
 
 }
 

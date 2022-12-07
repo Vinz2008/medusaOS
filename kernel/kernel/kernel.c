@@ -25,6 +25,7 @@
 #include <kernel/cpuid.h>
 #include <kernel/elf.h>
 #include <kernel/vfs.h>
+#include <kernel/task.h>
 #include <kernel/initrd.h>
 #include <kernel/devfs.h>
 #include <kernel/device.h>
@@ -302,10 +303,13 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
   ahci_init();
-  log(LOG_SERIAL, true, "AHCI initialized\n");
+  log(LOG_SERIAL, false, "AHCI initialized\n");
   init_speaker();
   init_sound_blaster_16();
-  log(LOG_SERIAL, true, "Sound Blaster 16 initialized\n");
+  log(LOG_SERIAL, false, "Sound Blaster 16 initialized\n");
+  initTasking();
+  log(LOG_SERIAL, false, "Cooperative multitasking initialized\n");
+  test_switch_task();
   //syscall_c(SYS_READ, 0, 0, 0);
   /*char buf[15];
   strcpy(buf, "test syscall\n");

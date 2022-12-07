@@ -8,7 +8,7 @@
 
 
 void descriptor_tables_initialize();
-void sys_tick_handler(x86_iframe_t* frame);
+void sys_tick_handler(registers_t* frame);
 
 struct gdt_entry
 {
