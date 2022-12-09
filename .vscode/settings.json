@@ -53,7 +53,9 @@
     "sstream": "c",
     "speaker.h": "c",
     "functional": "c",
-    "fstream": "c"
+    "fstream": "c",
+    "assert.h": "c",
+    "tuple": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <math.h>
+#include <stdlib.h>
 #include <kernel/fb.h>
 #include <kernel/config.h>
 #if GUI_MODE

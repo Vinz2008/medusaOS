@@ -1,3 +1,6 @@
+#ifndef _CTYPE_H
+#define _CTYPE_H 1
+
 enum
 {
   _ISupper = 01,	/* UPPERCASE.  */
@@ -36,3 +39,5 @@ extern unsigned char _ctype[];
 #define isascii(c)	((unsigned)(c) <= 0x7F)
 #define tolower(c)	(isupper(c) ? c + 'a' - 'A' : c)
 #define toupper(c)	(islower(c) ? c + 'A' - 'a' : c)
+
+#endif

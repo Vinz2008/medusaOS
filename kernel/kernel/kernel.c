@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 #include <multiboot2.h>
 #include <kernel/config.h>
 #include <kernel/gui.h>

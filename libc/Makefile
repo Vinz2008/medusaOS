@@ -47,6 +47,12 @@ stdlib/calloc.o \
 stdlib/malloc.o \
 stdlib/strtol.o \
 stdlib/stack_chk.o \
+stdlib/abs.o \
+stdlib/labs.o \
+stdlib/div.o \
+stdlib/ldiv.o \
+stdlib/rand.o \
+stdlib/srand.o \
 string/memcmp.o \
 string/memcpy.o \
 string/memmove.o \
@@ -68,6 +74,11 @@ errno/perror.o \
 syscalls/syscalls.o \
 ctype/ctype.o \
 math/math.o \
+assert.o \
+locale/localeconv.o \
+setjmp/setjmp.o \
+setjmp/longjmp.o \
+
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \

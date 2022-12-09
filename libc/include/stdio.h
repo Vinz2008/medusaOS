@@ -12,6 +12,17 @@
 #define LOG_ALL 3
 
 #define EOF (-1)
+#define	F_OK	0
+#define	R_OK	4
+#define	W_OK	2
+#define	X_OK	1
+
+#define	SEEK_SET	0
+#define	SEEK_CUR	1
+#define	SEEK_END	2
+#define BUFSIZ 512
+#define TMP_MAX 32
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,15 +51,6 @@ void vok_printing_boot(const char* restrict format, va_list parameters);
 //typedef file_descriptor_t FILE;
 typedef int FILE;
 
-
-#define	F_OK	0
-#define	R_OK	4
-#define	W_OK	2
-#define	X_OK	1
-
-#define	SEEK_SET	0
-#define	SEEK_CUR	1
-#define	SEEK_END	2
 
 int fclose(FILE *stream);
 
