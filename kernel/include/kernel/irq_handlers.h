@@ -20,3 +20,4 @@ void irq_register_handler(int irq, void (*handler)(registers_t*));
 void sys_key_handler(registers_t* frame);
 void sys_mouse_handler(registers_t* frame);
 void sys_tick_handler(registers_t* frame);
+void sys_mouse_handler(registers_t* frame);

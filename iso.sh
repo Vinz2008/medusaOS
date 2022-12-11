@@ -14,7 +14,7 @@ mkdir -p isodir/boot
 mkdir -p isodir/boot/grub
 mkdir -p isodir/modules
 
-cp modules/test_module.bin isodir/modules
+cp modules/*.mod isodir/modules
 cp -r sysroot/* isodir/
 #cp sysroot/boot/kernel.kernel isodir/boot/kernel.kernel
 cp grub/grub.cfg isodir/boot/grub/grub.cfg

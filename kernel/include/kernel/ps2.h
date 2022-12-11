@@ -2,6 +2,7 @@
 
 #define PS2_CMD 0x64
 #define PS2_DATA 0x60
+#define PS2_STATUS 0x64
 
 // Configuration byte
 #define PS2_CFG_FIRST_PORT 1
@@ -13,6 +14,10 @@
 #define PS2_CFG_MUST_BE_ZERO (1 << 7)
 
 // Controller commands
+#define PS2_DISABLE_PORT2  0xA7
+#define PS2_ENABLE_PORT2   0xA8
+#define PS2_DISABLE_PORT1  0xAD
+#define PS2_ENABLE_PORT1   0xAE
 #define PS2_DISABLE_FIRST 0xAD
 #define PS2_DISABLE_SECOND 0xA7
 #define PS2_ENABLE_FIRST 0xAE
@@ -55,3 +60,4 @@ bool ps2_write_device(uint32_t device, uint8_t b);
 bool ps2_expect_ack();
 bool ps2_write_device(uint32_t device, uint8_t b);
 uint8_t ps2_read(uint32_t port);
+void ps2_initialize();

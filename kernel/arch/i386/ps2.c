@@ -8,6 +8,19 @@
 
 bool controllers[] = { true, true };
 
+static int ps2_wait_input(void) {
+	uint64_t timeout = 100000UL;
+	while (--timeout) {
+		if (!(inb(PS2_STATUS) & (1 << 1))) return 0;
+	}
+	return 1;
+}
+
+void ps2_command(uint8_t cmdbyte){
+    ps2_wait_input();
+	outb(PS2_CMD, cmdbyte);
+}
+
 bool ps2_wait_write() {
     int timer = PS2_TIMEOUT;
     while ((inb(0x64) & 2) && timer-- > 0){
@@ -199,7 +212,7 @@ void init_ps2(){
                 case PS2_KEYBOARD_TRANSLATED:
                     log(LOG_SERIAL, false, "keyboard\n");
                     //init_kbd(i);
-                    init_keyboard(i);
+                    //init_keyboard(i);
                     break;
                 case PS2_MOUSE:
                 case PS2_MOUSE_SCROLL_WHEEL:
@@ -220,4 +233,22 @@ void init_ps2(){
     ps2_write(PS2_CMD, PS2_WRITE_CONFIG);
     ps2_write(PS2_DATA, config);
     x86_enable_int();
+}
+
+void ps2_initialize(){
+    ps2_command(PS2_DISABLE_PORT1);
+	ps2_command(PS2_DISABLE_PORT2);
+    size_t timeout = 1024;
+    while ((inb(PS2_STATUS) & 1) && timeout > 0) {
+		timeout--;
+		inb(PS2_DATA);
+	}
+    if (timeout == 0) {
+		log(LOG_SERIAL, false, "ps2: probably don't actually have PS/2.\n");
+		return;
+	}
+    ps2_command(PS2_ENABLE_PORT1);
+	ps2_command(PS2_ENABLE_PORT2);
+    mouse_write(MOUSE_SET_DEFAULTS);
+	mouse_write(MOUSE_DATA_ON);
 }

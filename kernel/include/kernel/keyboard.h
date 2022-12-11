@@ -20,6 +20,6 @@ typedef struct {
 } kbd_context_t;
 
 uint8_t read_scan_code(void);
-void init_keyboard(uint32_t dev);
+void keyboard_install();
 void switch_led(int led);
 char kbd_keycode_to_char(uint32_t keycode, bool shift);

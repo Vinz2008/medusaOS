@@ -41,6 +41,8 @@ kernel/kmalloc.o \
 kernel/list.o \
 kernel/ringbuffer.o \
 kernel/devfs.o \
+kernel/pipe.o \
+kernel/process.o \
 
 
 OBJS=\

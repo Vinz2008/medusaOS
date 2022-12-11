@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <kernel/irq_handlers.h>
+#include <kernel/pipe.h>
 #include <kernel/ps2.h>
 #include <kernel/io.h>
 
 #define KBD_DATA_PORT   0x60
 
+fs_node_t* keyboard_pipe;
 
 uint8_t read_scan_code(void){
     return inb(KBD_DATA_PORT);
@@ -136,4 +138,11 @@ void switch_led(int led){
   outb(0x60, 0xED);
   kbd_ack();
   outb(0x60, led_status);
+}
+
+
+void keyboard_install(){
+  keyboard_pipe = make_pipe(128);
+  irq_register_handler(1, sys_key_handler);
+  log(LOG_ALL, true, "IRQ handler set: sys_key_handler\n");	
 }

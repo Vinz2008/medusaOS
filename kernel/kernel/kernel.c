@@ -12,6 +12,7 @@
 #include <kernel/tty_framebuffer.h>
 #include <kernel/serial.h>
 #include <kernel/keyboard.h>
+#include <kernel/mouse.h>
 #include <kernel/descriptors_tables.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/multiboot2_internal.h>
@@ -282,7 +283,9 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   irq_register_handler(0, sys_tick_handler);
   log(LOG_ALL, true, "IRQ handler set: sys_tick_handler\n");
   //init_ps2();
-  init_keyboard(0);
+  //ps2_initialize();
+  keyboard_install();
+  //mouse_install();
 #if GUI_MODE
 #else
 	char timer_str[] = "System timer is ticking\n";

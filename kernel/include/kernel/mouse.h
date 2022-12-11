@@ -1,5 +1,10 @@
 #include <types.h>
 
+#define MOUSE_STATUS 0x64
+#define MOUSE_PORT   0x60
+#define MOUSE_BBIT   0x01
+#define MOUSE_F_BIT  0x20
+#define MOUSE_WRITE  0xD4
 
 // Mouse-specific commands
 #define MOUSE_SET_SAMPLE 0xF3
@@ -21,6 +26,9 @@
 #define MOUSE_UNUSED_A (1 << 7)
 #define MOUSE_UNUSED_B (1 << 6)
 
+#define MOUSE_SET_DEFAULTS 0xF6
+#define MOUSE_DATA_ON 0xF4
+
 typedef struct {
     float x, y;
     bool left_pressed;
@@ -28,7 +36,5 @@ typedef struct {
     bool middle_pressed;
 } mouse_t;
 
-typedef void (*mouse_callback_t)(mouse_t);
 
-void mouse_handle_packet();
-void init_mouse(uint32_t dev);
+void mouse_install();

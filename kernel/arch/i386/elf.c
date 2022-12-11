@@ -215,9 +215,19 @@ int elf_do_reloc(Elf32_EHeader* header, Elf32_Rel *rel, Elf32_SectionHeader* rel
 	return symval;
 }
 
+
+void elf_start_executable(void* file){
+
+}
+
 void *elf_load_file(void *file) {
     log(LOG_SERIAL, false, "loading elf module\n");
 	Elf32_EHeader *header = (Elf32_EHeader *)file;
+	log(LOG_SERIAL, false, "Type %s%s%s\n",
+		header->e_ident[4] == 1 ? "32bit ": "64bit ",
+		header->e_ident[5] == 1 ?  "Little Endian ": "Big endian ",
+		header->e_ident[6] == 1 ? "True ELF ": "buggy ELF "
+	);
 	if(!elf_check_supported(header)) {
 		log(LOG_SERIAL, false, "ELF File cannot be loaded.\n");
 		return NULL;
