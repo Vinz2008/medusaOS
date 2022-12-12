@@ -53,6 +53,7 @@ test_module.bin: $(OBJS)
 
 clean:
 	rm -f $(BIN)
+	rm -f *.mod
 	rm -f $(OBJS) *.o */*.o */*/*.o
 	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
 

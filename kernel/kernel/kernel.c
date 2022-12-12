@@ -376,5 +376,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 #else
 	printf("> ");
 #endif
+  char* argv[] = { "/bin/init", NULL};
 	while(1);
 }

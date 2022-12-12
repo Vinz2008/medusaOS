@@ -7,6 +7,7 @@ for PROJECT in $PROJECTS; do
 done
 
 cd modules && $MAKE clean && cd ..
+cd userspace && $MAKE clean && cd ..
 
 rm -rf isodir
 rm -rf kernel.iso

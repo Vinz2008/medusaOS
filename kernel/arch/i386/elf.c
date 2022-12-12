@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <kernel/vfs.h>
 #include <kernel/kmalloc.h>
 
 static inline Elf32_SectionHeader *elf_sheader(Elf32_EHeader* header) {
@@ -242,4 +244,12 @@ void *elf_load_file(void *file) {
 			return elf_load_rel(header);
 	}
 	return NULL;
+}
+
+int exec(char* path, int argc, char** argv){
+	fs_node_t* file = vfs_open(path, "r");
+	if (!file){
+		return 0;
+	}
+	log(LOG_SERIAL, false, "file found\n");
 }

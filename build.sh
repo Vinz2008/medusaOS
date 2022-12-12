@@ -7,3 +7,4 @@ for PROJECT in $PROJECTS; do
 done
 
 cd modules && DESTDIR="$SYSROOT" $MAKE install && cd ..
+cd userspace && DESTDIR="$SYSROOT" $MAKE install && cd ..
