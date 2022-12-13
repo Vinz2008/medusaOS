@@ -15,6 +15,7 @@ int putchar(int ic) {
 #else
 	//terminal_write(&c, sizeof(c));
 	terminal_framebuffer_putc(c);
+	//terminal_framebuffer_putc_back(c);
 #endif
 #else
 	// TODO: Implement stdio and the write system call.

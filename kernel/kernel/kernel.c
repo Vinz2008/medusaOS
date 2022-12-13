@@ -64,6 +64,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	write_serial("LOG START\n");
 	init_pmm(addr);
   init_paging(addr);
+  vfs_init();
 	log(LOG_SERIAL, false, "MedusaOS\n");
 	log(LOG_SERIAL, false, "kernel is %d KiB large\n", ((uint32_t) &KERNEL_SIZE) >> 0);
 	//mb_info = mbd;

@@ -32,15 +32,18 @@ struct dirent* devfs_readdir(struct fs_node* node, uint32_t index){
     }
     for (int i = 0; i < n_devices; i++){
         log(LOG_SERIAL, false, "readdir device_list[%d] : %s\n", i, device_list[i].name);
+        log(LOG_SERIAL, false, "readdir device_list[%d] ptr name : %p\n", i, &(device_list[i].name));
     }
+    log(LOG_SERIAL, false, "name of device returned : %s\n", device_list[index].name);
     return &device_list[index];
 }
 
 void add_to_device_list(fs_node_t* node){
     if (device_list == NULL){
-        device_list = kmalloc(sizeof(fs_node_t) * 2);
+        log(LOG_SERIAL, false, "size allocated to device list : %d * sizeof(fs_node_t)\n", (n_devices+1));
+        device_list = kmalloc(sizeof(fs_node_t) * (n_devices+1));
     } else {
-        krealloc(device_list, sizeof(fs_node_t) * n_devices + sizeof(fs_node_t));
+        krealloc(device_list, sizeof(fs_node_t) * (n_devices + 1));
     }
     device_list[n_devices] = *node;
     log(LOG_SERIAL, false, "device_list[%d] : %s\n", n_devices, device_list[n_devices].name);
@@ -54,8 +57,9 @@ fs_node_t* devfs_register_device(Device* device){
         }
     }
     fs_node_t* device_node = (fs_node_t*)kmalloc(sizeof(fs_node_t));
-    //memset((uint8_t*)device_node, 0, sizeof(fs_node_t));
+    memset((uint8_t*)device_node, 0, sizeof(fs_node_t));
     log(LOG_SERIAL, false, "device->name : %s\n", device->name);
+    memset(device_node->name, 0, sizeof(device_node->name));
     strcpy(device_node->name, device->name);
     device_node->node_type = device->device_type;
     device_node->open = device->open;

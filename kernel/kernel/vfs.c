@@ -1,9 +1,68 @@
 #include <kernel/vfs.h>
 #include <stdio.h>
 #include <string.h>
+#include <kernel/kmalloc.h>
 #include <kernel/serial.h>
 
 fs_node_t *fs_root = NULL;
+vfs_tree_t* fs_tree = NULL;
+
+vfs_tree_t* vfs_tree_init(){
+  vfs_tree_t* tree = kmalloc(sizeof(vfs_tree_t));
+  tree->nodes = 0;
+  tree->root = NULL;
+  return tree;
+}
+
+vfs_tree_node_t* vfs_tree_node_create(struct vfs_entry* vfs_node){
+  vfs_tree_node_t* temp = kmalloc(sizeof(vfs_tree_node_t));
+  temp->vfs_entry_file = vfs_node;
+  temp->children_list = kmalloc(sizeof(struct vfs_children_list));
+  temp->children_list->childrens = kmalloc(sizeof(struct vfs_children) * 10);
+  temp->children_list->used = 0;
+  temp->parent = NULL;
+  return temp;
+}
+
+void vfs_tree_set_root(vfs_tree_t* fs_tree, struct vfs_entry* vfs_node){
+  vfs_tree_node_t* root = vfs_tree_node_create(vfs_node);
+  fs_tree->root = root;
+  fs_tree->nodes = 1;
+}
+
+
+void vfs_init(){
+  fs_tree = vfs_tree_init;
+  struct vfs_entry* root = kmalloc(sizeof(struct vfs_entry));
+  root->name = strdup("[root]");
+  root->file = NULL;
+  root->fs_type = NULL;
+  root->device = NULL;
+  vfs_tree_set_root(fs_tree, root);
+}
+
+void* vfs_mount(const char* path, fs_node_t* local_root){
+  vfs_tree_node_t* ret_val = NULL;
+  char* p = strdup(path);
+  vfs_tree_node_t* root_node = fs_tree->root;
+  if (*path == '/'){
+    struct vfs_entry* root = (struct vfs_entry*)root_node->vfs_entry_file;
+    if (root->file){
+      log(LOG_SERIAL, false, "Path %s already mounted\n", path);
+    }
+    root->file = local_root;
+
+  } else {
+    vfs_tree_node_t* node = root_node;
+    while (1){
+      int found = 0;
+      for (int i = 0; i < node->children_list->used; i++){
+        vfs_tree_node_t* tchild = (vfs_tree_node_t*)node->children_list->childrens[i].vfs_entry_file;
+      }
+    }
+  }
+  return ret_val;
+}
 
 uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer){
   // Has the node got a read callback?

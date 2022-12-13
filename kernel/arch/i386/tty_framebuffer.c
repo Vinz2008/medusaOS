@@ -37,11 +37,77 @@ static char line_cli[300];
 static char last_line_cli[300];
 char directory[100] = {'\0'};
 
+
+char** framebuffer_back = NULL;
+int framebuffer_back_row = 0;
+int framebuffer_back_column = 0;
+
 void terminal_framebuffer_initialize(){
     log(LOG_SERIAL, false, "Starting terminal framebuffer\n");
     fb = fb_get_info();
+	framebuffer_back = kmalloc(sizeof(char[fb.height/8][fb.width/12]));
 }
 
+
+void framebuffer_update(){
+	for (int i = 0; i < framebuffer_back_row; i++){
+		for (int j = 0; j < framebuffer_back_column; j++){
+		//log(LOG_SERIAL, false, "framebuffer_back[%d][%d] : %c\n", i, j, framebuffer_back[i][j]);
+		terminal_framebuffer_putc_pixel(framebuffer_back[i][j]);
+		}
+	}
+}
+
+void terminal_framebuffer_putc_back(char c){
+	if (c == '\n'){
+		framebuffer_back_column = 0;
+		framebuffer_back_row++;
+		return;
+	}
+	framebuffer_back[framebuffer_back_row][framebuffer_back_column] = c;
+	framebuffer_back_column++;
+	log(LOG_SERIAL, false, "fb.width/8 : %d\n", fb.width/8);
+	if (++framebuffer_back_column >= fb.width/8){
+		framebuffer_back_column = 0;
+		framebuffer_back_row++;
+		if (++framebuffer_back_row == fb.height/12){
+			framebuffer_back_row = 0;
+		}
+	}
+	//framebuffer_back_row++;
+	framebuffer_update();
+}
+
+void terminal_framebuffer_putc_pixel(char c){
+#if GUI_MODE
+#else
+    /*if (c == '\n'){
+        row += 12;
+        column = 0;
+        return;
+    }*/
+	row = framebuffer_back_row * 12;
+	column = framebuffer_back_column * 8;
+	log(LOG_SERIAL, false, "row : %d, column : %d\n", row, column);
+    uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
+    for (int i = 0; i < 16; i ++){
+        for (int j = 0; j < 8; j++){
+            if (offset[i] & (1 << j)){
+                //draw_pixel(fb, x + 8 - j, y + i, col);
+                draw_pixel(fb, column + 8 - j, row + i, color);
+            }
+        }
+    }
+    /*column += 8;
+    if (column >= fb.width){
+        column = 0;
+        row  += 12;
+        if (row == fb.height){
+            row = 0;
+        }
+    }*/
+#endif
+}
 
 
 void terminal_framebuffer_putc(char c){
@@ -100,13 +166,14 @@ void empty_line_cli_framebuffer(){
 void launch_command_framebuffer(){
 	char* line_cli_copy = kmalloc(sizeof(char) * 300);
 	memset(line_cli_copy, 0, sizeof(line_cli_copy));
-	log(LOG_SERIAL, false,"line_cli_copy: %s\n", line_cli_copy);
 	log(LOG_SERIAL, false,"line_cli: %s\n", line_cli);
 	strcpy(line_cli_copy, line_cli);
+	log(LOG_SERIAL, false,"line_cli_copy: %s\n", line_cli_copy);
 	if (strlen(line_cli_copy) != 0){
 		printf("\n");
 	}
 	char* command = strtok(line_cli_copy, " ");
+	log(LOG_SERIAL, false,"command bef: %s\n", command);
 	if (command == NULL){
 		command = kmalloc(strlen(line_cli_copy) * sizeof(char));
 		strcpy(command, line_cli_copy);
@@ -114,8 +181,13 @@ void launch_command_framebuffer(){
 	log(LOG_SERIAL, false,"command: %s\n", command);
 	//log(LOG_SERIAL, false,"command ptr: %p\n", command);
 	char* args = kmalloc((strlen(line_cli) - strlen(command)) * sizeof(char));
-	memset(args, 0, 300);
+	log(LOG_SERIAL, false,"command ptr: %p\n", command);
+	log(LOG_SERIAL, false,"line_cli_copy ptr: %p\n", line_cli_copy);
+	log(LOG_SERIAL, false,"args ptr: %p\n", args);
+	log(LOG_SERIAL, false,"command b: %s\n", command);
+	memset(args, 0, (strlen(line_cli) - strlen(command)) * sizeof(char));
 	int i2 = 0;
+	log(LOG_SERIAL, false,"command: %s\n", command);
 	log(LOG_SERIAL, false, "strlen(command) : %d\n", strlen(command));
 	/*for (int i = 0; i < 300; i++){
 		log(LOG_SERIAL, false, "before args[%d] : %c\n", i, args[i]);
@@ -134,12 +206,17 @@ void launch_command_framebuffer(){
 	char *delim;
 	int argc = 1;
 	argv[0] = buf;
+	for (int i = 0; i < strlen(argv[0]); i++){
+		log(LOG_SERIAL, false,"argv[0][%d] : %c\n", i, argv[0][i]);
+	}
     while ((delim = strchr(argv[argc - 1], ' '))) {
         argv = krealloc(argv, (argc + 1) * sizeof (char *));
         argv[argc] = delim + 1;
         *delim = 0x00;
         argc++;
     }
+	log(LOG_SERIAL, false, "argc bef : %d\n", argc);
+	log(LOG_SERIAL, false, "argv[0][0] : %c\n", argv[0][0]);
 	if (argv[0][0] == '\0'){
 		argc = 0;
 	}
@@ -156,6 +233,7 @@ void launch_command_framebuffer(){
 		}
 		printf("\n");
 	} else if (strcmp("ls", command) == 0){
+		char* temp;
 		log(LOG_SERIAL, false, "command ptr : %p\n", command);
 		fs_node_t* root = get_initrd_root();
 		fs_node_t* node;
@@ -165,7 +243,7 @@ void launch_command_framebuffer(){
 			log(LOG_SERIAL, false, "node name to find : %s\n", argv[0]);
 			node = finddir_fs(root, argv[0]);
 			if (node == NULL){
-				char* temp = kmalloc(sizeof(char) * (strlen(argv[0]) + 1));
+				temp = kmalloc(sizeof(char) * (strlen(argv[0]) + 1));
 				strcpy(temp, argv[0]);
 				append(temp, '/');
 				node = finddir_fs(root, temp);
@@ -186,13 +264,19 @@ void launch_command_framebuffer(){
 		bool print = false;
 		while ((dir = readdir_fs(node, i))!=NULL){
 			log(LOG_SERIAL, false, "dir ptr : %p\n", dir);
-			if (strcmp(directory, "\0") != 0){
+			log(LOG_SERIAL, false, "directory : %s\n", directory);
+			if (strcmp("\0", directory) != 0){
 				if (startswith(directory, dir->name)){
 					print = true;
 				}
 			} else {
+			log(LOG_SERIAL, false, "directory empty\n");
         	print = true;
 			}
+			if (strcmp("dev/", temp) == 0){
+				print = true;
+			}
+			log(LOG_SERIAL, false, "print : %s\n", print ? "true" : "false");
 			if (print){
 			printf("filename [%i] : %s\n",i, dir->name);
 			log(LOG_SERIAL, false,"filename [%i] : %s\n",i, dir->name);
@@ -203,6 +287,7 @@ void launch_command_framebuffer(){
 			print = false;
         }
 end_ls:
+		kfree(temp);
 	} else if (strcmp("cat", command) == 0){
 		log(LOG_SERIAL, false, "test cat cmd\n");
 		char*  filename = argv[0];
@@ -263,6 +348,7 @@ end_ls:
 		log(LOG_SERIAL, false, "temp_directory : %s\n", temp_directory);
 		strcpy(directory, temp_directory);		
 	} else if (strcmp("pwd", command) == 0){
+		log(LOG_SERIAL, false, "PWD\n");
 		printf("%s\n", directory);
 	} else if (strcmp("chown", command) == 0){
 		char* user = argv[0];
@@ -318,7 +404,7 @@ end_ls:
 	} else if (strcmp("thirdtemple", command) == 0){
 		printf("If you search the third temple of god, you are in the wrong OS. \n Install TempleOS\n");
 	} else {
-		if (strlen(line_cli_copy) != 0) {
+		if (strlen(line_cli) != 0) {
 			printf("command not found\n");
 		}
 	}

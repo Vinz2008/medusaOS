@@ -74,6 +74,38 @@ struct dirent // One of these is returned by the readdir call, according to POSI
   uint32_t ino;     // Inode number. Required by POSIX.
 }; 
 
+
+
+typedef struct vfs_tree_node {
+  struct vfs_entry* vfs_entry_file;
+  struct vfs_children_list* children_list;
+  struct vfs_treen_node* parent;
+} vfs_tree_node_t;
+
+
+
+typedef struct {
+  size_t nodes;
+  vfs_tree_node_t* root;
+} vfs_tree_t;
+
+struct vfs_entry {
+  fs_node_t* file;
+  char* device;
+  char* fs_type;
+  char* name;
+};
+
+struct vfs_children {
+  struct vfs_entry* vfs_entry_file;
+};
+
+struct vfs_children_list {
+  struct vfs_children* childrens;
+  size_t used;
+};
+
+
 extern fs_node_t *fs_root; 
 uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
 uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
@@ -86,5 +118,6 @@ fs_node_t* fs_get_root_node();
 
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size);
 fs_node_t* vfs_open(const char* path, const char* mode);
+void vfs_init();
 
 #endif

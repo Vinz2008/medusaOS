@@ -15,7 +15,7 @@ mkdir -p isodir/boot/grub
 mkdir -p isodir/modules
 
 cp modules/*.mod isodir/modules
-mkdir sysroot/bin/
+mkdir -p sysroot/bin/
 cp userspace/init sysroot/bin/
 cp -r sysroot/* isodir/
 #cp sysroot/boot/kernel.kernel isodir/boot/kernel.kernel

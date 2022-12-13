@@ -13,3 +13,4 @@ void terminal_framebuffer_reset_color();
 void empty_line_cli_framebuffer();
 void launch_command_framebuffer();
 char* get_line_cli();
+void terminal_framebuffer_putc_back(char c);
