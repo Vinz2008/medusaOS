@@ -8,6 +8,7 @@ LDFLAGS?=
 LIBS?=
 
 CC=i686-medusaos-gcc
+AR=i686-medusaos-ar
 
 DESTDIR?=
 PREFIX?=/usr/local
@@ -15,9 +16,9 @@ EXEC_PREFIX?=$(PREFIX)
 INCLUDEDIR?=$(PREFIX)/include
 LIBDIR?=$(EXEC_PREFIX)/lib
 
-CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra
+CFLAGS:=$(CFLAGS) -Wall -Wextra
 CPPFLAGS:=$(CPPFLAGS) -D__is_libc -Iinclude
-LIBK_CFLAGS:=$(CFLAGS)
+LIBK_CFLAGS:=$(CFLAGS) -ffreestanding 
 LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_libk
 
 ARCHDIR=arch/$(HOSTARCH)
