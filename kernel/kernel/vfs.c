@@ -64,6 +64,18 @@ void* vfs_mount(const char* path, fs_node_t* local_root){
   return ret_val;
 }
 
+int get_file_size_fs(fs_node_t *node){
+  if (node == NULL){
+	log(LOG_SERIAL, false, "NULL in get_file_size_fs\n");
+    return -1;
+  }
+  if (node->get_file_size != 0){
+    return node->get_file_size(node);
+  } else {
+    return -1;
+  }
+}
+
 uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer){
   // Has the node got a read callback?
   if (node == NULL){

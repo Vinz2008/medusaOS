@@ -246,10 +246,29 @@ void *elf_load_file(void *file) {
 	return NULL;
 }
 
-int exec(char* path, int argc, char** argv){
+int exec_elf(char* path, int argc, char** argv){
+	uint32_t seg_begin, seg_end;
 	fs_node_t* file = vfs_open(path, "r");
 	if (!file){
 		return 0;
 	}
 	log(LOG_SERIAL, false, "file found\n");
+	int size = get_file_size_fs(file);
+	void* file_buffer = kmalloc(size);
+	read_fs(file, 0, size, file_buffer);
+	Elf32_EHeader* head = file_buffer;
+	Elf32_ProgramHeader* prgm_head = (void*)head + head->e_phoff;
+	if (elf_check_file(head) == false){
+		log(LOG_SERIAL, false, "invalid ELf executable\n");
+		return -1;
+	}
+	for (int i = 0; i < head->e_phnum; i++){
+		if (prgm_head->p_type == PT_LOAD){
+			seg_begin = prgm_head->p_vaddr;
+			seg_end = seg_begin + prgm_head->p_memsz;
+			// should allocate region in current process
+		}
+	}
+
+	return 0;
 }

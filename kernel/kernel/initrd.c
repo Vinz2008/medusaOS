@@ -191,6 +191,15 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 	return 0;
 }
 
+void initrd_get_file_size(fs_node_t* node){
+    for (int i = 0; i < nroot_nodes; i++){
+        if (strcmp(node->name, root_nodes[i].name) == 0){
+            return list_headers.headers[i]->size;
+        }
+    }
+    return -1;
+}
+
 
 fs_node_t *initialise_initrd(uint32_t location){
     //initrd_header = (initrd_header_t*) location;
@@ -209,6 +218,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     initrd_root->close = 0;
     initrd_root->readdir = &initrd_readdir;
     initrd_root->finddir = &initrd_finddir;
+    initrd_root->get_file_size = &initrd_get_file_size;
     /*initrd_dev = (fs_node_t*)kmalloc(sizeof(fs_node_t));
     strcpy(initrd_dev->name, "dev/");
     initrd_dev->mask = initrd_dev->uid = initrd_dev->gid = initrd_dev->inode = initrd_dev->length = 0;
@@ -240,6 +250,7 @@ fs_node_t *initialise_initrd(uint32_t location){
 		root_nodes[i].open	= 0;
 		root_nodes[i].close	= 0;
 		root_nodes[i].impl	= 0;
+        root_nodes[i].get_file_size = &initrd_get_file_size;
         switch(list_headers.headers[i]->typeflag[0]){
             case FILE_TAR_TYPE:
                 root_nodes[i].node_type = FT_File;

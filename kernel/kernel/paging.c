@@ -198,5 +198,3 @@ uintptr_t paging_virt_to_phys(uintptr_t virt) {
 
     return (((uintptr_t)*p) & PAGE_FRAME) + (virt & 0xFFF);
 }
-
-
