@@ -249,9 +249,10 @@ void kernel_main(uint32_t addr, uint32_t magic) {
                                   + ((tag->size + 7) & ~7));
   	log(LOG_SERIAL, false, "Total mbi size 0x%x\n", (unsigned) tag - addr);
 
-  uint32_t brand[12];
-  get_brand(brand);
- 	log(LOG_SERIAL, false, "brand : %s\n", brand);
+  uint32_t model_name[12];
+  if (get_model_name(model_name) == 0){
+ 	log(LOG_SERIAL, false, "model name : %s\n", model_name);
+  }
 
 
 #if GUI_MODE

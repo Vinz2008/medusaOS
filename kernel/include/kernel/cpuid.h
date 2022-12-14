@@ -98,4 +98,5 @@ enum {
     CPUID_FEAT_EDX_PBE          = 1 << 31
 };
 
-void get_brand(uint32_t* buf);
+int get_model_name(uint32_t* buf);
+void detect_cpu();

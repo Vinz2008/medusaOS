@@ -38,39 +38,58 @@ static char last_line_cli[300];
 char directory[100] = {'\0'};
 
 
-char** framebuffer_back = NULL;
+char* framebuffer_back = NULL;
 int framebuffer_back_row = 0;
 int framebuffer_back_column = 0;
+int framebuffer_width_in_column = 0;
+int framebuffer_height_in_row = 0;
+
+int get_offset(int x, int y){
+	return (x * framebuffer_width_in_column + y);
+}
 
 void terminal_framebuffer_initialize(){
     log(LOG_SERIAL, false, "Starting terminal framebuffer\n");
     fb = fb_get_info();
-	framebuffer_back = kmalloc(sizeof(char[fb.height/8][fb.width/12]));
+	framebuffer_height_in_row = fb.height/8;
+	framebuffer_width_in_column = fb.width/12;
+	log(LOG_SERIAL, false, "fb height : %d, fb width : %d\n", fb.height, fb.width);
+	log(LOG_SERIAL, false, "framebuffer_height_in_row : %d, framebuffer_width_in_column : %d\n", framebuffer_height_in_row, framebuffer_width_in_column);
+	//framebuffer_back = kmalloc(sizeof(char[framebuffer_height_in_row][framebuffer_width_in_column]));
+	framebuffer_back = kmalloc(framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
+	memset(framebuffer_back, ' ', framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
 }
 
 
 void framebuffer_update(){
-	for (int i = 0; i < framebuffer_back_row; i++){
-		for (int j = 0; j < framebuffer_back_column; j++){
-		//log(LOG_SERIAL, false, "framebuffer_back[%d][%d] : %c\n", i, j, framebuffer_back[i][j]);
-		terminal_framebuffer_putc_pixel(framebuffer_back[i][j]);
+	for (int i = 0; i < framebuffer_height_in_row; i++){
+		for (int j = 0; j < framebuffer_width_in_column; j++){
+		log(LOG_SERIAL, false, "framebuffer_back[get_offset(%d, %d)] : %c\n", i, j, framebuffer_back[get_offset(j, i)]);
+		//terminal_framebuffer_putc_pixel(framebuffer_back[i][j]);
+		terminal_framebuffer_putc_pixel(framebuffer_back[get_offset(j, i)]);
 		}
 	}
 }
 
+int loop = 0;
+
+
 void terminal_framebuffer_putc_back(char c){
 	if (c == '\n'){
+		log(LOG_SERIAL, false, "go to next line\n");
 		framebuffer_back_column = 0;
 		framebuffer_back_row++;
 		return;
 	}
-	framebuffer_back[framebuffer_back_row][framebuffer_back_column] = c;
+	//framebuffer_back[framebuffer_back_row][framebuffer_back_column] = c;
+	framebuffer_back[get_offset(framebuffer_back_column, framebuffer_back_row)] = c;
+	//log(LOG_SERIAL, false, "framebuffer_back[get_offset(framebuffer_back_column, framebuffer_back_row)] : %c\n", framebuffer_back[get_offset(framebuffer_back_column, framebuffer_back_row)]);
 	framebuffer_back_column++;
-	log(LOG_SERIAL, false, "fb.width/8 : %d\n", fb.width/8);
-	if (++framebuffer_back_column >= fb.width/8){
+	if (++framebuffer_back_column >= framebuffer_width_in_column){
 		framebuffer_back_column = 0;
 		framebuffer_back_row++;
-		if (++framebuffer_back_row == fb.height/12){
+
+		if (++framebuffer_back_row == framebuffer_height_in_row){
 			framebuffer_back_row = 0;
 		}
 	}
@@ -88,7 +107,7 @@ void terminal_framebuffer_putc_pixel(char c){
     }*/
 	row = framebuffer_back_row * 12;
 	column = framebuffer_back_column * 8;
-	log(LOG_SERIAL, false, "row : %d, column : %d\n", row, column);
+	//log(LOG_SERIAL, false, "row : %d, column : %d\n", row, column);
     uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
     for (int i = 0; i < 16; i ++){
         for (int j = 0; j < 8; j++){
@@ -376,9 +395,10 @@ end_ls:
 			kfree(temp);
 		}
 	} else if (strcmp("lscpu", command) == 0){
-		uint32_t brand[12];
+		detect_cpu();
+		/*uint32_t brand[12];
   		get_brand(brand);
- 	 	printf("brand : %s\n", brand);
+ 	 	printf("brand : %s\n", brand);*/
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");
