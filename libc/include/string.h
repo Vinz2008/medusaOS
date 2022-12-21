@@ -23,6 +23,7 @@ void reverse(char *str1);
 char *strcat(char *dest, const char *src);
 bool startswith(char str[], char code[]);
 char* strcpy(char* dst, const char* src);
+char* strncpy(char* dst, const char* src, size_t num);
 int strcmp(const char* s1, const char* s2);
 int strncmp(const char* s1, const char* s2, size_t n);
 char* strdup(const char* s);

@@ -62,6 +62,8 @@ struct multiboot_tag *tag;
 void kernel_main(uint32_t addr, uint32_t magic) {
 	init_serial();
 	write_serial("LOG START\n");
+  fpu_init();
+	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_pmm(addr);
   init_paging(addr);
   vfs_init();
@@ -304,8 +306,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	log(LOG_SERIAL, false, "NMI enabled\n");
 	sse_init();
 	log(LOG_SERIAL, false, "SSE initialized\n");
-	fpu_init();
-	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_syscalls();
 	log(LOG_ALL, true, "Syscalls enabled\n");
   ahci_init();

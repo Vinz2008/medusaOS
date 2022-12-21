@@ -49,6 +49,17 @@ interrupt_common:
     addl $8, %esp           /* drop exception number and error code */
     iret
 
+.global irq_handler_end
+irq_handler_end:
+    popa                    /* restore general purpose registers */
+    popl %ds                /* restore segment registers */
+    popl %es
+    popl %fs
+    popl %gs
+    addl $8, %esp /* drop exception number and error code */
+    iret
+
+
 .global flush_gdt
 flush_gdt:
     lgdt gdt_p
