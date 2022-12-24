@@ -120,24 +120,22 @@ void kbd_ack(){
   while(!(inb(0x60)==0xfa));
 }
 
+uint8_t leds_status;
 
-void switch_led(int led){
-  uint8_t led_status = 0;
-  switch (led){ 
-    case KBD_LED_SCROLL_LOCK:
-      led_status ^= 1;
-      break;
-    case KBD_LED_NUMBER_LOCK:
-      led_status ^= 2;
-      break;
-    case KBD_LED_CAPS_LOCK:
-      led_status ^= 4;
-      break;
+void switch_led(uint8_t led){
+  if (led == 0){
+    leds_status = 0;
+  } else {
+  log(LOG_SERIAL, false, "led status : %x\n", led);
+  if (leds_status == (leds_status | led)){
+    leds_status ^= led; // turn led on
+  } else {
+    leds_status |= led; // else turn led on
   }
-  log(LOG_SERIAL, false, "led status : %d\n", led_status);
+  }
   outb(0x60, 0xED);
   kbd_ack();
-  outb(0x60, led_status);
+  outb(0x60, leds_status);
 }
 
 

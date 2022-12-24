@@ -5,9 +5,10 @@
 #define KBD_SSC_2 0x02
 #define KBD_SSC_3 0x03
 
-#define KBD_LED_SCROLL_LOCK 0
-#define KBD_LED_NUMBER_LOCK 1
-#define KBD_LED_CAPS_LOCK 2
+#define KBD_LED_SCROLL_LOCK 0x01
+#define KBD_LED_NUMBER_LOCK 0x02
+#define KBD_LED_CAPS_LOCK 0x04
+#define KBD_LED_ALL 0xFF
 
 typedef struct {
     uint8_t scancode[8];
@@ -21,5 +22,5 @@ typedef struct {
 
 uint8_t read_scan_code(void);
 void keyboard_install();
-void switch_led(int led);
+void switch_led(uint8_t led);
 char kbd_keycode_to_char(uint32_t keycode, bool shift);

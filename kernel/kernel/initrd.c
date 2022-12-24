@@ -263,6 +263,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     pos = i;
     isInitrdInitialized = true;
     log(LOG_SERIAL, false, "initrd initialized\n");
+    vfs_mount(initrd_root, "/");
     return initrd_root;
 }
 

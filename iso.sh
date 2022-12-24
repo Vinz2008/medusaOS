@@ -6,7 +6,7 @@ cd initrd
 tar -cvf ../sysroot/boot/initrd.tar *
 cd ..
 
-dd if=/dev/zero of=disk.img bs=1M count=2
+qemu-img create disk.img 10M
 mkfs.vfat -F12 disk.img
 
 mkdir -p isodir

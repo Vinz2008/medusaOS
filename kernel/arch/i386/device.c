@@ -7,10 +7,10 @@ void null_open(fs_node_t* node){
 }
 
 void register_devices_necessary(){
-    //Device stdin_dev = (Device){.name="stdin", .close=0, .read=0, .write=0,};
-    Device stdin_dev;
+    Device stdin_dev = (Device){.name="stdin", .close=0, .read=0, .write=0,};
+    /*Device stdin_dev;
     memset((uint8_t*)&stdin_dev, 0, sizeof(Device));
-    strcpy(stdin_dev.name, "stdin");
+    strcpy(stdin_dev.name, "stdin");*/
     devfs_register_device(&stdin_dev);
     Device stdout_dev = (Device){.name="stdout", .close=0, .read=0, .write=0,};
     devfs_register_device(&stdout_dev);

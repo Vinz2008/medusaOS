@@ -30,6 +30,7 @@ char* strdup(const char* s);
 char* strstr(const char* str1, const char* str2);
 char *strchr(const char *str, int c);
 char *strtok(char *str, const char *delimiters);
+char *strtok_r(char *text, const char delimitor, char **save_this);
 
 #ifdef __cplusplus
 }

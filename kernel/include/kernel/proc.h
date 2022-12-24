@@ -53,4 +53,7 @@ typedef struct _sched_t {
     void (*sched_exit)(struct _sched_t*, process_t*);
 } scheduler_t;
 
+
+void init_proc();
+
 #endif

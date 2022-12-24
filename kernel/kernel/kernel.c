@@ -34,6 +34,7 @@
 #include <kernel/rtc.h>
 #include <kernel/ps2.h>
 #include <kernel/fb.h>
+#include <kernel/proc.h>
 #include <kernel/pmm.h>
 #include <kernel/paging.h>
 #include <kernel/kmalloc.h>
@@ -316,6 +317,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   initTasking();
   log(LOG_SERIAL, false, "Cooperative multitasking initialized\n");
   test_switch_task();
+  init_proc();
+  log(LOG_SERIAL, false, "scheduler initialized\n");
   //syscall_c(SYS_READ, 0, 0, 0);
   /*char buf[15];
   strcpy(buf, "test syscall\n");
@@ -357,7 +360,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	//uint32_t *ptr = (uint32_t*)0xA0000000;
   //uint32_t do_page_fault = *ptr;
   switch_led(KBD_LED_SCROLL_LOCK);
-  switch_led(KBD_LED_NUMBER_LOCK);
+  switch_led(KBD_LED_SCROLL_LOCK | KBD_LED_NUMBER_LOCK);
   switch_led(KBD_LED_CAPS_LOCK);
 	int i = 1233;
 #if GUI_MODE

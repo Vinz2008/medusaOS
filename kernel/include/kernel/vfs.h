@@ -20,6 +20,10 @@ typedef int file_descriptor_t;
 #define FS_SYMLINK     0x06
 #define FS_MOUNTPOINT  0x08 // Is the file an active mountpoint?
 
+#define PATH_SEPARATOR '/'
+#define PATH_SEPARATOR_STRING "/"
+#define PATH_DOT '.'
+
 typedef enum FileType
 {
     FT_File               = 1,
@@ -80,7 +84,7 @@ struct dirent // One of these is returned by the readdir call, according to POSI
 
 
 typedef struct vfs_tree_node {
-  struct vfs_entry* vfs_entry_file;
+  void* value;
   struct vfs_children_list* children_list;
   struct vfs_treen_node* parent;
 } vfs_tree_node_t;
@@ -100,7 +104,8 @@ struct vfs_entry {
 };
 
 struct vfs_children {
-  struct vfs_entry* vfs_entry_file;
+  void* value;
+  struct vfs_children_list* owner;
 };
 
 struct vfs_children_list {
@@ -112,7 +117,7 @@ struct vfs_children_list {
 extern fs_node_t *fs_root; 
 uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
 uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
-void open_fs(fs_node_t *node, uint8_t read, uint8_t write);
+void open_fs(fs_node_t *node, uint32_t flags);
 void close_fs(fs_node_t *node);
 struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
 fs_node_t *finddir_fs(fs_node_t *node, char *name); 
