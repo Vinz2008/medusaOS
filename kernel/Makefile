@@ -43,6 +43,7 @@ kernel/ringbuffer.o \
 kernel/devfs.o \
 kernel/pipe.o \
 kernel/process.o \
+kernel/base64.o \
 
 
 OBJS=\

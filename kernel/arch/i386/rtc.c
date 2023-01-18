@@ -50,7 +50,7 @@ uint8_t read_years_RTC(){
       return read_RTC_register(0x09);
 }
 
-void read_rtc_date(){
+char* read_rtc_date(){
       uint8_t century;
       uint8_t last_second;
       uint8_t last_minute;
@@ -128,6 +128,9 @@ void read_rtc_date(){
             year += (CURRENT_YEAR / 100) * 100;
             if(year < CURRENT_YEAR) year += 100;
       }
-      printf("%d:%d:%d %d/%d/%d\n",hour, minute, second, day, month, year);
+      char* str = kmalloc(150 * sizeof(char));
+      sprintf(str, "%d:%d:%d %d/%d/%d",hour, minute, second, day, month, year);
+      return str;
+      //printf("%d:%d:%d %d/%d/%d\n",hour, minute, second, day, month, year);
 }
 

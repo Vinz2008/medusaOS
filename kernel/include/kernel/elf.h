@@ -1,5 +1,7 @@
 # include <stdint.h>
 
+#define MAXARGC 30
+
 typedef uint16_t Elf32_Half;	// Unsigned half int
 typedef uint32_t Elf32_Off;	// Unsigned offset
 typedef uint32_t Elf32_Addr;	// Unsigned address
@@ -23,7 +25,7 @@ typedef struct {
 	Elf32_Half	e_shentsize;
 	Elf32_Half	e_shnum;
 	Elf32_Half	e_shstrndx;
-} Elf32_EHeader;
+} Elf32_Ehdr;
 
 enum Elf_Ident {
 	EI_MAG0		= 0, // 0x7F
@@ -66,7 +68,7 @@ typedef struct {
 	Elf32_Word	sh_info;
 	Elf32_Word	sh_addralign;
 	Elf32_Word	sh_entsize;
-} Elf32_SectionHeader;
+} Elf32_Shdr;
 
 # define SHN_UNDEF	(0x00) // Undefined/Not present
 
@@ -161,5 +163,5 @@ typedef struct {
 #define PT_LOPROC  0x70000000
 #define PT_HIPROC  0x7fffffff
 
-int elf_do_reloc(Elf32_EHeader* header, Elf32_Rel *rel, Elf32_SectionHeader* reltab);
-void *elf_load_file(void *file);
+int elf_do_reloc(Elf32_Ehdr* header, Elf32_Rel *rel, Elf32_Shdr* reltab);
+void* elf_load_file(void *file);

@@ -6,26 +6,26 @@
 #include <kernel/vfs.h>
 #include <kernel/kmalloc.h>
 
-static inline Elf32_SectionHeader *elf_sheader(Elf32_EHeader* header) {
-	return (Elf32_SectionHeader*)((int)header + header->e_shoff);
+static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr* header) {
+	return (Elf32_Shdr*)((int)header + header->e_shoff);
 }
 
-static inline Elf32_SectionHeader* elf_section(Elf32_EHeader* header, int idx) {
+static inline Elf32_Shdr* elf_section(Elf32_Ehdr* header, int idx) {
 	return &elf_sheader(header)[idx];
 }
 
-static inline char *elf_str_table(Elf32_EHeader* header) {
+static inline char *elf_str_table(Elf32_Ehdr* header) {
 	if(header->e_shstrndx == SHN_UNDEF) return NULL;
 	return (char *)header + elf_section(header, header->e_shstrndx)->sh_offset;
 }
 
-static inline char *elf_lookup_string(Elf32_EHeader* header, int offset) {
+static inline char *elf_lookup_string(Elf32_Ehdr* header, int offset) {
 	char *strtab = elf_str_table(header);
 	if(strtab == NULL) return NULL;
 	return strtab + offset;
 }
 
-bool elf_check_file(Elf32_EHeader* header){
+bool elf_check_file(Elf32_Ehdr* header){
     if (!header) return false;
     if (header->e_ident[EI_MAG0] != ELFMAG0){
         log(LOG_SERIAL, false, "ERROR : ELF Header EI_MAG0 incorrect.\n");
@@ -46,7 +46,7 @@ bool elf_check_file(Elf32_EHeader* header){
     return true;
 }
 
-bool elf_check_supported(Elf32_EHeader* header) {
+bool elf_check_supported(Elf32_Ehdr* header) {
 	if(!elf_check_file(header)) {
 		log(LOG_SERIAL, false, "ERROR : Invalid ELF File.\n");
 		return false;
@@ -79,9 +79,9 @@ void* elf_lookup_symbol(const char* name){
 }
 
 
-static int elf_get_symval(Elf32_EHeader* header, int table, uint8_t idx){
+static int elf_get_symval(Elf32_Ehdr* header, int table, uint8_t idx){
     if(table == SHN_UNDEF || idx == SHN_UNDEF) return 0;
-    Elf32_SectionHeader* symtab = elf_section(header, table);
+    Elf32_Shdr* symtab = elf_section(header, table);
     uint32_t symtab_entries = symtab->sh_size / symtab->sh_entsize;
     if(idx >= symtab_entries) {
 		log(LOG_SERIAL, false, "Symbol Index out of Range (%d:%u).\n", table, idx);
@@ -91,7 +91,7 @@ static int elf_get_symval(Elf32_EHeader* header, int table, uint8_t idx){
 	Elf32_Sym *symbol = &((Elf32_Sym *)symaddr)[idx];
     if(symbol->st_shndx == SHN_UNDEF) {
 		// External symbol, lookup value
-		Elf32_SectionHeader* strtab = elf_section(header, symtab->sh_link);
+		Elf32_Shdr* strtab = elf_section(header, symtab->sh_link);
 		const char *name = (const char *)header + strtab->sh_offset + symbol->st_name;
 
 		extern void *elf_lookup_symbol(const char *name);
@@ -115,17 +115,17 @@ static int elf_get_symval(Elf32_EHeader* header, int table, uint8_t idx){
 		return symbol->st_value;
 	} else {
 		// Internally defined symbol
-		Elf32_SectionHeader* target = elf_section(header, symbol->st_shndx);
+		Elf32_Shdr* target = elf_section(header, symbol->st_shndx);
 		return (int)header + symbol->st_value + target->sh_offset;
 	}
 }
 
-static int elf_load_stage1(Elf32_EHeader* header) {
-	Elf32_SectionHeader* shdr = elf_sheader(header);
+static int elf_load_stage1(Elf32_Ehdr* header) {
+	Elf32_Shdr* shdr = elf_sheader(header);
 	unsigned int i;
 	// Iterate over section headers
 	for(i = 0; i < header->e_shnum; i++) {
-		Elf32_SectionHeader* section = &shdr[i];
+		Elf32_Shdr* section = &shdr[i];
 		// If the section isn't present in the file
 		if(section->sh_type == SHT_NOBITS) {
 			// Skip if it the section is empty
@@ -144,13 +144,13 @@ static int elf_load_stage1(Elf32_EHeader* header) {
 	return 0;
 }
 
-static int elf_load_stage2(Elf32_EHeader* header) {
-	Elf32_SectionHeader* shdr = elf_sheader(header);
+static int elf_load_stage2(Elf32_Ehdr* header) {
+	Elf32_Shdr* shdr = elf_sheader(header);
 
 	unsigned int i, idx;
 	// Iterate over section headers
 	for(i = 0; i < header->e_shnum; i++) {
-		Elf32_SectionHeader *section = &shdr[i];
+		Elf32_Shdr *section = &shdr[i];
 		// If this is a relocation section
 		if(section->sh_type == SHT_REL) {
 			// Process each entry in the table
@@ -168,7 +168,7 @@ static int elf_load_stage2(Elf32_EHeader* header) {
 	return 0;
 }
 
-static inline void *elf_load_rel(Elf32_EHeader* header) {
+static inline void *elf_load_rel(Elf32_Ehdr* header) {
 	int result;
 	result = elf_load_stage1(header);
 	if(result == ELF_RELOC_ERR) {
@@ -185,8 +185,8 @@ static inline void *elf_load_rel(Elf32_EHeader* header) {
 }
 
 
-int elf_do_reloc(Elf32_EHeader* header, Elf32_Rel *rel, Elf32_SectionHeader* reltab) {
-	Elf32_SectionHeader* target = elf_section(header, reltab->sh_info);
+int elf_do_reloc(Elf32_Ehdr* header, Elf32_Rel *rel, Elf32_Shdr* reltab) {
+	Elf32_Shdr* target = elf_section(header, reltab->sh_info);
 
 	int addr = (int)header + target->sh_offset;
 	int *ref = (int *)(addr + rel->r_offset);
@@ -224,7 +224,7 @@ void elf_start_executable(void* file){
 
 void *elf_load_file(void *file) {
     log(LOG_SERIAL, false, "loading elf module\n");
-	Elf32_EHeader *header = (Elf32_EHeader *)file;
+	Elf32_Ehdr *header = (Elf32_Ehdr *)file;
 	log(LOG_SERIAL, false, "Type %s%s%s\n",
 		header->e_ident[4] == 1 ? "32bit ": "64bit ",
 		header->e_ident[5] == 1 ?  "Little Endian ": "Big endian ",
@@ -246,17 +246,27 @@ void *elf_load_file(void *file) {
 	return NULL;
 }
 
-int exec_elf(char* path, int argc, char** argv){
+#define PROC_STACK_BOTTOM 0x20000000 
+
+int exec_elf(char* path, char** argv){
 	uint32_t seg_begin, seg_end;
+	uint32_t argc;
 	fs_node_t* file = vfs_open(path, "r");
 	if (!file){
-		return 0;
+		return -1;
 	}
 	log(LOG_SERIAL, false, "file found\n");
+	void* stack = kmalloc(PROC_STACK_BOTTOM);
+	uint32_t sp = PROC_STACK_BOTTOM;
+	for (argc = 0; argv[argc]; argc++){
+		if (argc >= MAXARGC){
+			return -1;
+		}
+	}
 	int size = get_file_size_fs(file);
 	void* file_buffer = kmalloc(size);
 	read_fs(file, 0, size, file_buffer);
-	Elf32_EHeader* head = file_buffer;
+	Elf32_Ehdr* head = file_buffer;
 	Elf32_ProgramHeader* prgm_head = (void*)head + head->e_phoff;
 	if (elf_check_file(head) == false){
 		log(LOG_SERIAL, false, "invalid ELf executable\n");

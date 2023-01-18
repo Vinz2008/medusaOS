@@ -14,6 +14,8 @@
 #include <kernel/initrd.h>
 #include <kernel/speaker.h>
 #include <kernel/config.h>
+#include <kernel/rtc.h>
+#include <kernel/base64.h>
 
 #if GUI_MODE
 #else
@@ -396,9 +398,31 @@ end_ls:
 		}
 	} else if (strcmp("lscpu", command) == 0){
 		detect_cpu();
-		/*uint32_t brand[12];
-  		get_brand(brand);
- 	 	printf("brand : %s\n", brand);*/
+	} else if (strcmp("base64", command) == 0){
+		char* filename;
+		bool decode = false;
+		for (int i = 0; i < argc; i++){
+			if (strcmp("--d", argv[i]) == 0){
+				decode = true;
+			} else {
+				filename = argv[i];
+			}
+		}
+		fs_node_t* node = vfs_open(filename, "r");
+		uint8_t buffer[node->length];
+        read_fs(node, 0, node->length, buffer);
+		size_t output_length;
+		char* output;
+		if (decode){
+			output = base64_decode(buffer, node->length, &output_length);
+		} else {
+			output = base64_encode(buffer, node->length, &output_length);
+		}
+		printf("%s\n", output);
+		close_fs(node);
+	} else if (strcmp("date", command) == 0){
+		char* date = read_rtc_date();
+  		printf("%s\n", date);
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");

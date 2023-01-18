@@ -372,7 +372,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
 #endif
 	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");
-	read_rtc_date();
+	char* date = read_rtc_date();
+  printf("%s\n", date);
 	/*if (CHECK_FLAG (mb_info->flags, 2)){
     printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 	}*/
