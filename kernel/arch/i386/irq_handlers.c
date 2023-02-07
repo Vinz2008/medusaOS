@@ -127,6 +127,7 @@ void sys_key_handler(registers_t* frame){
         printf("\n> ");
     } else if (scan_code == DELETE_KEY || scan_code == BACKSPACE_KEY){ // DELETE - pressed
         write_serialf("delete pressed\n");
+        terminal_framebuffer_delete_character();
         //remove_character();
         //bug with delete character (wrong keycode)
     } else if (scan_code == CURSOR_LEFT_KEY) {

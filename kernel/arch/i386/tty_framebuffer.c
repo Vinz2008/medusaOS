@@ -131,6 +131,16 @@ void terminal_framebuffer_putc_pixel(char c){
 }
 
 
+void terminal_framebuffer_delete_character(){
+	column -= 8;
+	for (int i = 0; i < 16; i ++){
+        for (int j = 0; j < 8; j++){  
+            draw_pixel(fb, column + 8 - j, row + i, BLACK);
+        }
+    }
+	line_cli[strlen(line_cli) - 1] = '\0';
+}
+
 void terminal_framebuffer_putc(char c){
 #if GUI_MODE
 #else
