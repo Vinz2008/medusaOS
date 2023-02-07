@@ -312,7 +312,7 @@ end_ls:
 	} else if (strcmp("cat", command) == 0){
 		log(LOG_SERIAL, false, "test cat cmd\n");
 		char*  filename = argv[0];
-		char* temp = kmalloc(200 * sizeof(char));
+		char* temp = kmalloc((strlen(directory) + strlen(filename) + 2) * sizeof(char));
 		memset(temp, 0, sizeof(temp));
 		strcpy(temp, directory);
 		strcat(temp, filename);
@@ -432,6 +432,10 @@ end_ls:
 		printf("clear : clear screen\n");
 		printf("reboot : reboot the computer\n");
 		printf("arch : print arch of the computer\n");
+		printf("lscpu : print infos about your cpu\n");
+		printf("base64 : base64 encode or decode file");
+		printf("date : print the date\n");
+		printf("sleep a number of seconds\n");
 		printf("thirdtemple : ...\n");
 		printf("help : print this help\n");
 	} else if (strcmp("arch", command) == 0){
