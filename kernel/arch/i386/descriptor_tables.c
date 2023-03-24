@@ -9,14 +9,15 @@
 #include <kernel/descriptors_tables.h>
 #include <kernel/serial.h>
 #include <kernel/x86.h>
+#include <kernel/tss.h>
 
 extern void flush_gdt();
 extern void flush_idt(uint32_t);
 extern void idt_initialize();
-
+extern void flush_tss(void);
 
 static void gdt_initialize();
-static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
+void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
 struct gdt_entry gdt[6];
 struct gdt_ptr gdt_p;
@@ -36,11 +37,14 @@ static void gdt_initialize(){
     set_gdt_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
     set_gdt_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // ring 3 code
     set_gdt_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // ring 3 data
+    //install_tss(&gdt[5]);
+    write_tss(5, 0x10, 0x0);
     flush_gdt();
+    //flush_tss();
 }
 
 // Set the value of one GDT entry.
-static void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity){
+void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity){
     gdt[index].base_low = (base & 0xFFFF);
     gdt[index].base_middle = (base >> 16) & 0xFF;
     gdt[index].base_high = (base >> 24) & 0xFF;

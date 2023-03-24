@@ -28,4 +28,6 @@ struct gdt_ptr
 
 extern void gdt_flush();
 
+void set_gdt_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
+
 #endif

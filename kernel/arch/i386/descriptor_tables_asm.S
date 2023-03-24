@@ -75,10 +75,10 @@ flush_gdt:
 
 .global flush_tss
 flush_tss:
-    mov (5 * 8) | 0, %ax
+#    mov (5 * 8) | 0, %ax
+    mov $0x2B, %ax
     ltr %ax
     ret
-
 
 .global flush_idt
 
