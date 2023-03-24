@@ -46,7 +46,7 @@ uintptr_t paging_get_kernel_directory() {
  * If the `create` flag is passed, the corresponding page table is created with
  * the passed flags if needed and this function should never return NULL.
  */
-page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags) {
+page_t* paging_get_page_select_dir(uintptr_t virt, bool create, uint32_t flags, directory_entry_t* dir) {
     if (virt % 0x1000) {
         log(LOG_SERIAL, false,"Paging_get_page: unaligned address %p",virt);
         abort();
@@ -55,7 +55,7 @@ page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags) {
     uint32_t dir_index = DIRECTORY_INDEX(virt);
     uint32_t table_index = TABLE_INDEX(virt);
 
-    directory_entry_t* dir = (directory_entry_t*) 0xFFFFF000;
+    //directory_entry_t* dir = (directory_entry_t*) 0xFFFFF000;
     page_t* table = (page_t*) (0xFFC00000 + (dir_index << 12));
 
     if (!(dir[dir_index] & PAGE_PRESENT) && create) {
@@ -70,6 +70,10 @@ page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags) {
     }
 
     return NULL;
+}
+
+page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags){
+    return paging_get_page_select_dir(virt, create, flags, (directory_entry_t*)0xFFFFF000);
 }
 
 // TODO: refuse 4 MiB pages

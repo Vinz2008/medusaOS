@@ -285,12 +285,111 @@ int exec_elf(char* path, char** argv){
 }
 
 
-int exec_elf(char* path, int argc, char** argv, char** env){
+int elf_exec(char* path, int argc, char** argv, char** env){
 	fs_node_t* file = vfs_open(path, "r");
 	if (!file){
 		return -1;
 	}
-	for (uint32_t x = 0x30000000; w < 0x30000000 + file->length; x += 0x1000){
-		
+	for (uint32_t x = 0x30000000; x < 0x30000000 + file->length; x += 0x1000){
+		paging_alloc_pages(x, 1);
 	}
+	Elf32_Ehdr * header = (Elf32_Ehdr *)0x30000000;
+	read_fs(file, 0, file->length, (uint8_t*)header);
+	//current_process->name = malloc(strlen(path) + 1);
+	//memcpy(current_process->name, path, strlen(path) + 1);
+	if (header->e_ident != ELFMAG0 || header->e_ident[1] != ELFMAG1 || header->e_ident[2] != ELFMAG2 || header->e_ident[3] != ELFMAG3){
+		printf("Fatal: Not a valid ELF executable.\n");
+		for (uint32_t x = 0x30000000; x < 0x30000000 + file->length; x += 0x1000){
+			paging_unmap_page(x);
+		}
+		close_fs(file);
+		return -1;
+	}
+	for (uint32_t x = 0; x < (uint32_t)header->e_shentsize * header->e_shnum; x += header->e_shentsize){
+		Elf32_Shdr* shdr = (Elf32_Shdr*)((uint32_t)header + (header->e_shoff + x));
+		if (shdr->sh_addr){
+			// TODO : if is loadable section, set entry of process to shdr->sh_addr
+			/*if (shdr->sh_addr < current_process->image.entry){
+				current_process->image.entry = shdr->sh_addr;
+			}*/
+			/*if (shdr->sh_addr + shdr->sh_size - current_process->image.entry > current_process->image.size) {
+				// We also store the total size of the memory region used by the application
+				current_process->image.size = shdr->sh_addr + shdr->sh_size - current_process->image.entry;
+			}*/
+			for (uint32_t i = 0; i < shdr->sh_size + 0x2000; i += 0x1000) {
+				paging_alloc_pages(shdr->sh_addr + i, 1);
+			}
+			if (shdr->sh_type == SHT_NOBITS) {
+				/* This is the .bss, zero it */
+				memset((void *)(shdr->sh_addr), 0x0, shdr->sh_size);
+			} else {
+				/* Copy the section into memory */
+				memcpy((void *)(shdr->sh_addr), (void *)((uint32_t)header + shdr->sh_offset), shdr->sh_size);
+			}
+		}
+	}
+	uint32_t entry = (uint32_t)header->e_entry;
+
+	for (uint32_t x = 0x30000000; x < 0x30000000 + file->length; x += 0x1000) {
+		paging_unmap_page(x);
+	}
+	close_fs(file);
+	for (uint32_t stack_pointer = USER_STACK_BOTTOM; stack_pointer < USER_STACK_TOP; stack_pointer += 0x1000) {
+		paging_alloc_pages(stack_pointer, 1);
+	}
+
+	/* Collect arguments */
+	int envc = 0;
+	for (envc = 0; env[envc] != NULL; ++envc);
+	
+	/* Format auxv */
+	/*Elf32_auxv auxv[] = {
+		{256, 0xDEADBEEF},
+		{0, 0}
+	};
+	int auxvc = 0;
+	for (auxvc = 0; auxv[auxvc].id != 0; ++auxvc);*/
+
+	//uintptr_t heap = current_process->image.entry + current_process->image.size;
+	//paging_alloc_pages(heap, 1);
+	/*char ** argv_ = (char **)heap;
+	heap += sizeof(char *) * (argc + 1);
+	char ** env_ = (char **)heap;
+	heap += sizeof(char *) * (envc + 1);
+	void * auxv_ptr = (void *)heap;
+	heap += sizeof(Elf32_auxv) * (auxvc);
+
+	for (int i = 0; i < argc; ++i) {
+		paging_alloc_pages(heap, 1);
+		argv_[i] = (char *)heap;
+		memcpy((void *)heap, argv[i], strlen(argv[i]) * sizeof(char) + 1);
+		heap += strlen(argv[i]) + 1;
+	}
+	// Don't forget the NULL at the end of that... 
+	argv_[argc] = 0;
+
+	for (int i = 0; i < envc; ++i) {
+		paging_alloc_pages(heap, 1);
+		env_[i] = (char *)heap;
+		memcpy((void *)heap, env[i], strlen(env[i]) * sizeof(char) + 1);
+		heap += strlen(env[i]) + 1;
+	}
+	env_[envc] = 0;*/
+
+	//memcpy(auxv_ptr, auxv, sizeof(Elf32_auxv) * (auxvc));
+
+	//current_process->image.heap        = heap; // heap end
+	//current_process->image.heap_actual = heap + (0x1000 - heap % 0x1000);
+	//current_process->image.user_stack  = USER_STACK_TOP;
+	/*while (current_process->fds->length < 3) {
+		process_append_fd((process_t *)current_process, NULL);
+	}*/
+
+	//current_process->image.start = entry;
+
+	//enter_user_jmp(entry, argc, argv_, USER_STACK_TOP);
+
+	/* We should never reach this code */
+	return -1;
+
 }

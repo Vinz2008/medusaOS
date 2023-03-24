@@ -11,6 +11,7 @@ typedef uint32_t page_t;
 void init_paging(uint32_t addr);
 uintptr_t paging_get_kernel_directory();
 page_t* paging_get_page(uintptr_t virt, bool create, uint32_t flags);
+page_t* paging_get_page_select_dir(uintptr_t virt, bool create, uint32_t flags, directory_entry_t* dir);
 void paging_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags);
 void paging_unmap_page(uintptr_t virt);
 void paging_map_pages(uintptr_t phys, uintptr_t virt, uint32_t num, uint32_t flags);

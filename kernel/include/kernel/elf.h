@@ -1,5 +1,7 @@
 # include <stdint.h>
 
+#define USER_STACK_TOP    0x10010000
+#define USER_STACK_BOTTOM 0x10000000
 #define MAXARGC 30
 
 typedef uint16_t Elf32_Half;	// Unsigned half int

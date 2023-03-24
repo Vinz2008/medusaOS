@@ -443,9 +443,9 @@ end_ls:
 		printf("reboot : reboot the computer\n");
 		printf("arch : print arch of the computer\n");
 		printf("lscpu : print infos about your cpu\n");
-		printf("base64 : base64 encode or decode file");
+		printf("base64 : base64 encode or decode file\n");
 		printf("date : print the date\n");
-		printf("sleep a number of seconds\n");
+		printf("sleep : sleep a number of seconds\n");
 		printf("thirdtemple : ...\n");
 		printf("help : print this help\n");
 	} else if (strcmp("arch", command) == 0){
