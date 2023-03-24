@@ -5,6 +5,7 @@
 #include <string.h>
 #include <kernel/vfs.h>
 #include <kernel/kmalloc.h>
+#include <kernel/paging.h>
 
 static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr* header) {
 	return (Elf32_Shdr*)((int)header + header->e_shoff);
@@ -281,4 +282,15 @@ int exec_elf(char* path, char** argv){
 	}
 
 	return 0;
+}
+
+
+int exec_elf(char* path, int argc, char** argv, char** env){
+	fs_node_t* file = vfs_open(path, "r");
+	if (!file){
+		return -1;
+	}
+	for (uint32_t x = 0x30000000; w < 0x30000000 + file->length; x += 0x1000){
+		
+	}
 }
