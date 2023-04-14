@@ -126,23 +126,23 @@ void sys_key_handler(registers_t* frame){
     log(LOG_SERIAL, false, "key pressed : %d\n", scan_code);
     if (scan_code & 0x80){
         log(LOG_SERIAL, false, "modifer key/special key pressed : %d\n", scan_code);
-    }
-    if (scan_code == 0x4B){
+    } else if (scan_code == 0x4B){
         log(LOG_SERIAL, false, "left\n");
         move_focused_window_wm(LEFT);
-    }
-    if (scan_code == 0x48){
+    } else if (scan_code == 0x48){
         log(LOG_SERIAL, false, "up\n");
         move_focused_window_wm(UP);
-    }
-    if (scan_code == 0x4D){
+    } else if (scan_code == 0x4D){
         log(LOG_SERIAL, false, "right\n");
         move_focused_window_wm(RIGHT);
-    }
-    if (scan_code == 0x50){
+    } else if (scan_code == 0x50){
         log(LOG_SERIAL, false, "down\n");
         move_focused_window_wm(DOWN);
+    } else if (scan_code < 0x81){
+        char c = keyboard_us[scan_code];
+        gui_keypress(c);
     }
+
 #else
     if(scan_code == ESC_KEY){ // ESC - pressed
         reboot();

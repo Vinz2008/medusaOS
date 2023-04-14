@@ -20,6 +20,31 @@ static mouse_t mouse;
 static window_t* focused;
 static uint32_t background_color;
 static window_t* background_window;
+int row_putchar = 0;
+int column_putchar = 8;
+static window_t** window_list;
+size_t window_list_used;
+size_t window_list_size;
+
+void init_window_list(){
+    window_list = kmalloc(1 * sizeof(window_t*));
+    window_list_used = 0;
+    window_list_size = 1;
+}
+
+void add_to_window_list(window_t* window){
+    if (window_list_used == window_list_size){
+        window_list_size *= 2;
+        window_list = krealloc(window_list, window_list_size * sizeof(window_t*));
+    }
+    window_list[window_list_used++] = window;
+}
+
+void empty_window_list(){
+    kfree(window_list);
+    window_list = NULL;
+    window_list_size = window_list_used = 0;
+}
 
 rect_t rect_from_window(wm_window_t* win) {
     return (rect_t) {
@@ -28,6 +53,28 @@ rect_t rect_from_window(wm_window_t* win) {
         .bottom = win->pos.y + win->kfb.height - 1,
         .right = win->pos.x + win->kfb.width - 1
     };
+}
+
+void putchar_gui(char c){
+    if (c == '\n'){
+        row_putchar += 12;
+        column_putchar = 8;
+        return;
+    }
+    draw_char(focused->fb, c, column_putchar, row_putchar, 0xFFFFFF);
+    column_putchar += 8;
+    if (column_putchar >= focused->width - 16){
+        column_putchar = 8;
+        row_putchar += 12;
+        if (row_putchar == focused->height){
+            row_putchar = 0;
+        }
+    }
+    render_window(focused);
+}
+
+void gui_keypress(char c){
+    putchar_gui(c);
 }
 
 void move_window(window_t* window, int x, int y){
@@ -154,6 +201,12 @@ void render_window(window_t* win){
     draw_border(fb, win->x, win->y, win->width, win->height, border_color2);
 }
 
+void render_screen(){
+    for (int i = 0; i < window_list_used; i++){
+        render_window(window_list[i]);
+    }
+}
+
 void wm_render_window(uint32_t win_id, rect_t* clip) {
 	/*wm_window_t* win = wm_get_window(win_id);
 
@@ -184,6 +237,7 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
     //win->id = snow_wm_open_window(&win->fb, flags);
     win->flags = flags;
     focused = win;
+    add_to_window_list(win);
     return win;
 }
 
