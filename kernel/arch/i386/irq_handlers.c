@@ -73,6 +73,7 @@ void handle_platform_irq(registers_t* frame){
     }
 }*/
 void sys_mouse_handler(registers_t* frame){
+    log(LOG_SERIAL, false, "mouse moved\n");
     (void)frame;
     uint8_t status = inb(MOUSE_STATUS);
     while (status & MOUSE_BBIT){
