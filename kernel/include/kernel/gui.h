@@ -25,6 +25,13 @@ enum WM_EVENT {
     WM_EVENT_LOST_FOCUS,
 };
 
+enum direction {
+    LEFT = 1,
+    RIGHT,
+    UP,
+    DOWN
+};
+
 #define COLOR(_r, _g, _b)((uint8_t)( \
     (((_r) & 0x7) << 5) |       \
     (((_g) & 0x7) << 2) |       \
@@ -42,6 +49,8 @@ typedef struct {
     fb_t fb;
     uint32_t id;
     uint32_t flags;
+    int x;
+    int y;
 } window_t;
 
 typedef struct _wm_window_t {
@@ -86,3 +95,4 @@ typedef wm_rect_t rect_t;
 void init_gui();
 window_t* open_window(const char* title, int width, int height, uint32_t flags);
 void draw_window(window_t* win);
+void move_focused_window_wm(enum direction dir);

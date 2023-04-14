@@ -13,6 +13,11 @@
 #include <kernel/keyboard.h>
 #include <kernel/pit.h>
 #include <kernel/tty_framebuffer.h>
+#include <kernel/config.h>
+
+#if GUI_MODE
+#include <kernel/gui.h>
+#endif
 
 extern uint32_t simple_sc_to_kc[];
 static uint32_t device;
@@ -116,6 +121,28 @@ void sys_key_handler(registers_t* frame){
         return;
     }
 
+#if GUI_MODE
+    log(LOG_SERIAL, false, "key pressed : %d\n", scan_code);
+    if (scan_code & 0x80){
+        log(LOG_SERIAL, false, "modifer key/special key pressed : %d\n", scan_code);
+    }
+    if (scan_code == 0x4B){
+        log(LOG_SERIAL, false, "left\n");
+        move_focused_window_wm(LEFT);
+    }
+    if (scan_code == 0x48){
+        log(LOG_SERIAL, false, "up\n");
+        move_focused_window_wm(UP);
+    }
+    if (scan_code == 0x4D){
+        log(LOG_SERIAL, false, "right\n");
+        move_focused_window_wm(RIGHT);
+    }
+    if (scan_code == 0x50){
+        log(LOG_SERIAL, false, "down\n");
+        move_focused_window_wm(DOWN);
+    }
+#else
     if(scan_code == ESC_KEY){ // ESC - pressed
         reboot();
     }
@@ -139,4 +166,5 @@ void sys_key_handler(registers_t* frame){
         char c = keyboard_us[scan_code];
         terminal_framebuffer_keypress(c);
     }
+#endif
 }

@@ -17,8 +17,9 @@ void wm_mouse_callback(mouse_t curr);
 static uint32_t id_count = 0;
 static fb_t fb;
 static mouse_t mouse;
-//static wm_window_t* focused;
-
+static window_t* focused;
+static uint32_t background_color;
+static window_t* background_window;
 
 rect_t rect_from_window(wm_window_t* win) {
     return (rect_t) {
@@ -29,7 +30,41 @@ rect_t rect_from_window(wm_window_t* win) {
     };
 }
 
+void move_window(window_t* window, int x, int y){
+    if (window->x + x < 0 || window->x + x > fb.width){
+        return;
+    }
+    if (window->y + y < 0 || window->y + y > fb.height){
+        return;
+    }
+    fill_window_place(window);
+    window->x += x;
+    window->y += y;
+    render_window(window);
+}
 
+void move_window_wm(window_t* window, enum direction dir){
+    switch (dir){
+        default:
+        case LEFT:
+            move_window(window, -100, 0);
+            break;
+        case RIGHT:
+            move_window(window, 100, 0);
+            break;
+        case UP:
+            move_window(window, 0, -100);
+            break;
+        case DOWN:
+            move_window(window, 0, 100);
+            break;
+    }
+}
+
+
+void move_focused_window_wm(enum direction dir){
+    move_window_wm(focused, dir);
+}
 
 uint32_t wm_open_window(fb_t* buff, uint32_t flags) {
     wm_window_t* win = (wm_window_t*) kmalloc(sizeof(wm_window_t));
@@ -81,13 +116,42 @@ void wm_draw_window(wm_window_t* win, rect_t rect) {
     rect_clear_clipped(&clip_rects);*/
 }
 
+void fill_screen(uint32_t col){
+    for (int y = 0; y < fb.height; y++){
+        for (int x = 0; x < fb.width; x++){
+            draw_pixel(fb, x, y, col);
+        }
+    }
+}
+
+void clear_screen(){
+    fill_screen(background_color);
+}
+
+void fill_window_place(window_t* win){
+    for (int y = 0; y < win->height; y++){
+        for (int x = 0; x < win->width; x++){
+            uint32_t* offset_fb = pixel_offset(fb, x + win->x, y + win->y);
+            offset_fb[0] = background_color;
+        }
+    }
+}
 
 void render_window(window_t* win){
     fb_t* wfb = &win->fb;
     uintptr_t fb_off = fb.address + fb.pitch + fb.bpp/8;
+    uint32_t border_color2 = 0x00AA1100;
     //memcpy(fb.address, wfb->address, sizeof(wfb->height*wfb->pitch));
     log(LOG_SERIAL, false, "size window when rendering : %d\n", wfb->height*wfb->width*wfb->bpp/8);
-    memcpy((uint32_t*)fb.address, (uint32_t*)wfb->address, wfb->height*wfb->pitch);
+    //memcpy((uint32_t*)fb.address, (uint32_t*)wfb->address, wfb->height*wfb->pitch);
+    for (int y = 0; y < wfb->height; y++){
+        for (int x = 0; x < wfb->width; x++){
+            uint32_t* offset_window = pixel_offset(*wfb, x, y);
+            uint32_t* offset_fb = pixel_offset(fb, x + win->x, y + win->y);
+            offset_fb[0] = offset_window[0];
+        }
+    }
+    draw_border(fb, win->x, win->y, win->width, win->height, border_color2);
 }
 
 void wm_render_window(uint32_t win_id, rect_t* clip) {
@@ -119,7 +183,7 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
 
     //win->id = snow_wm_open_window(&win->fb, flags);
     win->flags = flags;
-
+    focused = win;
     return win;
 }
 
@@ -141,6 +205,7 @@ void draw_window(window_t* win){
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
+    background_window = open_window("background window", fb.width, fb.height, 0);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
     //mouse_set_callback(wm_mouse_callback);
