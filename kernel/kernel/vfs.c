@@ -4,6 +4,7 @@
 #include <fnctl.h>
 #include <kernel/kmalloc.h>
 #include <kernel/serial.h>
+#include <kernel/list.h>
 
 
 #define MAX_SYMLINK_DEPTH 10
@@ -271,6 +272,7 @@ void vfs_init(){
   root->fs_type = NULL;
   root->device = NULL;
   vfs_tree_set_root(fs_tree, root);
+  init_file_descriptor_table();
 }
 
 void* vfs_mount(const char* path, fs_node_t* local_root){
@@ -397,6 +399,22 @@ uint32_t vfs_get_depth(const char *path){
    return depth;
 }
 
+list_t* file_descriptors_table;
+
+file_descriptor_t stdinfd;
+file_descriptor_t stdoutfd;
+file_descriptor_t stderrfd;
+file_descriptor_t serialfd;
+
+void init_file_descriptor_table(){
+  file_descriptors_table = list_create();
+  // should have struct to have pairs of file descriptors and fs_node pointers
+  list_append(&stdinfd, file_descriptors_table);
+  list_append(&stdoutfd, file_descriptors_table);
+  list_append(&stderrfd, file_descriptors_table);
+  list_append(&serialfd, file_descriptors_table);
+}
+
 // write a character
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size){
     (void)size;
@@ -463,4 +481,6 @@ fs_node_t* vfs_open(const char* path, const char* mode){
 	open_fs(file, flags);
 	return file;
 }
+
+
 

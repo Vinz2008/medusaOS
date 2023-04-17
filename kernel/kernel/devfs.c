@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <kernel/kmalloc.h>
 #include <kernel/vfs.h>
-#include <kernel/list.h>
+//#include <kernel/list.h>
 
 
 static fs_node_t* device_list = NULL;

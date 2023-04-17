@@ -6,7 +6,7 @@
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/mouse.h>
-#include <kernel/list.h>
+//#include <kernel/list.h>
 #include <kernel/kmalloc.h>
 #include <kernel/x86.h>
 

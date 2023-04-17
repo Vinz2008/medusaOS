@@ -2,7 +2,39 @@
 #include <kernel/list.h>
 #include <kernel/kmalloc.h>
 
-List* list_create()
+list_t* list_create(){
+    list_t* list = kmalloc(sizeof(list_t));
+    list->used = 0;
+    list->list = kmalloc(sizeof(struct listItem)*1);
+    list->size = 1;
+    return list;
+}
+
+void list_clear(list_t* list){
+    for (int i = 0; i < list->used; i++){
+        list->list[i].data = NULL;
+    }
+}
+
+void list_destroy(list_t* list){
+    list_clear(list);
+    kfree(list->list);
+    kfree(list);
+}
+
+bool list_is_empty(list_t* list){
+    return list->used == 0;
+}
+
+void list_append(void* data, list_t* list){
+    if (list->used == list->size){
+        list->size *= 2;
+        list->list = krealloc(list->list, list->size * sizeof(struct listItem));
+    }
+    list->list[list->used++].data = data;
+}
+
+/*List* list_create()
 {
     List* list = (List*)kmalloc(sizeof(List));
 
@@ -105,4 +137,4 @@ ListNode* list_get_first_node(List* list)
 ListNode* list_get_last_node(List* list)
 {
     return list->tail;
-}
+}*/

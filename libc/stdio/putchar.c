@@ -12,7 +12,7 @@ int putchar(int ic) {
 	char c = (char) ic;
 #if GUI_MODE
 	//draw_string(&c, 100, 250, 0xFFFFFF);
-	putchar_gui(c);
+	//putchar_gui(c);
 #else
 	//terminal_write(&c, sizeof(c));
 	terminal_framebuffer_putc(c);
