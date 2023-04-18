@@ -39,6 +39,7 @@ kernel/multiboot2.o \
 kernel/pmm.o \
 kernel/kmalloc.o \
 kernel/list.o \
+kernel/pair.o \
 kernel/ringbuffer.o \
 kernel/devfs.o \
 kernel/pipe.o \

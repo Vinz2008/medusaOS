@@ -5,6 +5,7 @@
 #include <kernel/kmalloc.h>
 #include <kernel/serial.h>
 #include <kernel/list.h>
+#include <kernel/pair.h>
 
 
 #define MAX_SYMLINK_DEPTH 10
@@ -409,7 +410,7 @@ file_descriptor_t serialfd;
 void init_file_descriptor_table(){
   file_descriptors_table = list_create();
   // should have struct to have pairs of file descriptors and fs_node pointers
-  list_append(&stdinfd, file_descriptors_table);
+  list_append(create_pair_a(&stdinfd, vfs_open("/dev/stdin", "r")), file_descriptors_table);
   list_append(&stdoutfd, file_descriptors_table);
   list_append(&stderrfd, file_descriptors_table);
   list_append(&serialfd, file_descriptors_table);

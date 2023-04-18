@@ -1,5 +1,6 @@
 #include <kernel/pipe.h>
 #include <string.h>
+#include <stdio.h>
 #include <kernel/vfs.h>
 #include <kernel/kmalloc.h>
 
@@ -7,7 +8,8 @@ fs_node_t* make_pipe(size_t size){
     fs_node_t* node = kmalloc(sizeof(fs_node_t));
     pipe_device_t* pipe = kmalloc(sizeof(pipe_device_t));
     node->inode = 0;
-    strcpy(node->name, "[pipe]");
+    //strcpy(node->name, "[pipe]");
+    //log(LOG_SERIAL, false, "[pipe] addr : %p\n", node->name);
     node->uid = node->gid = 0;
     node->read  = 0;
 	node->write = 0;

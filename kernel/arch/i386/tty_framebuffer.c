@@ -248,7 +248,8 @@ void launch_command_framebuffer(){
     }
 	log(LOG_SERIAL, false, "argc bef : %d\n", argc);
 	log(LOG_SERIAL, false, "argv[0][0] : %c\n", argv[0][0]);
-	if (argv[0][0] == '\0'){
+	log(LOG_SERIAL, false, "argv[0][0] d : %d\n", argv[0][0]);
+	if (argv[0][0] == '\0' || argv[0][0] < 7){
 		argc = 0;
 	}
 	log(LOG_SERIAL, false, "argc : %d\n", argc);

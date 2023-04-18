@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <kernel/kmalloc.h>
 #include <kernel/vfs.h>
-//#include <kernel/list.h>
+#include <kernel/list.h>
 
 
-static fs_node_t* device_list = NULL;
-int n_devices = 0;
+list_t* device_list;
+//static fs_node_t* device_list = NULL;
+//int n_devices = 0;
 static void devfs_open(struct fs_node* node);
 fs_node_t* dev_root = NULL;
 
@@ -26,28 +27,32 @@ fs_node_t* devfs_finddir(struct fs_node* node, char *name){
 }
 
 struct dirent* devfs_readdir(struct fs_node* node, uint32_t index){
-    log(LOG_SERIAL, false, "dev readdir: %d, n_devices : %d\n", index, n_devices);
-    if (index >= n_devices){
+    log(LOG_SERIAL, false, "dev readdir: %d, nb devices : %d\n", index, device_list->used);
+    if (index >= device_list->used){
         return NULL;
     }
-    for (int i = 0; i < n_devices; i++){
-        log(LOG_SERIAL, false, "readdir device_list[%d] : %s\n", i, device_list[i].name);
-        log(LOG_SERIAL, false, "readdir device_list[%d] ptr name : %p\n", i, &(device_list[i].name));
+    for (int i = 0; i < device_list->used; i++){
+        fs_node_t* temp_node = device_list->list[i].data;
+        log(LOG_SERIAL, false, "readdir device_list[%d] : %s\n", i, temp_node->name);
+        log(LOG_SERIAL, false, "readdir device_list[%d] ptr name : %p\n", i, &(temp_node->name));
     }
-    log(LOG_SERIAL, false, "name of device returned : %s\n", device_list[index].name);
-    return &device_list[index];
+    fs_node_t* node_found = device_list->list[index].data;
+    log(LOG_SERIAL, false, "name of device returned : %s\n", node_found->name);
+    log(LOG_SERIAL, false, "name of device returned ptr : %p\n", node_found->name);
+    return node_found;
 }
 
-void add_to_device_list(fs_node_t* node){
-    krealloc(device_list, sizeof(fs_node_t) * (n_devices + 1));
+/*void add_to_device_list(fs_node_t* node){
+    //krealloc(device_list, sizeof(fs_node_t) * (n_devices + 1));
     device_list[n_devices] = *node;
     log(LOG_SERIAL, false, "device_list[%d] : %s\n", n_devices, device_list[n_devices].name);
     n_devices++;
-}
+}*/
 
 fs_node_t* devfs_register_device(Device* device){
-    for (int i = 0; i < n_devices; i++){
-        if (strcmp(device->name, device_list[i].name) == 0){
+    for (int i = 0; i < device_list->used; i++){
+        fs_node_t* temp_node = (fs_node_t*)device_list->list[i].data;
+        if (strcmp(device->name, temp_node->name) == 0){
             return NULL;
         }
     }
@@ -65,8 +70,9 @@ fs_node_t* devfs_register_device(Device* device){
     device_node->write = device->write;
     device_node->private_node_data = device->private_data;
     device_node->parent = dev_root;
-    add_to_device_list(device_node);
-    log(LOG_SERIAL, false, "after adding device_list[%d] : %s\n", n_devices - 1, device_list[n_devices - 1].name);
+    list_append(device_node, device_list);
+    //add_to_device_list(device_node);
+    log(LOG_SERIAL, false, "after adding device_list[%d] : %s\n", device_list->used - 1, ((fs_node_t*)device_list->list[device_list->used - 1].data)->name);
     return device_node;
 }
 
@@ -94,5 +100,6 @@ void devfs_initialize(){
     dev_root->open = &devfs_open;
     dev_root->finddir = &devfs_finddir;
     dev_root->readdir = &devfs_readdir;
-    device_list = kmalloc(sizeof(fs_node_t));
+    device_list = list_create();
+    //device_list = kmalloc(sizeof(fs_node_t));
 }
