@@ -2,6 +2,7 @@
 #include <string.h>
 #include <kernel/devfs.h>
 #include <kernel/kmalloc.h>
+#include <kernel/tty_framebuffer.h>
 
 void null_open(fs_node_t* node){
     (void)node;
@@ -20,9 +21,21 @@ Device* create_device(char* name, read_type_t read, write_type_t write, open_typ
     return device;
 }
 
+static uint32_t stdin_read(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer){
+    char* written = get_line_cli();
+    memcpy(buffer, written, size);
+    return size;
+}
+
+static uint32_t stdout_write(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t* buffer){
+    char* str = kmalloc(sizeof(char) * size);
+    memcpy(str, buffer, size);
+    printf("%s", str);
+}
+
 void register_devices_necessary(){
     //Device* stdin_dev = (Device){.name="stdin", .close=0, .read=0, .write=0,};
-    Device* stdin_dev = create_device("stdin", 0, 0, 0, 0);
+    Device* stdin_dev = create_device("stdin", 0, 0, &stdin_read, 0);
     //memset((uint8_t*)stdin_dev, 0, sizeof(Device));
     /*Device stdin_dev;
     memset((uint8_t*)&stdin_dev, 0, sizeof(Device));
