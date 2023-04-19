@@ -133,11 +133,36 @@ void draw_char(fb_t fb, char c, int x, int y, uint32_t col){
 #endif
 }
 
+void draw_char_size(fb_t fb, int size_mult, char c, int x, int y, uint32_t col){
+    log(LOG_SERIAL, false, "draw character: %c x : %d y : %d col : %d\n", c, x, y, col);
+#if GUI_MODE
+    uint8_t* offset = font_psf + sizeof(font_header_t) + c*16;
+    for (int i = 0; i < 16; i ++){
+        for (int j = 0; j < 8; j++){
+            if (offset[i] & (1 << j)){
+                //for (int mult = 0; mult < size_mult; mult++){
+                //draw_pixel(fb, (x + 8 - j) * size_mult, (y + i) * size_mult, col);
+                for (int add = 0; add < size_mult; add++){
+                draw_pixel(fb, (x + 8 - j) * size_mult + add, (y + i) * size_mult + add, col);
+                }
+            }
+        }
+    }
+#endif
+}
+
 
 void draw_string(fb_t fb, const char* str, int x, int y, uint32_t col){
     size_t len = strlen(str);
     for (size_t i = 0; i < len; i++) {
         draw_char(fb, str[i], x + 8*i, y, col);
+    }
+}
+
+void draw_string_size(fb_t fb, int size_mult, const char* str, int x, int y, uint32_t col){
+    size_t len = strlen(str);
+    for (size_t i = 0; i < len; i++) {
+        draw_char_size(fb, size_mult, str[i], x + 8*i, y, col);
     }
 }
 

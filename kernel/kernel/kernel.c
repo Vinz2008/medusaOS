@@ -263,6 +263,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	//draw_line_vertical(100, 10, 250, 0xFFFFFF);
   fb_t fb = fb_get_info();
 	draw_string(fb, "MEDUSAOS", 100, 250, 0xFFFFFF);
+  draw_string_size(fb, 2, "MEDUSAOS", 100, 250, 0xFFFFFF);
   draw_line_horizontal(fb, 125, 360, 330, 0xFFFFFF);
   window_t* win = open_window("test window", 300, 125, 0);
   //draw_string(fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
