@@ -1,6 +1,6 @@
 #include <types.h>
 #include <kernel/fb.h>
-#include <kernel/ringbuffer.h>
+//#include <kernel/ringbuffer.h>
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
@@ -59,7 +59,8 @@ typedef struct _wm_window_t {
     point_t pos;
     uint32_t id;
     uint32_t flags;
-    ringbuffer_t* events;
+    //ringbuffer_t* events; // some sort of list
+    void* events;
 } wm_window_t;
 
 typedef struct {

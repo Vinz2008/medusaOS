@@ -6,7 +6,7 @@
 #include <kernel/fb.h>
 #include <kernel/graphics.h>
 #include <kernel/mouse.h>
-//#include <kernel/list.h>
+#include <kernel/list.h>
 #include <kernel/kmalloc.h>
 #include <kernel/x86.h>
 
@@ -22,11 +22,12 @@ static uint32_t background_color;
 static window_t* background_window;
 int row_putchar = 0;
 int column_putchar = 8;
-static window_t** window_list;
-size_t window_list_used;
-size_t window_list_size;
+static list_t* window_list;
+//static window_t** window_list;
+//size_t window_list_used;
+//size_t window_list_size;
 
-void init_window_list(){
+/*void init_window_list(){
     window_list = kmalloc(1 * sizeof(window_t*));
     window_list_used = 0;
     window_list_size = 1;
@@ -44,7 +45,7 @@ void empty_window_list(){
     kfree(window_list);
     window_list = NULL;
     window_list_size = window_list_used = 0;
-}
+}*/
 
 rect_t rect_from_window(wm_window_t* win) {
     return (rect_t) {
@@ -120,7 +121,8 @@ uint32_t wm_open_window(fb_t* buff, uint32_t flags) {
         .kfb = *buff,
         .id = ++id_count,
         .flags = flags | WM_NOT_DRAWN,
-        .events = ringbuffer_new(WM_EVENT_QUEUE_SIZE * sizeof(wm_event_t))
+        //.events = ringbuffer_new(WM_EVENT_QUEUE_SIZE * sizeof(wm_event_t))
+        .events = NULL
     };
     win->kfb.address = (uintptr_t) kmalloc(buff->height*buff->pitch);
     //wm_assign_position(win);
@@ -202,8 +204,8 @@ void render_window(window_t* win){
 }
 
 void render_screen(){
-    for (int i = 0; i < window_list_used; i++){
-        render_window(window_list[i]);
+    for (int i = 0; i < window_list->used; i++){
+        render_window(window_list->list[i].data);
     }
 }
 
@@ -237,7 +239,8 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
     //win->id = snow_wm_open_window(&win->fb, flags);
     win->flags = flags;
     focused = win;
-    add_to_window_list(win);
+    list_append(win, window_list);
+    //add_to_window_list(win);
     return win;
 }
 
@@ -259,6 +262,7 @@ void draw_window(window_t* win){
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
+    window_list = list_create();
     background_window = open_window("background window", fb.width, fb.height, 0);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
