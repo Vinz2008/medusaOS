@@ -6,6 +6,11 @@
 #define SCREEN_HEIGHT 200
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 
+//flags
+#define NO_BORDER 0x01
+#define NOT_VISIBLE 0x02
+// then 0x04 and 0x08, etc
+
 #define WM_NORMAL 0
 #define WM_BACKGROUND 1
 #define WM_FOREGROUND 2

@@ -71,7 +71,8 @@ void putchar_gui(char c){
             row_putchar = 0;
         }
     }
-    render_window(focused);
+    //render_window(focused);
+    render_screen();
 }
 
 void gui_keypress(char c){
@@ -88,7 +89,8 @@ void move_window(window_t* window, int x, int y){
     fill_window_place(window);
     window->x += x;
     window->y += y;
-    render_window(window);
+    //render_window(window);
+    render_screen();
 }
 
 void move_window_wm(window_t* window, enum direction dir){
@@ -200,12 +202,17 @@ void render_window(window_t* win){
             offset_fb[0] = offset_window[0];
         }
     }
+    if (!(win->flags & NO_BORDER)){
     draw_border(fb, win->x, win->y, win->width, win->height, border_color2);
+    }
 }
 
 void render_screen(){
     for (int i = 0; i < window_list->used; i++){
-        render_window(window_list->list[i].data);
+        window_t* temp_window = window_list->list[i].data;
+        if (!(temp_window->flags & NOT_VISIBLE)){
+        render_window(temp_window);
+        }
     }
 }
 
@@ -258,14 +265,19 @@ void draw_window(window_t* win){
     draw_border(win->fb, 10, 10, win->width, win->height, border_color2);
 }
 
+window_t* get_background_window(){
+    return background_window;
+}
 
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
     window_list = list_create();
-    background_window = open_window("background window", fb.width, fb.height, 0);
+    background_window = open_window("background window", fb.width, fb.height, NO_BORDER);
+    draw_rectangle(background_window->fb, 0, 0, background_window->width, background_window->height, 0x0000ff);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
+    render_screen();
     //mouse_set_callback(wm_mouse_callback);
     //kbd_set_callback(wm_kbd_callback);
 }
