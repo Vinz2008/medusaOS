@@ -40,6 +40,7 @@ kernel/pmm.o \
 kernel/kmalloc.o \
 kernel/list.o \
 kernel/pair.o \
+kernel/hashtable.o \
 kernel/devfs.o \
 kernel/pipe.o \
 kernel/process.o \

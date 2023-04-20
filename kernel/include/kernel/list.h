@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#pragma once
+
 /*#define list_foreach(list_node, list) for (ListNode* list_node = list->head; NULL != list_node ; list_node = list_node->next)
 
 typedef struct ListNode
@@ -43,3 +45,4 @@ void list_clear(list_t* list);
 void list_destroy(list_t* list);
 bool list_is_empty(list_t* list);
 void list_append(void* data, list_t* list);
+list_t*  list_create_ext(size_t used, size_t size);

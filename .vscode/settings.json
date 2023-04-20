@@ -2,6 +2,8 @@
   "files.associations": {
     "io": "llvm",
     "std": "llvm",
+    "*.wasm": "wasm",
+    "*.toml": "toml",
     "stdlib.h": "c",
     "vga.h": "c",
     "random": "c",
@@ -55,7 +57,13 @@
     "functional": "c",
     "fstream": "c",
     "assert.h": "c",
-    "tuple": "c"
+    "tuple": "c",
+    "vector": "c",
+    "string": "c",
+    "memory": "c",
+    "optional": "c",
+    "system_error": "c",
+    "variant": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

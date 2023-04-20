@@ -11,6 +11,14 @@ list_t* list_create(){
     return list;
 }
 
+list_t*  list_create_ext(size_t used, size_t size){
+    list_t* list = kmalloc(sizeof(list_t));
+    list->used = used;
+    list->list = kmalloc(sizeof(struct listItem)*size);
+    list->size = size;
+    return list;
+}
+
 void list_clear(list_t* list){
     for (int i = 0; i < list->used; i++){
         list->list[i].data = NULL;

@@ -39,6 +39,7 @@
 #include <kernel/paging.h>
 #include <kernel/kmalloc.h>
 #include <kernel/syscall.h>
+#include <kernel/hashtable.h>
 
 #define _KERNEL_
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -375,6 +376,14 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	printf("Press ESC to reboot\n");
 	alert("error : %s\n", "string");
 	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
+  /*hashtable_t* htable = hashtable_create();
+  int* a = kmalloc(sizeof(int));
+  *a = 300;
+  hashtable_set(htable, "testkey", a);
+  log(LOG_SERIAL, false, "test after\n");
+  //int* result = NULL;
+  int* result = hashtable_get("testkey", htable);
+  log(LOG_SERIAL, false, "test hash table result (should be 300) : %d at address %p\n", *result, result);*/
   fs_node_t* stdout_node = vfs_open("dev/stdout", "w");
   char* str_buf = "Hello from vfs dev/stdout\n";
   if (stdout_node == NULL){
