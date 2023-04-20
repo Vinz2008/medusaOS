@@ -295,8 +295,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   //init_ps2();
   //ps2_initialize();
   keyboard_install();
-  //mouse_install();
 #if GUI_MODE
+  mouse_install();
 #else
 	char timer_str[] = "System timer is ticking\n";
     terminal_tick_init(sizeof(timer_str));
@@ -375,6 +375,12 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	printf("Press ESC to reboot\n");
 	alert("error : %s\n", "string");
 	fprintf(VFS_FD_STDOUT, "hello from fprintf stdout\n");
+  fs_node_t* stdout_node = vfs_open("dev/stdout", "w");
+  char* str_buf = "Hello from vfs dev/stdout\n";
+  if (stdout_node == NULL){
+    log(LOG_SERIAL, false, "couldn't find file\n");
+  }
+  //write_fs(stdout_node, 0, strlen(str_buf), str_buf);
 #endif
 	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");
 	char* date = read_rtc_date();

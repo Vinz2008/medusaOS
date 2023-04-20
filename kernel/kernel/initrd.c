@@ -10,7 +10,7 @@
 
 
 initrd_list_header_t list_headers;
-
+bool initrd_readdir_call = false;
 initrd_header_t *initrd_header;     // The header.
 fs_node_t *initrd_root;             // Our root directory node.
 fs_node_t *initrd_dev;              // We also add a directory node for /dev, so we can mount devfs later on.
@@ -134,6 +134,7 @@ static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
 		dirent.ino = 0;
 		return &dirent;
 	}*/
+    initrd_readdir_call = true;
     if (index >= nroot_nodes){
         return NULL;
     }

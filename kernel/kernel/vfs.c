@@ -445,7 +445,7 @@ fs_node_t* vfs_search_node(fs_node_t* parent, const char* path, size_t index_chi
 			return child;
 		}
 		if (child->node_type == FT_Directory){
-      log(LOG_SERIAL, false, "directory\n");
+      log(LOG_SERIAL, false, "directory %s\n", child->name);
       index_child++;
 			fs_node_t* recursive_child = vfs_search_node(child, path, index_child);
 			if (recursive_child != NULL){

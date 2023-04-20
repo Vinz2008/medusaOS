@@ -41,7 +41,7 @@ void register_devices_necessary(){
     memset((uint8_t*)&stdin_dev, 0, sizeof(Device));
     strcpy(stdin_dev.name, "stdin");*/
     devfs_register_device(stdin_dev);
-    Device stdout_dev = (Device){.name="stdout", .close=0, .read=0, .write=0,};
+    Device stdout_dev = (Device){.name="stdout", .close=0, .read=0, .write=stdout_write,};
     devfs_register_device(&stdout_dev);
     Device tty_dev = (Device){.name="tty", .close=0, .read=0, .write=0,};
     devfs_register_device(&tty_dev);

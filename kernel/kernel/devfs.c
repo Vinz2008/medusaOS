@@ -12,6 +12,8 @@ list_t* device_list;
 static void devfs_open(struct fs_node* node);
 fs_node_t* dev_root = NULL;
 
+extern bool initrd_readdir_call;
+
 
 fs_node_t* get_root_devfs(){
     return dev_root;
@@ -29,8 +31,14 @@ fs_node_t* devfs_finddir(struct fs_node* node, char *name){
 struct dirent* devfs_readdir(struct fs_node* node, uint32_t index){
     log(LOG_SERIAL, false, "dev readdir: %d, nb devices : %d\n", index, device_list->used);
     if (index >= device_list->used){
-        return NULL;
+        if (initrd_readdir_call){
+            // put to 0 to reset index for if last call to readdir was to an other filesystem
+            index = 0;
+        } else {
+            return NULL;
+        }
     }
+    initrd_readdir_call = false;
     for (int i = 0; i < device_list->used; i++){
         fs_node_t* temp_node = device_list->list[i].data;
         log(LOG_SERIAL, false, "readdir device_list[%d] : %s\n", i, temp_node->name);
