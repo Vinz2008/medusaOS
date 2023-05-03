@@ -264,10 +264,13 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	//draw_line_vertical(100, 10, 250, 0xFFFFFF);
   fb_t fb = fb_get_info();
   window_t* bg_window = get_background_window();
+  window_t* top_bar_window = get_top_bar_window();
 	draw_string(bg_window->fb, "MEDUSAOS", 100, 250, 0xFFFFFF);
   draw_string_size(bg_window->fb, 2, "MEDUSAOS", 100, 250, 0xFFFFFF);
   draw_line_horizontal(bg_window->fb, 125, 360, 330, 0xFFFFFF);
   render_window(bg_window);
+  render_window(top_bar_window);
+
   window_t* win = open_window("test window", 300, 125, 0);
   //draw_string(fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
   //draw_border(fb, 40, 50, strlen("Lorem Ipsum")*8+10, 26, 0xFFFFFF);

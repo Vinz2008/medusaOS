@@ -6,6 +6,7 @@
 #include <kernel/pic.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/x86.h>
+#include <kernel/config.h>
 
 extern bool tick_animation_enabled;
 static uint64_t timer_delta_time;
@@ -69,6 +70,12 @@ void sys_tick_handler(registers_t* frame){
     terminal_tick(ticks_anim_chars[ti]);
     }
     pic_send_EOI(IRQ_PIT);
+#if GUI_MODE
+  if (ticks % 1000 == 0){
+  render_date_to_top_bar();
+  }
+#endif
+
 }
 
 static inline uint8_t get_port(uint8_t channel) {

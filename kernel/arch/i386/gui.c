@@ -9,6 +9,7 @@
 #include <kernel/list.h>
 #include <kernel/kmalloc.h>
 #include <kernel/x86.h>
+#include <kernel/rtc.h>
 
 #define WM_EVENT_QUEUE_SIZE 5
 
@@ -20,6 +21,7 @@ static mouse_t mouse;
 static window_t* focused;
 static uint32_t background_color;
 static window_t* background_window;
+static window_t* top_bar_window;
 int row_putchar = 0;
 int column_putchar = 8;
 static list_t* window_list;
@@ -207,13 +209,57 @@ void render_window(window_t* win){
     }
 }
 
+
+int pos_text_top_bar = 0;
+
+void clear_window_list(){
+    draw_rectangle(top_bar_window->fb, 0, 0, top_bar_window->width, top_bar_window->height, 0xff0000);
+    render_window(top_bar_window);
+}
+
+void add_to_top_bar_window_list(const char* title){
+    log(LOG_SERIAL, false, "number of windows %d\n", window_list->used);
+    draw_string(top_bar_window->fb, title, pos_text_top_bar, 0, 0xFFFFFF);
+    pos_text_top_bar += 9*strlen(title);
+    draw_string(top_bar_window->fb, "|", pos_text_top_bar, 0, 0xFFFFFF);
+    pos_text_top_bar += 9 + 10;
+}
+
+char* date = "       ";
+
+void add_date_to_top_bar(){
+    date = read_rtc_date();
+    log(LOG_SERIAL, false, "date in bar : %s\n", date);
+    draw_string(top_bar_window->fb, date, top_bar_window->width-9*strlen(date), 0, 0xFFFFFF);
+}
+
+void clear_date_top_bar(){
+    draw_rectangle(top_bar_window->fb, top_bar_window->width-9*strlen(date), 0, 9*strlen(date), top_bar_window->height, 0xff0000);
+}
+
+void render_date_to_top_bar(){
+    pos_text_top_bar = 0;
+    clear_date_top_bar();
+    for (int i = 0; i < window_list->used; i++){
+        window_t* temp_window = window_list->list[i].data;
+        add_to_top_bar_window_list(temp_window->title);
+    }
+    add_date_to_top_bar();
+    render_window(top_bar_window);
+}
+
 void render_screen(){
+    pos_text_top_bar = 0;
+    clear_window_list();
     for (int i = 0; i < window_list->used; i++){
         window_t* temp_window = window_list->list[i].data;
         if (!(temp_window->flags & NOT_VISIBLE)){
         render_window(temp_window);
         }
+        add_to_top_bar_window_list(temp_window->title);
     }
+    add_date_to_top_bar();
+    render_window(top_bar_window);
 }
 
 void wm_render_window(uint32_t win_id, rect_t* clip) {
@@ -269,6 +315,10 @@ window_t* get_background_window(){
     return background_window;
 }
 
+window_t* get_top_bar_window(){
+    return top_bar_window;
+}
+
 void set_window_title(const char* title, window_t* window){
     window->title = title;
 }
@@ -279,6 +329,8 @@ void init_gui(){
     window_list = list_create();
     background_window = open_window("background window", fb.width, fb.height, NO_BORDER);
     draw_rectangle(background_window->fb, 0, 0, background_window->width, background_window->height, 0x0000ff);
+    top_bar_window = open_window("top bar window", fb.width, fb.height/15, NO_BORDER);
+    draw_rectangle(top_bar_window->fb, 0, 0, top_bar_window->width, top_bar_window->height, 0xff0000);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;
     render_screen();
