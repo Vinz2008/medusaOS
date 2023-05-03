@@ -63,7 +63,8 @@
     "memory": "c",
     "optional": "c",
     "system_error": "c",
-    "variant": "c"
+    "variant": "c",
+    "scheduler.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

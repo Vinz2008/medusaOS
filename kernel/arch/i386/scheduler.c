@@ -1,6 +1,10 @@
 #include <stdlib.h>
+#include <string.h>
 #include <kernel/proc.h>
 #include <kernel/kmalloc.h>
+#include <kernel/x86.h>
+#include <kernel/paging.h>
+
 
 
 typedef struct _proc_node_t {
@@ -12,6 +16,22 @@ typedef struct {
     scheduler_t sched;
     proc_node_t* processes;
 } scheduler_medusaos_t;
+
+process_t *pqueue;
+process_t *current_proc;
+
+volatile void switch_task(registers_t* regs){
+    memcpy(&current_proc->regs, regs, sizeof(registers_t));
+    if (current_proc->next != NULL){
+         current_proc = current_proc->next;
+    } else {
+        current_proc = pqueue;
+    }
+    memcpy(regs, &current_proc->regs, sizeof(registers_t));
+    paging_switch_directory(current_proc->directory);
+}
+
+/*
 
 process_t* scheduler_get_current(scheduler_t* sched){
     scheduler_medusaos_t* sc = (scheduler_medusaos_t*)sched;
@@ -99,8 +119,7 @@ void scheduler_exit(scheduler_t* sched, process_t* process) {
     kfree(to_remove);
 }
 
-/* Allocates a scheduler.
- */
+// Allocates a scheduler.
 scheduler_t* scheduler_medusaos() {
     scheduler_medusaos_t* sched = kmalloc(sizeof(scheduler_medusaos_t));
 
@@ -114,4 +133,4 @@ scheduler_t* scheduler_medusaos() {
     sched->processes = NULL;
 
     return (scheduler_t*) sched;
-}
+}*/

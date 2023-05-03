@@ -269,6 +269,10 @@ window_t* get_background_window(){
     return background_window;
 }
 
+void set_window_title(const char* title, window_t* window){
+    window->title = title;
+}
+
 void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();

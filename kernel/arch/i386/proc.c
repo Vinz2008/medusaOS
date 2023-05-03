@@ -16,7 +16,7 @@ scheduler_t* scheduler = NULL;
 static uint32_t next_pid = 1;
 
 void init_proc(){
-    scheduler = scheduler_medusaos();
+    //scheduler = scheduler_medusaos();
 }
 
 process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc){
@@ -87,6 +87,9 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc){
     // Switch to the original page directory
     paging_switch_directory(previous_pd);
     *process = (process_t){
+        .directory = pd_phys,
+    };
+    /* *process = (process_t){
         .pid = next_pid++,
         .code_len = num_code_pages,
         .stack_len = num_stack_pages,
@@ -97,10 +100,10 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc){
         .mem_len = 0,
         .sleep_ticks = 0,
         .cwd = strdup("/")
-    };
+    };*/
     uint32_t* jmp = &irq_handler_end;
     // Setup the process's kernel stack as if it had already been interrupted
-    asm volatile (
+    /*asm volatile (
         // Save our stack in %ebx
         "mov %%esp, %%ebx\n"
 
@@ -146,7 +149,7 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc){
           [ustack] "r" (process->initial_user_stack),
           [jmp] "r" (jmp)
         : "%eax", "%ebx"
-    );
+    );*/
     scheduler->sched_add(scheduler, process);
 
     return process;
@@ -164,7 +167,7 @@ void proc_enter_usermode() {
     }
     paging_switch_directory(current_process->directory);
 
-    asm volatile (
+    /*asm volatile (
         "mov $0x23, %%eax\n"
         "mov %%eax, %%ds\n"
         "mov %%eax, %%es\n"
@@ -178,5 +181,5 @@ void proc_enter_usermode() {
         "push $0x00001000\n" // %eip
         "iret\n"
         :: [ustack] "r" (current_process->initial_user_stack)
-        : "%eax");
+        : "%eax");*/
 }
