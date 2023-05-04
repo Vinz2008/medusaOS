@@ -400,7 +400,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
 	/*if (CHECK_FLAG (mb_info->flags, 2)){
     printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 	}*/
-	//printf("\x9B1;31m\n");
+	printf("\x1b[1;31m Hello World in red with ansi escape sequences \x1b[0m \n");
 #if GUI_MODE
 #else
 	printf("> ");

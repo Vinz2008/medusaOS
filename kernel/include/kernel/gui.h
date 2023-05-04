@@ -19,6 +19,11 @@
 
 #define WM_NOT_DRAWN  ((uint32_t) 1 << 31)
 
+#define COLOR_WHITE 0xFFFFFF
+#define COLOR_RED 0xFF0000
+#define COLOR_GREEN 0x90EE90
+#define COLOR_BLUE 0x0000FF
+
 enum WM_EVENT {
     WM_EVENT_MOUSE_PRESS = 1,
     WM_EVENT_MOUSE_RELEASE,

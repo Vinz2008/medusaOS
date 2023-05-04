@@ -200,23 +200,24 @@ void terminal_putchar(char c) {
 void terminal_write(const char* data, size_t size) {
 	bool controlSequence = false;
 	for (size_t i = 0; i < size; i++) {
+		log(LOG_SERIAL, false, "data[i] : %c in ascii %d\n", data[i], data[i]);
 		switch (data[i]) {
 		case '\x1B':
-			write_serialf("found escape character\n");
+			log(LOG_SERIAL, false, "found escape character\n");
 			if (data[i + 1] == '['){
 				controlSequence = true;
 				i++;
 			}			
 			break;
-		case '\x9B':
+		/*case '\x9B':
 			controlSequence = true;
-			break;
+			break;*/
 		default:
-			if (controlSequence == true){
-				write_serialf("control sequence found\n");
-			} else {
+			/*if (controlSequence == true){
+				log(LOG_SERIAL, false, "control sequence found\n");
+			} else {*/
 				terminal_putchar(data[i]);
-			}
+			//}
 			break;
 		}
 	}

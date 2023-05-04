@@ -16,11 +16,14 @@
 #include <kernel/config.h>
 #include <kernel/rtc.h>
 #include <kernel/base64.h>
+#include <kernel/ansi.h>
 
 #if GUI_MODE
 #else
 #include <kernel/font.h>
 #endif
+
+#define SIZE_ESCAPE_CHAR_BUF 30
 
 extern void sys_sleep(int seconds);
 typedef struct {
@@ -46,6 +49,9 @@ int framebuffer_back_column = 0;
 int framebuffer_width_in_column = 0;
 int framebuffer_height_in_row = 0;
 
+bool is_in_ansi_escape_char = false;
+char* escape_char_buf;
+
 int get_offset(int x, int y){
 	return (x * framebuffer_width_in_column + y);
 }
@@ -60,6 +66,7 @@ void terminal_framebuffer_initialize(){
 	//framebuffer_back = kmalloc(sizeof(char[framebuffer_height_in_row][framebuffer_width_in_column]));
 	framebuffer_back = kmalloc(framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
 	memset(framebuffer_back, ' ', framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
+	escape_char_buf = kmalloc(SIZE_ESCAPE_CHAR_BUF*sizeof(char));
 }
 
 
@@ -141,9 +148,25 @@ void terminal_framebuffer_delete_character(){
 	line_cli[strlen(line_cli) - 1] = '\0';
 }
 
+
 void terminal_framebuffer_putc(char c){
 #if GUI_MODE
 #else
+	if (c == '\x1B'){
+		is_in_ansi_escape_char = true;
+		memset(escape_char_buf, 0, SIZE_ESCAPE_CHAR_BUF);
+		return;
+	}
+	if (is_in_ansi_escape_char && (c == ' ' || c == '\n')){
+		log(LOG_SERIAL, false, "ansi escape sequence : %s\n", escape_char_buf);
+		handle_ansi_sequence(escape_char_buf);
+		is_in_ansi_escape_char = false;
+		return;
+	}
+	if (is_in_ansi_escape_char){
+		append(escape_char_buf, c);
+		return;
+	}
     if (c == '\n'){
         row += 12;
         column = 0;
