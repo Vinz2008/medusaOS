@@ -50,7 +50,11 @@ int sprintf(char *str, const char *format, ...);
 // Uninmplemented declarations for hosted cross compiler
 
 //typedef file_descriptor_t FILE;
-typedef int FILE;
+//typedef int FILE;
+typedef struct {
+    int fd;
+    char* name;
+} FILE;
 
 
 int fclose(FILE *stream);

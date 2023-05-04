@@ -17,13 +17,17 @@
 #include <kernel/rtc.h>
 #include <kernel/base64.h>
 #include <kernel/ansi.h>
+#include <kernel/gui.h>
 
 #if GUI_MODE
 #else
 #include <kernel/font.h>
 #endif
 
-#define SIZE_ESCAPE_CHAR_BUF 30
+#define ESCAPE_CHAR_BUF_SIZE 30
+
+#define LINE_CLI_SIZE 300
+#define DIRECTORY_PATH_SIZE 100
 
 extern void sys_sleep(int seconds);
 typedef struct {
@@ -35,12 +39,12 @@ typedef struct {
 static fb_t fb;
 int row = 0;
 int column = 0;
-uint32_t color = 0xFFFFFF;
+uint32_t color = COLOR_WHITE;
 uint32_t old_color;
 
-static char line_cli[300];
-static char last_line_cli[300];
-char directory[100] = {'\0'};
+static char line_cli[LINE_CLI_SIZE];
+static char last_line_cli[LINE_CLI_SIZE];
+char directory[DIRECTORY_PATH_SIZE] = {'\0'};
 
 
 char* framebuffer_back = NULL;
@@ -66,7 +70,7 @@ void terminal_framebuffer_initialize(){
 	//framebuffer_back = kmalloc(sizeof(char[framebuffer_height_in_row][framebuffer_width_in_column]));
 	framebuffer_back = kmalloc(framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
 	memset(framebuffer_back, ' ', framebuffer_height_in_row * framebuffer_width_in_column * sizeof(char));
-	escape_char_buf = kmalloc(SIZE_ESCAPE_CHAR_BUF*sizeof(char));
+	escape_char_buf = kmalloc(ESCAPE_CHAR_BUF_SIZE*sizeof(char));
 }
 
 
@@ -154,7 +158,7 @@ void terminal_framebuffer_putc(char c){
 #else
 	if (c == '\x1B'){
 		is_in_ansi_escape_char = true;
-		memset(escape_char_buf, 0, SIZE_ESCAPE_CHAR_BUF);
+		memset(escape_char_buf, 0, ESCAPE_CHAR_BUF_SIZE);
 		return;
 	}
 	if (is_in_ansi_escape_char && (c == ' ' || c == '\n')){
@@ -213,12 +217,12 @@ char* get_line_cli(){
 }
 
 void empty_line_cli_framebuffer(){
-    memset(line_cli, 0, 300);
+    memset(line_cli, 0, LINE_CLI_SIZE);
 }
 
 
 void launch_command_framebuffer(){
-	char* line_cli_copy = kmalloc(sizeof(char) * 300);
+	char* line_cli_copy = kmalloc(sizeof(char) * LINE_CLI_SIZE);
 	memset(line_cli_copy, 0, sizeof(line_cli_copy));
 	log(LOG_SERIAL, false,"line_cli: %s\n", line_cli);
 	strcpy(line_cli_copy, line_cli);

@@ -9,7 +9,7 @@ handler_t syscall_handlers[SYSCALL_NUM] = { 0 };
 
 void syscall_handler(registers_t* frame){
     log(LOG_SERIAL, false, "test syscall handler\n");
-    if(frame->eax < SYS_MAX){
+    if(frame->eax < SYS_MAX && syscall_handlers[frame->eax]){
         handler_t handler = syscall_handlers[frame->eax];
         frame->eax = 0;
         handler(frame);
@@ -31,7 +31,7 @@ void syscall_write(registers_t* frame){
 }
 
 void syscall_sbrk(registers_t* frame){
-
+    
 }
 
 void init_syscalls(){
