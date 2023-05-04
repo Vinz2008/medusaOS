@@ -45,6 +45,7 @@ kernel/tools/ansi.o \
 kernel/tools/base64.o \
 kernel/proc/syscall.o \
 kernel/proc/process.o \
+kernel/devices/device.o \
 kernel/fb.o \
 kernel/multiboot2.o \
 
