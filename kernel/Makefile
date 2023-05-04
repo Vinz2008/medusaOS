@@ -30,22 +30,23 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
-kernel/vfs.o \
-kernel/syscall.o \
-kernel/paging.o \
-kernel/initrd.o \
+kernel/data_structures/list.o \
+kernel/data_structures/pair.o \
+kernel/data_structures/hashtable.o \
+kernel/fs/vfs.o \
+kernel/fs/devfs.o \
+kernel/fs/pipe.o \
+kernel/fs/initrd.o \
+kernel/fs/ext2.o \
+kernel/mm/pmm.o \
+kernel/mm/kmalloc.o \
+kernel/mm/paging.o \
+kernel/tools/ansi.o \
+kernel/tools/base64.o \
+kernel/proc/syscall.o \
+kernel/proc/process.o \
 kernel/fb.o \
 kernel/multiboot2.o \
-kernel/pmm.o \
-kernel/kmalloc.o \
-kernel/list.o \
-kernel/pair.o \
-kernel/hashtable.o \
-kernel/devfs.o \
-kernel/pipe.o \
-kernel/process.o \
-kernel/base64.o \
-kernel/ansi.o \
 
 
 OBJS=\
