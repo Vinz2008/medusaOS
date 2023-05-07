@@ -212,12 +212,12 @@ void init_ps2(){
                 case PS2_KEYBOARD_TRANSLATED:
                     log(LOG_SERIAL, false, "keyboard\n");
                     //init_kbd(i);
-                    //init_keyboard(i);
+                    init_keyboard(i);
                     break;
                 case PS2_MOUSE:
                 case PS2_MOUSE_SCROLL_WHEEL:
                 case PS2_MOUSE_FIVE_BUTTONS:
-                    //log(LOG_SERIAL, false, "mouse\n");
+                    log(LOG_SERIAL, false, "mouse\n");
                     //init_mouse(i);
                     break;
                 default:
