@@ -298,6 +298,27 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags){
 }
 
 
+window_t* find_first_normal_window(){
+    for (int i = 0; i < window_list->used; i++){
+        window_t* win = window_list->list[i].data;
+        if (!(win->flags & WM_WINDOW) && !(win->flags & NOT_VISIBLE)){
+            return win;
+        }
+
+    }
+}
+
+void close_window(window_t* win){
+    kfree(win->fb.address);
+    window_list = list_remove(win, window_list);
+    if (focused == win){
+        focused = find_first_normal_window();
+    }
+    render_screen();
+    kfree(win);
+}
+
+
 void draw_window(window_t* win){
     uint32_t bg_color = 0x353535;
     //uint32_t base_color = 0x222221;
@@ -318,6 +339,9 @@ window_t* get_background_window(){
 window_t* get_top_bar_window(){
     return top_bar_window;
 }
+window_t* get_focused_window(){
+    return focused;
+}
 
 void set_window_title(const char* title, window_t* window){
     window->title = title;
@@ -327,9 +351,9 @@ void init_gui(){
     log(LOG_SERIAL, false, "Starting GUI\n");
     fb = fb_get_info();
     window_list = list_create();
-    background_window = open_window("background window", fb.width, fb.height, NO_BORDER);
+    background_window = open_window("background window", fb.width, fb.height, NO_BORDER | WM_WINDOW);
     draw_rectangle(background_window->fb, 0, 0, background_window->width, background_window->height, 0x0000ff);
-    top_bar_window = open_window("top bar window", fb.width, fb.height/15, NO_BORDER);
+    top_bar_window = open_window("top bar window", fb.width, fb.height/15, NO_BORDER | WM_WINDOW);
     draw_rectangle(top_bar_window->fb, 0, 0, top_bar_window->width, top_bar_window->height, 0xff0000);
     mouse.x = fb.width/2;
     mouse.y = fb.height/2;

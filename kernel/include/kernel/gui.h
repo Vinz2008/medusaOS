@@ -9,6 +9,7 @@
 //flags
 #define NO_BORDER 0x01
 #define NOT_VISIBLE 0x02
+#define WM_WINDOW 0x04
 // then 0x04 and 0x08, etc
 
 #define WM_NORMAL 0

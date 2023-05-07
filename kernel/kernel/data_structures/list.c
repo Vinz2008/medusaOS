@@ -42,3 +42,27 @@ void list_append(void* data, list_t* list){
     }
     list->list[list->used++].data = data;
 }
+
+
+list_t* list_remove(void* data, list_t* list){
+    list_t* new_list = list_create_ext(0, list->size);
+    for (int i = 0; i < list->used; i++){
+        if (list->list[i].data != data){
+            list_append(list->list[i].data, new_list);
+        }
+    }
+    list_destroy(list);
+    return new_list;
+}
+
+list_t* list_remove_index(int index, list_t* list){
+    list_t* new_list = list_create_ext(0, list->size);
+    for (int i = 0; i < list->used; i++){
+        if (i != index){
+            list_append(list->list[i].data, new_list);
+        }
+    }
+    list_destroy(list);
+    return new_list;
+
+}
