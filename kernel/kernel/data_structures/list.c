@@ -64,5 +64,16 @@ list_t* list_remove_index(int index, list_t* list){
     }
     list_destroy(list);
     return new_list;
+}
 
+void* list_find(void* data, list_t* list){
+    for (int i = 0; i < list->used; i++){
+        if (list->list[i].data == data){
+            return list->list[i].data;
+        }
+    }
+}
+
+void* list_find_at(int index, list_t* list){
+    return list->list[index].data;
 }
