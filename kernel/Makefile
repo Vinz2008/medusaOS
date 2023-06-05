@@ -34,6 +34,7 @@ kernel/data_structures/list.o \
 kernel/data_structures/pair.o \
 kernel/data_structures/hashtable.o \
 kernel/data_structures/linked_list.o \
+kernel/data_structures/stack.o \
 kernel/fs/vfs.o \
 kernel/fs/devfs.o \
 kernel/fs/pipe.o \
