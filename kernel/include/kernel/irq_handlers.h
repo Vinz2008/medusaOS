@@ -21,3 +21,4 @@ void sys_key_handler(registers_t* frame);
 void sys_mouse_handler(registers_t* frame);
 void sys_tick_handler(registers_t* frame);
 void sys_mouse_handler(registers_t* frame);
+void setup_custom_keypress_function(void (*f)(int));

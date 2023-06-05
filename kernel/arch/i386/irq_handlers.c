@@ -102,6 +102,11 @@ void sys_mouse_handler(registers_t* frame){
 
 }
 
+void (*custom_keypress_function)(int) = NULL;
+
+void setup_custom_keypress_function(void (*f)(int)){
+    custom_keypress_function = f;
+}
 
 void sys_key_handler(registers_t* frame){
     (void)frame;
@@ -122,7 +127,13 @@ void sys_key_handler(registers_t* frame){
     if (!pressed) {
         return;
     }
-
+    if(scan_code == ESC_KEY){ // ESC - pressed
+        reboot();
+    }
+    if (custom_keypress_function != NULL){
+        custom_keypress_function(scan_code);
+        return;
+    }
 #if GUI_MODE
     log(LOG_SERIAL, false, "key pressed : %d\n", scan_code);
     if (scan_code & 0x80){
@@ -153,9 +164,6 @@ void sys_key_handler(registers_t* frame){
     }
 
 #else
-    if(scan_code == ESC_KEY){ // ESC - pressed
-        reboot();
-    }
     if (scan_code == ENTER_KEY){ // ENTER - pressed
         //launch_command();
         launch_command_framebuffer();

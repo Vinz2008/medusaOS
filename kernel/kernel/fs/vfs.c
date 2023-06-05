@@ -466,7 +466,7 @@ fs_node_t* vfs_open(const char* path, const char* mode){
   }
 	fs_node_t* file = vfs_search_node(root, path, 0);
 	if (file == NULL){
-    log(LOG_SERIAL, false, "Couldn't find file vfs_open\n");
+    log(LOG_SERIAL, false, "Couldn't find %s file vfs_open\n", path);
 		return NULL;
 	}
 	if (file->node_type != FT_File){

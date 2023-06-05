@@ -18,11 +18,7 @@
 #include <kernel/base64.h>
 #include <kernel/ansi.h>
 #include <kernel/gui.h>
-
-#if GUI_MODE
-#else
 #include <kernel/font.h>
-#endif
 
 #define ESCAPE_CHAR_BUF_SIZE 30
 
@@ -111,8 +107,6 @@ void terminal_framebuffer_putc_back(char c){
 }
 
 void terminal_framebuffer_putc_pixel(char c){
-#if GUI_MODE
-#else
     /*if (c == '\n'){
         row += 12;
         column = 0;
@@ -138,7 +132,6 @@ void terminal_framebuffer_putc_pixel(char c){
             row = 0;
         }
     }*/
-#endif
 }
 
 
@@ -154,8 +147,6 @@ void terminal_framebuffer_delete_character(){
 
 
 void terminal_framebuffer_putc(char c){
-#if GUI_MODE
-#else
 	if (c == '\x1B'){
 		is_in_ansi_escape_char = true;
 		memset(escape_char_buf, 0, ESCAPE_CHAR_BUF_SIZE);
@@ -193,7 +184,6 @@ void terminal_framebuffer_putc(char c){
             row = 0;
         }
     }
-#endif
 }
 
 void terminal_framebuffer_clear(){
@@ -461,6 +451,9 @@ end_ls:
 	} else if (strcmp("date", command) == 0){
 		char* date = read_rtc_date();
   		printf("%s\n", date);
+	} else if (strcmp("chip8", command) == 0){
+		printf("launching chip8 emulator\n");
+		setup_chip8_emulator();
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");

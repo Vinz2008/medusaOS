@@ -169,16 +169,8 @@ void wm_draw_window(wm_window_t* win, rect_t rect) {
     rect_clear_clipped(&clip_rects);*/
 }
 
-void fill_screen(uint32_t col){
-    for (int y = 0; y < fb.height; y++){
-        for (int x = 0; x < fb.width; x++){
-            draw_pixel(fb, x, y, col);
-        }
-    }
-}
-
 void clear_screen(){
-    fill_screen(background_color);
+    fill_screen(fb, background_color);
 }
 
 void fill_window_place(window_t* win){

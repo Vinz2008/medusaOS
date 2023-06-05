@@ -372,6 +372,16 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   switch_led(KBD_LED_SCROLL_LOCK | KBD_LED_NUMBER_LOCK);
   switch_led(KBD_LED_CAPS_LOCK);
 	int i = 1233;
+  fs_node_t* rom_node = vfs_open("rom.ch8", "r");
+  uint8_t buffer[rom_node->length];
+  log(LOG_SERIAL, "rom_node->length : %d\n", rom_node->length);
+  if (rom_node == NULL){
+    log(LOG_SERIAL, "rom file not found : %s\n", "rom.ch8");
+  }
+  read_fs(rom_node, 0, rom_node->length, buffer);
+  for (int i = 0; i < rom_node->length; i++){
+    log(LOG_SERIAL, "chip instruction : %x\n", buffer[i]);
+  }
 #if GUI_MODE
 #else
 	printf("Welcome to kernel %i\n", i);

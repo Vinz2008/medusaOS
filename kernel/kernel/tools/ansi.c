@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <types.h>
-#include <kernel/gui.h>
+#include <kernel/graphics.h>
+//#include <kernel/gui.h>
 #include <kernel/config.h>
 
 static char nb_buf[100];

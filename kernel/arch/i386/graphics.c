@@ -6,9 +6,7 @@
 #include <stdlib.h>
 #include <kernel/fb.h>
 #include <kernel/config.h>
-#if GUI_MODE
 #include <kernel/font.h>
-#endif
 
 
 typedef struct {
@@ -181,4 +179,13 @@ void draw_border(fb_t fb, int x, int y, int w, int h, uint32_t col){
     draw_line_horizontal(fb, x, x + w - 1, y + h - 1, col);
     draw_line_vertical(fb, x, y, y + h - 1, col);
     draw_line_vertical(fb, x + w - 1, y, y + h - 1, col);
+}
+
+
+void fill_screen(fb_t fb, uint32_t col){
+    for (int y = 0; y < fb.height; y++){
+        for (int x = 0; x < fb.width; x++){
+            draw_pixel(fb, x, y, col);
+        }
+    }
 }
