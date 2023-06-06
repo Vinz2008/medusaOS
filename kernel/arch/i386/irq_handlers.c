@@ -13,6 +13,7 @@
 #include <kernel/keyboard.h>
 #include <kernel/pit.h>
 #include <kernel/tty_framebuffer.h>
+#include <kernel/chip8_emulator.h>
 #include <kernel/config.h>
 
 #if GUI_MODE
@@ -169,7 +170,9 @@ void sys_key_handler(registers_t* frame){
         launch_command_framebuffer();
         empty_line_cli_framebuffer();
         //empty_line_cli();
+        if (!is_chip8_emulator_mode()){
         printf("\n> ");
+        }
     } else if (scan_code == DELETE_KEY || scan_code == BACKSPACE_KEY){ // DELETE - pressed
         write_serialf("delete pressed\n");
         terminal_framebuffer_delete_character();

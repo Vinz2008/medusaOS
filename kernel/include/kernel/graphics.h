@@ -17,6 +17,7 @@ void fill_screen(fb_t fb, uint32_t col);
 #define RGB(r, g, b) (uint32_t)(r << 16 | g << 8 | b )
 
 #define COLOR_WHITE 0xFFFFFF
+#define COLOR_BLACK 0x000000
 #define COLOR_RED 0xFF0000
 #define COLOR_GREEN 0x90EE90
 #define COLOR_BLUE 0x0000FF

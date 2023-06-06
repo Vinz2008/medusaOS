@@ -19,6 +19,7 @@
 #include <kernel/ansi.h>
 #include <kernel/gui.h>
 #include <kernel/font.h>
+#include <kernel/chip8_emulator.h>
 
 #define ESCAPE_CHAR_BUF_SIZE 30
 
@@ -453,7 +454,7 @@ end_ls:
   		printf("%s\n", date);
 	} else if (strcmp("chip8", command) == 0){
 		printf("launching chip8 emulator\n");
-		setup_chip8_emulator();
+		setup_chip8_emulator("rom.ch8");
 	} else if (strcmp("help", command) == 0){
 		printf("usage help : \n");
 		printf("echo : print string\n");

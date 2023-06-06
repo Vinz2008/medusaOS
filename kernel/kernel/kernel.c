@@ -372,16 +372,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   switch_led(KBD_LED_SCROLL_LOCK | KBD_LED_NUMBER_LOCK);
   switch_led(KBD_LED_CAPS_LOCK);
 	int i = 1233;
-  fs_node_t* rom_node = vfs_open("rom.ch8", "r");
-  uint8_t buffer[rom_node->length];
-  log(LOG_SERIAL, "rom_node->length : %d\n", rom_node->length);
-  if (rom_node == NULL){
-    log(LOG_SERIAL, "rom file not found : %s\n", "rom.ch8");
-  }
-  read_fs(rom_node, 0, rom_node->length, buffer);
-  for (int i = 0; i < rom_node->length; i++){
-    log(LOG_SERIAL, "chip instruction : %x\n", buffer[i]);
-  }
 #if GUI_MODE
 #else
 	printf("Welcome to kernel %i\n", i);
@@ -397,11 +387,11 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   //int* result = NULL;
   int* result = hashtable_get("testkey", htable);
   log(LOG_SERIAL, false, "test hash table result (should be 300) : %d at address %p\n", *result, result);*/
-  fs_node_t* stdout_node = vfs_open("dev/stdout", "w");
+  /*fs_node_t* stdout_node = vfs_open("dev/stdout", "w");
   char* str_buf = "Hello from vfs dev/stdout\n";
   if (stdout_node == NULL){
     log(LOG_SERIAL, false, "couldn't find file\n");
-  }
+  }*/
   //write_fs(stdout_node, 0, strlen(str_buf), str_buf);
 #endif
 	fprintf(VFS_FD_SERIAL, "hello from fprintf serial\n");

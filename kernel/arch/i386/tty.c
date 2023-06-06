@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <ctype.h>
 #include <multiboot.h>
 #include <kernel/tty.h>
@@ -157,7 +158,9 @@ void terminal_reset_color(){
 }
 
 void terminal_ps1(){
+	if (!is_chip8_emulator_mode()){
 	printf("> ");
+	}
 }
 
 
