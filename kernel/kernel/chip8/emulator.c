@@ -1,6 +1,7 @@
 #include <kernel/chip8_emulator.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <kernel/irq_handlers.h>
 #include <kernel/graphics.h>
@@ -17,6 +18,31 @@ extern char keyboard_us[];
 static int pc;
 
 static chip8_emulator_t emulator;
+
+uint32_t chip8_int_to_hex(int num, int base, char sign){
+    char outbuf[10];
+    memset(outbuf, 0, 10);
+    int i = 12;
+    int j = 0;
+
+    do{
+        outbuf[i] = "0123456789ABCDEF"[num % base];
+        i--;
+        num = num/base;
+    }while( num > 0);
+
+    if(sign != ' '){
+        outbuf[0] = sign;
+        ++j;
+    }
+
+    while( ++i < 13){
+       outbuf[j++] = outbuf[i];
+    }
+
+    outbuf[j] = 0;
+    return strtol(outbuf, NULL, base);
+}
 
 void set_chip8_emulator_mode(bool mode){
     chip8_emulator_mode = mode;
@@ -78,10 +104,20 @@ void chip8_keyboard_handler(int scan_code){
     }
 }
 
+uint16_t chip8_get_combined_opcode(uint8_t opcode_1, uint8_t opcode_2){
+    uint16_t result = (opcode_1 << 4) | opcode_2;
+    return result;
+}
+
 void chip8_mainloop(uint8_t opcode_1, uint8_t opcode_2){
     emulator.pc += 2;
-    switch (opcode_1){
-        case 0x00:
+    log(LOG_SERIAL, false, "chip8_get_combined_opcode(0x00, 0xE0) : %x\n", chip8_get_combined_opcode(0x00, 0xE0));
+    log(LOG_SERIAL, false, "opcode 1 (in decimal) : %d, opcode 1 >> 4 : %x, opcode 1 & 0x0F : %x\n", opcode_1, opcode_1 >> 4, opcode_1 & 0x0F);
+    // first number : opcode >> 4
+    // second number : opcode & 0x0F
+    
+    switch (opcode_1 >> 4){
+        case 0x0:
             if (opcode_2 == 0xE0){
                 fill_screen(fb, COLOR_BLACK);
             } else if (opcode_2 == 0xEE){
@@ -89,6 +125,24 @@ void chip8_mainloop(uint8_t opcode_1, uint8_t opcode_2){
                 stack_pop(&emulator.stack);
             }
             break; 
+        case 0x1:
+            break;
+        case 0x2:
+            break;
+        case 0x3:
+            break;
+        case 0x4:
+            break;
+        case 0x5:
+            break;
+        case 0x6:
+            break;
+        case 0x7:
+            break;
+        case 0x8:
+            break;
+        case 0x9:
+            break;
     }
 }
 
@@ -119,7 +173,7 @@ void setup_chip8_emulator(const char* filename){
     }
     read_fs(rom_node, 0, rom_node->length, buffer);
     for (int i = 0; i < rom_node->length; i++){
-        log(LOG_SERIAL, false, "chip instruction : %x\n", buffer[i]);
+        log(LOG_SERIAL, false, "chip instruction (in decimal) : %d\n", buffer[i]);
     }
     chip8_load_program_into_ram(buffer, rom_node->length);
     for (pc = 0; pc < rom_node->length; pc+=2){
