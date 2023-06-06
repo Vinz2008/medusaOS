@@ -105,11 +105,11 @@ void chip8_keyboard_handler(int scan_code){
 }
 
 uint16_t chip8_get_combined_opcode(uint8_t opcode_1, uint8_t opcode_2){
-    uint16_t result = (opcode_1 << 4) | opcode_2;
+    uint16_t result = (opcode_1 << 8) | opcode_2; // TODO : fix this function
     return result;
 }
 
-void chip8_mainloop(uint8_t opcode_1, uint8_t opcode_2){
+void chip8_execute_instruction(uint8_t opcode_1, uint8_t opcode_2){
     emulator.pc += 2;
     log(LOG_SERIAL, false, "chip8_get_combined_opcode(0x00, 0xE0) : %x\n", chip8_get_combined_opcode(0x00, 0xE0));
     log(LOG_SERIAL, false, "opcode 1 (in decimal) : %d, opcode 1 >> 4 : %x, opcode 1 & 0x0F : %x\n", opcode_1, opcode_1 >> 4, opcode_1 & 0x0F);
@@ -126,24 +126,133 @@ void chip8_mainloop(uint8_t opcode_1, uint8_t opcode_2){
             }
             break; 
         case 0x1:
+            emulator.pc = chip8_get_combined_opcode(opcode_1, opcode_2) & 0xFFF;
+            log(LOG_SERIAL, false, "combined opcode : %x %d\n", emulator.pc, emulator.pc);
             break;
         case 0x2:
+            stack_push(&emulator.stack, &emulator.pc);
+            emulator.pc = chip8_get_combined_opcode(opcode_1, opcode_2) & 0xFFF;
             break;
         case 0x3:
+            if (emulator.vregisters[opcode_1 & 0x0F] == opcode_2){
+                emulator.pc += 2;
+            }
             break;
         case 0x4:
+            if (emulator.vregisters[opcode_1 & 0x0F] != opcode_2){
+                emulator.pc += 2;
+            }
             break;
         case 0x5:
+            if (emulator.vregisters[opcode_1 & 0x0F] == emulator.vregisters[opcode_2 >> 4]){
+                emulator.pc += 2;
+            }
             break;
         case 0x6:
+            emulator.vregisters[opcode_1 & 0x0F] = opcode_2;
             break;
         case 0x7:
+            emulator.vregisters[opcode_1 & 0x0F] += opcode_2;
             break;
         case 0x8:
+            switch (opcode_2 & 0x0F){
+                case 0x0:
+                    emulator.vregisters[opcode_1 & 0x0F] = emulator.vregisters[opcode_2 >> 4];
+                    break;
+                case 0x1:
+                    emulator.vregisters[opcode_1 & 0x0F] |= emulator.vregisters[opcode_2 >> 4];
+                    break;
+                case 0x2:
+                    emulator.vregisters[opcode_1 & 0x0F] &= emulator.vregisters[opcode_2 >> 4];
+                    break;
+                case 0x3:
+                    emulator.vregisters[opcode_1 & 0x0F] ^= emulator.vregisters[opcode_2 >> 4];
+                    break;
+                case 0x4:
+                    uint8_t sum = (emulator.vregisters[opcode_1 & 0x0F] += emulator.vregisters[opcode_2 >> 4]);
+                    emulator.vregisters[0xF] = 0;
+                    if (sum > 0xFF){
+                        emulator.vregisters[0xF] = 1;
+                    }
+                    emulator.vregisters[opcode_1 & 0x0F] = sum;
+                    break;
+                case 0x5:
+                    emulator.vregisters[0xF] = 0;
+                    if (emulator.vregisters[opcode_1 & 0x0F] > emulator.vregisters[opcode_2 >> 4]){
+                        emulator.vregisters[0xF] = 1;
+                    }
+                    emulator.vregisters[opcode_1 & 0x0F] -= emulator.vregisters[opcode_2 >> 4];
+                    break;
+                case 0x6:
+                    emulator.vregisters[0xF] = (emulator.vregisters[opcode_1 & 0x0F] & 0x1);
+                    emulator.vregisters[opcode_1 & 0x0F] >>= 1;
+                    break;
+            }
             break;
         case 0x9:
+            if (emulator.vregisters[opcode_1 & 0x0F] != emulator.vregisters[opcode_2 >> 4]){
+                emulator.pc += 2;
+            }
             break;
+        case 0xA:
+            emulator.i = chip8_get_combined_opcode(opcode_1, opcode_2) & 0xFFF;
+            break;
+        case 0xB:
+            emulator.pc = (chip8_get_combined_opcode(opcode_1, opcode_2) & 0xFFF) + emulator.vregisters[0];
+            break;
+        case 0xC:
+            int rand_nb = rand() % 256; // number between 0 and 255
+            emulator.vregisters[opcode_1 & 0x0F] = rand_nb & (opcode_2);
+            break;
+        case 0xF:
+            switch (opcode_2){
+                case 0x07:
+                    emulator.vregisters[opcode_1 & 0x0F] = emulator.delay_timer;
+                    break;
+                case 0x15:
+                    emulator.delay_timer = emulator.vregisters[opcode_1 & 0x0F];
+                    break;
+                case 0x1E:
+                    emulator.i += emulator.vregisters[opcode_1 & 0x0F];
+                    break;
+                case 0x29:
+                    emulator.i = emulator.vregisters[opcode_1 & 0x0F] * 5;
+                    break;
+                case 0x55:
+                    for (int i = 0; i <= emulator.vregisters[opcode_1 & 0x0F]; i++){
+                        emulator.ram[emulator.i + i] = emulator.vregisters[i];
+                    }
+                    break;
+                case 0x65:
+                    for (int i = 0; i <= emulator.vregisters[opcode_1 & 0x0F]; i++){
+                        emulator.vregisters[i] = emulator.ram[emulator.i + i];
+                    }
+                    break;
+            }
+            break;
+        default:
+            log(LOG_SERIAL, false, "Unknown opcode\n");
     }
+}
+
+void chip8_update_timers(){
+    if (emulator.delay_timer > 0){
+        emulator.delay_timer -= 1;
+    }
+}
+
+void chip8_cycle(){
+    for (int i = 0; i < emulator.speed; i++){
+        if (!emulator.paused){
+            uint8_t opcode_1 = emulator.ram[emulator.pc];
+            uint8_t opcode_2 = emulator.ram[emulator.pc+1];
+            chip8_execute_instruction(opcode_1, opcode_2);
+        }
+    }
+    if (!emulator.paused){
+        chip8_update_timers();
+    }
+    chip8_update_framebuffer();
 }
 
 void chip8_load_program_into_ram(uint8_t* buf, size_t buf_length){
@@ -177,7 +286,7 @@ void setup_chip8_emulator(const char* filename){
     }
     chip8_load_program_into_ram(buffer, rom_node->length);
     for (pc = 0; pc < rom_node->length; pc+=2){
-        chip8_mainloop(buffer[pc], buffer[pc+1]);
+        chip8_execute_instruction(buffer[pc], buffer[pc+1]);
     }
     fill_chip8_screen();
     //chip8_update_framebuffer();
