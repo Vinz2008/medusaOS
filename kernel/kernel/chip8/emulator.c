@@ -19,6 +19,50 @@ static int pc;
 
 static chip8_emulator_t emulator;
 
+enum chip8_key_t {
+    key_0,
+    key_1,
+    key_2,
+    key_3,
+    key_4,
+    key_5,
+    key_6,
+    key_7,
+    key_8,
+    key_9,
+    key_A,
+    key_B,
+    key_C,
+    key_D,
+    key_E,
+    key_F,
+};
+
+#define SPRITE_CHARS_LENGTH 80
+
+#define FPS_NUMBER 60
+
+char sprite_chars[] = {
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+};
+
+enum chip8_key_t chip8_key;
+
 uint32_t chip8_int_to_hex(int num, int base, char sign){
     char outbuf[10];
     memset(outbuf, 0, 10);
@@ -52,7 +96,7 @@ bool is_chip8_emulator_mode(){
     return chip8_emulator_mode;
 }
 
-void write_chip8_pixel(uint8_t x, uint8_t y, bool state){
+int write_chip8_pixel(uint8_t x, uint8_t y, bool state){
     for (int xtemp = 0; xtemp < fb.width/CHIP8_SCREEN_WIDTH; xtemp++){
         for (int ytemp = 0; ytemp < fb.height/CHIP8_SCREEN_HEIGHT; ytemp++){
             draw_pixel(fb, x* fb.width/CHIP8_SCREEN_WIDTH + xtemp, y * fb.height/CHIP8_SCREEN_HEIGHT + ytemp, (state) ? COLOR_RED : COLOR_BLACK);
@@ -97,10 +141,46 @@ void fill_chip8_screen(){
 }
 
 void chip8_keyboard_handler(int scan_code){
-    if (scan_code == ENTER_KEY){
+    /*if (scan_code == ENTER_KEY){
 
-    } else if (scan_code < 0x81){
+    } else*/ if (scan_code < 0x81){
         char c = keyboard_us[scan_code];
+        switch (c){
+            case '1':
+                chip8_key = key_1;
+            case '2':
+                chip8_key = key_2;
+            case '3':
+                chip8_key = key_3;
+            case '4':
+                chip8_key = key_C;
+            case 'q':
+                chip8_key = key_4;
+            case 'w':
+                chip8_key = key_5;
+            case 'e':
+                chip8_key = key_6;
+            case 'r':
+                chip8_key = key_D;
+            case 'a':
+                chip8_key = key_7;
+            case 's':
+                chip8_key = key_8;
+            case 'd':
+                chip8_key = key_8;
+            case 'f':
+                chip8_key = key_E;
+            case 'z':
+                chip8_key = key_A;
+            case 'x':
+                chip8_key = key_0;
+            case 'c':
+                chip8_key = key_B;
+            case 'v':
+                chip8_key = key_F;
+            default:
+                log(LOG_SERIAL, false, "Chip8 emulator : unknown key pressed\n");
+        }
     }
 }
 
@@ -204,6 +284,21 @@ void chip8_execute_instruction(uint8_t opcode_1, uint8_t opcode_2){
             int rand_nb = rand() % 256; // number between 0 and 255
             emulator.vregisters[opcode_1 & 0x0F] = rand_nb & (opcode_2);
             break;
+        case 0xD:
+            uint8_t sprite_width = 8;
+            uint8_t sprite_height = (opcode_2 & 0x0F);
+            emulator.vregisters[0xF] = 0;
+            for (int row = 0; row < sprite_height; row++){
+                uint8_t sprite = emulator.ram[emulator.i+row];
+                for (int col = 0; col < sprite_width; col++){
+                    if ((sprite & 0x80) > 0){
+                        write_chip8_pixel(emulator.vregisters[opcode_1 & 0x0F] + col, emulator.vregisters[opcode_2 >> 4] + row, true);
+                        // set emulator.vregisters[0xF] to 1 if the pixel was erased
+                    }
+                    sprite <<= 1;
+                }
+            }
+            break;
         case 0xF:
             switch (opcode_2){
                 case 0x07:
@@ -231,7 +326,7 @@ void chip8_execute_instruction(uint8_t opcode_1, uint8_t opcode_2){
             }
             break;
         default:
-            log(LOG_SERIAL, false, "Unknown opcode\n");
+            log(LOG_SERIAL, false, "Unknown opcode opcode_1 : %d, opcode_2 : %d\n", opcode_1, opcode_2);
     }
 }
 
@@ -241,7 +336,7 @@ void chip8_update_timers(){
     }
 }
 
-void chip8_cycle(){
+int chip8_cycle(){
     for (int i = 0; i < emulator.speed; i++){
         if (!emulator.paused){
             uint8_t opcode_1 = emulator.ram[emulator.pc];
@@ -253,11 +348,26 @@ void chip8_cycle(){
         chip8_update_timers();
     }
     chip8_update_framebuffer();
+    return 0;
+}
+
+void chip8_mainloop(){
+    while (true){
+        if (!chip8_cycle()){
+            break;
+        }
+    }
 }
 
 void chip8_load_program_into_ram(uint8_t* buf, size_t buf_length){
     for (int i = 0; i < buf_length; i++){
         emulator.ram[0x200 + i] = buf[i];
+    }
+}
+
+void chip8_load_sprites_into_ram(){
+    for (int i = 0; i < SPRITE_CHARS_LENGTH; i++){
+        emulator.ram[i] = sprite_chars[i];
     }
 }
 
@@ -290,4 +400,5 @@ void setup_chip8_emulator(const char* filename){
     }
     fill_chip8_screen();
     //chip8_update_framebuffer();
+    chip8_mainloop();
 }

@@ -11,9 +11,9 @@ bool is_chip8_emulator_mode();
 typedef struct Chip8_emulator {
     uint8_t ram[4096];
     uint8_t vregisters[16];
-    uint32_t i;
+    uint16_t i;
     int delay_timer;
-    uint32_t pc;
+    uint16_t pc;
     stack_t* stack;
     uint8_t speed;
     bool paused;
