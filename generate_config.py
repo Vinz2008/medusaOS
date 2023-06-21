@@ -1,6 +1,17 @@
 from os.path import exists
+import os
+import sys
 
 config_path = "kernel/include/kernel/config.h"
+
+if len(sys.argv) > 1:
+    if sys.argv[1] == "clean":
+        if not exists(config_path):
+            print("file doesn't exist")
+            exit(0)
+        print("delete ", config_path)
+        os.remove(config_path)
+        exit(0)
 
 if exists(config_path):
     print("config.h already exists at ", config_path)

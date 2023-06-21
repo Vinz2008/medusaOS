@@ -151,14 +151,16 @@ void sys_key_handler(registers_t* frame){
     } else if (scan_code == 0x50){
         log(LOG_SERIAL, false, "down\n");
         move_focused_window_wm(DOWN);
-    } else if (scan_code == ESC_KEY){
+    } /*else if (scan_code == ESC_KEY){
         close_window(get_focused_window());
-    } else if (scan_code < 0x81){
+    }*/ else if (scan_code < 0x81){
         char c = keyboard_us[scan_code];
         if (c == 'n'){
             window_t* win = open_window("test window", 300, 125, 0);
             draw_string(win->fb, "Lorem Ipsum", 45, 55, 0x00AA1100);
             render_window(win);
+        } else if (c == 'q'){
+            close_window(get_focused_window());
         } else {
         gui_keypress(c);
         }
