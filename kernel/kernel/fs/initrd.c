@@ -192,7 +192,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 	return 0;
 }
 
-void initrd_get_file_size(fs_node_t* node){
+int initrd_get_file_size(fs_node_t* node){
     for (int i = 0; i < nroot_nodes; i++){
         if (strcmp(node->name, root_nodes[i].name) == 0){
             return list_headers.headers[i]->size;

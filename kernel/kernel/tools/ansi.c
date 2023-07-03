@@ -6,6 +6,7 @@
 #include <types.h>
 #include <kernel/graphics.h>
 //#include <kernel/gui.h>
+#include <kernel/tty_framebuffer.h>
 #include <kernel/config.h>
 
 static char nb_buf[100];

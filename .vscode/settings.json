@@ -4,6 +4,7 @@
     "std": "llvm",
     "*.wasm": "wasm",
     "*.toml": "toml",
+    "*.hpoint": "cpoint",
     "stdlib.h": "c",
     "vga.h": "c",
     "random": "c",
@@ -64,8 +65,9 @@
     "optional": "c",
     "system_error": "c",
     "variant": "c",
-    "scheduler.h": "c"
-  },
+    "scheduler.h": "c",
+    "nmi.h": "c"
+},
   "C_Cpp.errorSquiggles": "Disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

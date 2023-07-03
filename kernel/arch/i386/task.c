@@ -1,5 +1,6 @@
 #include <kernel/task.h>
 #include <stdio.h>
+#include <kernel/kmalloc.h>
 
 static Task *runningTask;
 static Task mainTask;

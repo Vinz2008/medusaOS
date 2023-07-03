@@ -105,3 +105,4 @@ window_t* open_window(const char* title, int width, int height, uint32_t flags);
 void draw_window(window_t* win);
 void move_focused_window_wm(enum direction dir);
 void set_window_title(const char* title, window_t* window);
+void render_screen();

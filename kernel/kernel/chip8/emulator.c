@@ -15,8 +15,6 @@ static fb_t fb;
 
 extern char keyboard_us[];
 
-static int pc;
-
 static chip8_emulator_t emulator;
 
 enum chip8_key_t {
@@ -102,6 +100,7 @@ int write_chip8_pixel(uint8_t x, uint8_t y, bool state){
             draw_pixel(fb, x* fb.width/CHIP8_SCREEN_WIDTH + xtemp, y * fb.height/CHIP8_SCREEN_HEIGHT + ytemp, (state) ? COLOR_RED : COLOR_BLACK);
         }
     }
+    return 0;
 }
 
 void chip8_update_framebuffer(){
@@ -114,7 +113,7 @@ void chip8_update_framebuffer(){
     }
 }
 
-void write_chip8_screen(uint8_t x, uint8_t y, bool state){
+void write_chip8_screen(int8_t x, int8_t y, bool state){
     if (x > CHIP8_SCREEN_WIDTH){
         x -= CHIP8_SCREEN_WIDTH;
     } else if (x < 0){
@@ -148,36 +147,52 @@ void chip8_keyboard_handler(int scan_code){
         switch (c){
             case '1':
                 chip8_key = key_1;
+                break;
             case '2':
                 chip8_key = key_2;
+                break;
             case '3':
                 chip8_key = key_3;
+                break;
             case '4':
                 chip8_key = key_C;
+                break;
             case 'q':
                 chip8_key = key_4;
+                break;
             case 'w':
                 chip8_key = key_5;
+                break;
             case 'e':
                 chip8_key = key_6;
+                break;
             case 'r':
                 chip8_key = key_D;
+                break;
             case 'a':
                 chip8_key = key_7;
+                break;
             case 's':
                 chip8_key = key_8;
+                break;
             case 'd':
                 chip8_key = key_8;
+                break;
             case 'f':
                 chip8_key = key_E;
+                break;
             case 'z':
                 chip8_key = key_A;
+                break;
             case 'x':
                 chip8_key = key_0;
+                break;
             case 'c':
                 chip8_key = key_B;
+                break;
             case 'v':
                 chip8_key = key_F;
+                break;
             default:
                 log(LOG_SERIAL, false, "Chip8 emulator : unknown key pressed\n");
         }
@@ -292,6 +307,7 @@ void chip8_execute_instruction(uint8_t opcode_1, uint8_t opcode_2){
                 uint8_t sprite = emulator.ram[emulator.i+row];
                 for (int col = 0; col < sprite_width; col++){
                     if ((sprite & 0x80) > 0){
+                        log(LOG_SERIAL, false, "Write to screen pixel\n");
                         write_chip8_pixel(emulator.vregisters[opcode_1 & 0x0F] + col, emulator.vregisters[opcode_2 >> 4] + row, true);
                         // set emulator.vregisters[0xF] to 1 if the pixel was erased
                     }
@@ -382,7 +398,7 @@ void setup_chip8_emulator(const char* filename){
 
 
     setup_custom_keypress_function(chip8_keyboard_handler);
-    fill_screen(fb, COLOR_BLUE);
+    //fill_screen(fb, COLOR_BLUE);
     log(LOG_SERIAL, false, "TEST ROM");
     fs_node_t* rom_node = vfs_open(filename, "r");
     uint8_t buffer[rom_node->length];
@@ -395,10 +411,14 @@ void setup_chip8_emulator(const char* filename){
         log(LOG_SERIAL, false, "chip instruction (in decimal) : %d\n", buffer[i]);
     }
     chip8_load_program_into_ram(buffer, rom_node->length);
-    for (pc = 0; pc < rom_node->length; pc+=2){
+    /*for (pc = 0; pc < rom_node->length; pc+=2){
         chip8_execute_instruction(buffer[pc], buffer[pc+1]);
-    }
-    fill_chip8_screen();
+    }*/
+    //fill_chip8_screen();
     //chip8_update_framebuffer();
-    chip8_mainloop();
+    while (1){
+        emulator.pc = 0x200; // these lines were added to the chip8_mainloop call just for debugging
+        chip8_mainloop();
+        log(LOG_SERIAL, false, "execution ended\n");
+    }
 }

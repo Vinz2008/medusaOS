@@ -301,7 +301,7 @@ window_t* find_first_normal_window(){
 }
 
 void close_window(window_t* win){
-    kfree(win->fb.address);
+    kfree((void*)win->fb.address);
     window_list = list_remove(win, window_list);
     if (focused == win){
         focused = find_first_normal_window();

@@ -1,5 +1,6 @@
 #include <kernel/device.h>
 #include <string.h>
+#include <stdio.h>
 #include <kernel/devfs.h>
 #include <kernel/kmalloc.h>
 #include <kernel/tty_framebuffer.h>

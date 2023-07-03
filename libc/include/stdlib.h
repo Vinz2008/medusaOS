@@ -36,6 +36,8 @@ ldiv_t ldiv(long num, long denom);
 
 extern uint32_t _Randseed;
 
+int rand();
+
 #ifdef __cplusplus
 }
 #endif
