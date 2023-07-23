@@ -13,27 +13,39 @@
 fs_node_t *fs_root = NULL;
 vfs_tree_t* fs_tree = NULL;
 
+uint32_t vfs_get_depth(const char *path);
+
+
 vfs_tree_t* vfs_tree_init(){
   vfs_tree_t* tree = kmalloc(sizeof(vfs_tree_t));
-  tree->nodes = 0;
-  tree->root = NULL;
+  tree->root = fs_root;
   return tree;
 }
 
 vfs_tree_node_t* vfs_tree_node_create(struct vfs_entry* vfs_node){
-  vfs_tree_node_t* temp = kmalloc(sizeof(vfs_tree_node_t));
-  temp->value = vfs_node;
-  temp->children_list = kmalloc(sizeof(struct vfs_children_list));
-  temp->children_list->childrens = kmalloc(sizeof(struct vfs_children) * 10);
-  temp->children_list->used = 0;
-  temp->parent = NULL;
-  return temp;
+  
 }
 
 void vfs_tree_set_root(vfs_tree_t* fs_tree, struct vfs_entry* vfs_node){
   vfs_tree_node_t* root = vfs_tree_node_create(vfs_node);
   fs_tree->root = root;
-  fs_tree->nodes = 1;
+  //fs_tree->nodes = 1;
+}
+
+void* vfs_mount(const char* path, fs_node_t* local_root){
+    if (*path == '/'){
+        fs_tree->root->fs_node = local_root;
+    } else {
+    if (vfs_get_depth(path) > 2){
+        return NULL;
+    }
+    bool mount_folder_exists = false;
+    for (int i = 0; i < fs_tree->root->nb_childrens; i++){
+        if (strcmp(fs_tree->root->childrens[i]->name, path) == 0){
+            mount_folder_exists = true;
+        }
+    }
+    }
 }
 
 char *canonicalize_path(const char *cwd, const char *input) {
@@ -144,7 +156,7 @@ char *canonicalize_path(const char *cwd, const char *input) {
 	return output;
 }
 
-fs_node_t* get_mount_point(char* path, uint32_t path_depth, char **outpath, unsigned int * outdepth){
+/*fs_node_t* get_mount_point(char* path, uint32_t path_depth, char **outpath, unsigned int * outdepth){
   size_t depth;
   for (depth = 0; depth < path_depth; ++depth){
     path += strlen(path) + 1;
@@ -187,9 +199,9 @@ fs_node_t* get_mount_point(char* path, uint32_t path_depth, char **outpath, unsi
     return last_clone;
   }
   return last;
-}
+}*/
 
-fs_node_t* kopen_recur(const char* filename, int flags, uint64_t symlink_depth, char* relative_to){
+/*fs_node_t* kopen_recur(const char* filename, int flags, uint64_t symlink_depth, char* relative_to){
   if (!filename){
     return NULL;
   }
@@ -205,21 +217,18 @@ fs_node_t* kopen_recur(const char* filename, int flags, uint64_t symlink_depth, 
   char *path_offset = path;
   uint64_t path_depth = 0;
   while (path_offset < path + path_len) {
-		/* Find each PATH_SEPARATOR */
+		// Find each PATH_SEPARATOR
 		if (*path_offset == PATH_SEPARATOR) {
 			*path_offset = '\0';
 			path_depth++;
 		}
 		path_offset++;
 	}
-	/* Clean up */
+	// Clean up
 	path[path_len] = '\0';
 	path_offset = path + 1;
-  /*
-	 * At this point, the path is tokenized and path_offset points
-	 * to the first token (directory) and path_depth is the number
-	 * of directories in the path
-	 */
+
+	// At this point, the path is tokenized and path_offset points to the first token (directory) and path_depth is the number of directories in the path
   unsigned int depth = 0;
   fs_node_t *node_ptr = get_mount_point(path, path_depth, &path_offset, &depth);
   log(LOG_SERIAL, false, "path offset : %s\n", path_offset);
@@ -233,19 +242,19 @@ fs_node_t* kopen_recur(const char* filename, int flags, uint64_t symlink_depth, 
 			return node_ptr;
 		}
 		if (depth == path_depth) {
-			/* We found the file and are done, open the node */
+			// We found the file and are done, open the node 
 			open_fs(node_ptr, flags);
 			kfree(path);
 			return node_ptr;
 		}
-		/* We are still searching... */
+		// We are still searching...
 		log(LOG_SERIAL, false, "... Searching for %s", path_offset);
 		fs_node_t * node_next = finddir_fs(node_ptr, path_offset);
-		kfree(node_ptr); /* Always a clone or an unopened thing */
+		kfree(node_ptr); // Always a clone or an unopened thing 
 		node_ptr = node_next;
-		/* Search the active directory for the requested directory */
+		// Search the active directory for the requested directory 
 		if (!node_ptr) {
-			/* We failed to find the requested directory */
+			// We failed to find the requested directory
 			kfree(path);
 			return NULL;
 		}
@@ -253,30 +262,33 @@ fs_node_t* kopen_recur(const char* filename, int flags, uint64_t symlink_depth, 
 		++depth;
 	} while (depth < path_depth + 1);
 	log(LOG_SERIAL, false, "- Not found.");
-	/* We failed to find the requested file, but our loop terminated. */
+	// We failed to find the requested file, but our loop terminated. 
 	kfree(path);
 	return NULL;
-}
+}*/
 
+/*
 fs_node_t *kopen(const char *filename, unsigned int flags) {
 	log(LOG_SERIAL, false, "kopen(%s)", filename);
 
-	return kopen_recur(filename, flags, 0, /*(char *)(this_core->current_process->wd_name)*/calloc(10, sizeof(char)));
-}
+	//return kopen_recur(filename, flags, 0, (char *)(this_core->current_process->wd_name));
+    return kopen_recur(filename, flags, 0, calloc(10, sizeof(char)));
+}*/
+
 
 
 void vfs_init(){
   fs_tree = vfs_tree_init();
-  struct vfs_entry* root = kmalloc(sizeof(struct vfs_entry));
-  root->name = strdup("[root]");
-  root->file = NULL;
-  root->fs_type = NULL;
-  root->device = NULL;
-  vfs_tree_set_root(fs_tree, root);
+  //struct vfs_entry* root = kmalloc(sizeof(struct vfs_entry));
+  //root->name = strdup("[root]");
+  //root->file = NULL;
+  //root->fs_type = NULL;
+  //root->device = NULL;
+  //vfs_tree_set_root(fs_tree, root);
   init_file_descriptor_table();
 }
 
-void* vfs_mount(const char* path, fs_node_t* local_root){
+/*void* vfs_mount(const char* path, fs_node_t* local_root){
   vfs_tree_node_t* ret_val = NULL;
   char* p = strdup(path);
   vfs_tree_node_t* root_node = fs_tree->root;
@@ -297,7 +309,7 @@ void* vfs_mount(const char* path, fs_node_t* local_root){
     }
   }
   return ret_val;
-}
+}*/
 
 int get_file_size_fs(fs_node_t *node){
   if (node == NULL){
@@ -393,9 +405,10 @@ fs_node_t* fs_get_root_node(){
 uint32_t vfs_get_depth(const char *path){
   uint32_t depth = 0;
 
-   for(size_t i = 0; path[i] != '\0'; ++i)
+   for(size_t i = 0; path[i] != '\0'; ++i){
       if(path[i] == '/')
          ++depth;
+   }
 
    return depth;
 }

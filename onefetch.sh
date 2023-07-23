@@ -1,0 +1,1 @@
+onefetch --exclude kernel/arch/x86_64/uefi/*

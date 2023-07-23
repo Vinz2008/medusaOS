@@ -84,15 +84,15 @@ struct dirent // One of these is returned by the readdir call, according to POSI
 
 
 typedef struct vfs_tree_node {
-  void* value;
-  struct vfs_children_list* children_list;
-  struct vfs_treen_node* parent;
+  fs_node_t* fs_node;
+  fs_node_t** childrens;
+  size_t nb_childrens;
+  fs_node_t* root_current_fs;
 } vfs_tree_node_t;
 
 
 
 typedef struct {
-  size_t nodes;
   vfs_tree_node_t* root;
 } vfs_tree_t;
 
@@ -104,7 +104,7 @@ struct vfs_entry {
 };
 
 struct vfs_children {
-  void* value;
+  struct vfs_tree_node* tree_node;
   struct vfs_children_list* owner;
 };
 
