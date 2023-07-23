@@ -37,6 +37,7 @@ void* vfs_mount(const char* path, fs_node_t* local_root){
         fs_tree->root->fs_node = local_root;
     } else {
     if (vfs_get_depth(path) > 2){
+        // Can't mount in subfolder, only in direct folder to root
         return NULL;
     }
     bool mount_folder_exists = false;
