@@ -34,3 +34,4 @@ struct tss_entry_struct {
 typedef struct tss_entry_struct tss_entry_t;
 
 void write_tss(/*struct gdt_entry* g*/ int32_t num, uint16_t ss0, uint32_t esp0);
+void set_kernel_stack(uint32_t stack);

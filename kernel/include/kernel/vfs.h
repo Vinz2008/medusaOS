@@ -1,6 +1,8 @@
 #include <types.h>
 #include <stddef.h>
 
+#include <kernel/list.h>
+
 #ifndef _VFS_HEADER_
 #define _VFS_HEADER_
 struct fs_node;
@@ -85,8 +87,7 @@ struct dirent // One of these is returned by the readdir call, according to POSI
 
 typedef struct vfs_tree_node {
   fs_node_t* fs_node;
-  fs_node_t** childrens;
-  size_t nb_childrens;
+  list_t* childrens;
   fs_node_t* root_current_fs;
 } vfs_tree_node_t;
 
@@ -109,8 +110,9 @@ struct vfs_children {
 };
 
 struct vfs_children_list {
-  struct vfs_children* childrens;
+  fs_node_t** childrens;
   size_t used;
+  size_t allocated_size;
 };
 
 
@@ -128,5 +130,7 @@ int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size);
 fs_node_t* vfs_open(const char* path, const char* mode);
 void vfs_init();
 int get_file_size_fs(fs_node_t *node);
+
+void* vfs_mount(const char* path, fs_node_t* local_root);
 
 #endif

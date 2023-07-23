@@ -103,6 +103,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
             if (strcmp(mod->cmdline, "initrd") == 0){
                 set_initrd_address(data);
                 fs_root = initialise_initrd(data);
+                vfs_mount("/", fs_root);
+                vfs_mount("/tmp", fs_root);
                 struct dirent* dir = NULL;
                 int i = 0;
                 while ((dir = readdir_fs(fs_root, i))!=NULL){

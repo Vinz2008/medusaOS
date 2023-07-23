@@ -16,15 +16,21 @@ vfs_tree_t* fs_tree = NULL;
 uint32_t vfs_get_depth(const char *path);
 
 
+vfs_tree_node_t* vfs_tree_node_create(fs_node_t* fs_node){
+  vfs_tree_node_t* tree_node = kmalloc(sizeof(vfs_tree_node_t));
+  tree_node->fs_node = fs_node;
+  tree_node->childrens = list_create();
+  return tree_node;
+  
+}
+
 vfs_tree_t* vfs_tree_init(){
   vfs_tree_t* tree = kmalloc(sizeof(vfs_tree_t));
   tree->root = fs_root;
   return tree;
 }
 
-vfs_tree_node_t* vfs_tree_node_create(struct vfs_entry* vfs_node){
-  
-}
+
 
 void vfs_tree_set_root(vfs_tree_t* fs_tree, struct vfs_entry* vfs_node){
   vfs_tree_node_t* root = vfs_tree_node_create(vfs_node);
@@ -41,11 +47,16 @@ void* vfs_mount(const char* path, fs_node_t* local_root){
         return NULL;
     }
     bool mount_folder_exists = false;
-    for (int i = 0; i < fs_tree->root->nb_childrens; i++){
-        if (strcmp(fs_tree->root->childrens[i]->name, path) == 0){
+    int pos = -1;
+    for (int i = 0; i < fs_tree->root->childrens->used; i++){
+        if (strcmp(((vfs_tree_node_t*)fs_tree->root->childrens->list[i].data)->fs_node->name, path) == 0){
+            pos = i;
             mount_folder_exists = true;
         }
     }
+    ((vfs_tree_node_t*)fs_tree->root->childrens->list[pos].data)->fs_node = local_root; // maybe replace entire vfs_tree_node by passing to this function entire vfs_tree_node or find other way to do it
+    // TODO : verify if mount folder exists
+
     }
 }
 

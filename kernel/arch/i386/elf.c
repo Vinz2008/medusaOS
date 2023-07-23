@@ -223,6 +223,9 @@ void elf_start_executable(void* file){
 
 }
 
+char* current_process_name = ""; // TODO : INTEGRATE THIS WITH SCHEDULING AND PROCESS SYSTEM
+uintptr_t current_process_stack = USER_STACK_TOP;
+
 void *elf_load_file(void *file) {
     log(LOG_SERIAL, false, "loading elf module\n");
 	Elf32_Ehdr *header = (Elf32_Ehdr *)file;
@@ -295,6 +298,8 @@ int elf_exec(char* path, int argc, char** argv, char** env){
 	}
 	Elf32_Ehdr * header = (Elf32_Ehdr *)0x30000000;
 	read_fs(file, 0, file->length, (uint8_t*)header);
+	current_process_name = kmalloc(strlen(path) + 1);
+	memcpy(current_process_name, path, strlen(path) + 1);
 	//current_process->name = malloc(strlen(path) + 1);
 	//memcpy(current_process->name, path, strlen(path) + 1);
 	if (header->e_ident != ELFMAG0 || header->e_ident[1] != ELFMAG1 || header->e_ident[2] != ELFMAG2 || header->e_ident[3] != ELFMAG3){
