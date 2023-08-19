@@ -3,6 +3,8 @@
 
 #include <kernel/list.h>
 
+#define VFS_NEW_IMPL 0
+
 #ifndef _VFS_HEADER_
 #define _VFS_HEADER_
 struct fs_node;
@@ -85,10 +87,28 @@ struct dirent // One of these is returned by the readdir call, according to POSI
 
 
 
+// path strings are parsed into this struct
+// For example /a/b/c becomes a list with "a", "b" and "c"
+typedef struct path {
+    list_t* folders;
+    char* path_string;
+} path_t;
+
+struct vfs_entry {
+  fs_node_t* file;
+  //char* device;
+  //char* fs_type;
+  //char* name;
+};
+
 typedef struct vfs_tree_node {
-  fs_node_t* fs_node;
+  //fs_node_t* fs_node;
+  bool is_mount_point;
+  fs_node_t* mount_point_fs_node;
   list_t* childrens;
-  fs_node_t* root_current_fs;
+  char* name;
+  bool is_folder;
+  //fs_node_t* root_current_fs;
 } vfs_tree_node_t;
 
 
@@ -97,23 +117,24 @@ typedef struct {
   vfs_tree_node_t* root;
 } vfs_tree_t;
 
-struct vfs_entry {
-  fs_node_t* file;
-  char* device;
-  char* fs_type;
-  char* name;
-};
 
-struct vfs_children {
+struct vfs_tree_find_result {
+    char* path_to_use;
+    fs_node_t* fs_node;
+};  
+
+
+
+/*struct vfs_children {
   struct vfs_tree_node* tree_node;
   struct vfs_children_list* owner;
-};
+};*/
 
-struct vfs_children_list {
+/*struct vfs_children_list {
   fs_node_t** childrens;
   size_t used;
   size_t allocated_size;
-};
+};*/
 
 
 extern fs_node_t *fs_root; 

@@ -3,9 +3,12 @@
 
 list_t* inodes;
 
+struct dirent* memfs_readdir(){
+    
+}
 
 
-void tmpfs_create_file(){
+struct tmpfs_file* memfs_create_file(char* name){
     struct tmpfs_file* file;
     char* file_content = kmalloc(sizeof(char) * 10);
 }

@@ -181,6 +181,7 @@ static struct dirent *initrd_readdir(fs_node_t *dir, uint32_t index){
 	return NULL;
 }
 
+
 static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 	if (node == initrd_root && !strcmp(name, "dev") )
 		return initrd_dev;
@@ -189,7 +190,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name){
 	for (i = 0; i < nroot_nodes; i++)
 		if (!strcmp(name, root_nodes[i].name))
 			return &root_nodes[i];
-	return 0;
+	return NULL;
 }
 
 int initrd_get_file_size(fs_node_t* node){
@@ -264,7 +265,7 @@ fs_node_t *initialise_initrd(uint32_t location){
     pos = i;
     isInitrdInitialized = true;
     log(LOG_SERIAL, false, "initrd initialized\n");
-    vfs_mount(initrd_root, "/");
+    //vfs_mount(initrd_root, "/");
     return initrd_root;
 }
 

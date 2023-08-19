@@ -7,7 +7,6 @@
 #include <kernel/list.h>
 #include <kernel/pair.h>
 
-
 #define MAX_SYMLINK_DEPTH 10
 
 fs_node_t *fs_root = NULL;
@@ -15,34 +14,101 @@ vfs_tree_t* fs_tree = NULL;
 
 uint32_t vfs_get_depth(const char *path);
 
+path_t* parse_path(char* path_string){
+    path_t* path = kmalloc(sizeof(path_t));
+    path->folders = list_create();
+    path->path_string = strdup(path_string);
+    char* temp_path = kmalloc(sizeof(char) * 4096);
+    bool is_first_slash = true;
+    for (int i = 0; i < strlen(path_string); i++){
+        //log(LOG_SERIAL, false, "path_string[i]  : %c\n", path_string[i]);
+        if (path_string[i] == '/'){
+            if (!is_first_slash){
+            log(LOG_SERIAL, false, "appending path %s\n", temp_path);
+            list_append(strdup(temp_path), path->folders);
+            } else {
+                is_first_slash = false;
+            }
+            memset(temp_path, 0, 4096);
+        } else {
+            append(temp_path, path_string[i]);
+        }
+    }
+    kfree(temp_path);
+    return path;
+}
 
-vfs_tree_node_t* vfs_tree_node_create(fs_node_t* fs_node){
+
+vfs_tree_node_t* vfs_tree_node_create(char* name, bool is_folder){
   vfs_tree_node_t* tree_node = kmalloc(sizeof(vfs_tree_node_t));
-  tree_node->fs_node = fs_node;
+  tree_node->name = name;
+  tree_node->is_mount_point = false;
+  // replace NULL with fs_node for in memory folder if it is one (maybe add a boolean in args)
+  tree_node->mount_point_fs_node = NULL;
+  //tree_node->fs_node = fs_node;
   tree_node->childrens = list_create();
+  tree_node->is_folder = is_folder;
   return tree_node;
   
 }
 
 vfs_tree_t* vfs_tree_init(){
   vfs_tree_t* tree = kmalloc(sizeof(vfs_tree_t));
-  tree->root = fs_root;
+  tree->root = vfs_tree_node_create("/", true);
+  //tree->root = fs_root;
   return tree;
 }
 
 
 
 void vfs_tree_set_root(vfs_tree_t* fs_tree, struct vfs_entry* vfs_node){
-  vfs_tree_node_t* root = vfs_tree_node_create(vfs_node);
+  vfs_tree_node_t* root = vfs_tree_node_create("", true/*vfs_node*/);
   fs_tree->root = root;
   //fs_tree->nodes = 1;
 }
 
+vfs_tree_node_t* vfs_tree_find_child_with_name(char* name, list_t* childrens) {
+    for (int i = 0; i < childrens->used; i++){
+        vfs_tree_node_t* children_temp = (vfs_tree_node_t*)childrens->list[i].data;
+        if (strcmp(name, children_temp->name) == 0){
+            return children_temp;
+        }
+    }
+    return NULL;
+}
+
 void* vfs_mount(const char* path, fs_node_t* local_root){
     if (*path == '/'){
-        fs_tree->root->fs_node = local_root;
+        log(LOG_SERIAL, false, "vfs_mount mounting root\n");
+        fs_tree->root->mount_point_fs_node = local_root;
+        fs_tree->root->is_mount_point = true;
     } else {
-    if (vfs_get_depth(path) > 2){
+    vfs_tree_node_t* node_where_to_mount = NULL;
+    node_where_to_mount = fs_tree->root;
+    path_t* path_parsed = parse_path(path);
+    // find node in tree where to mount
+    for (int i = 0; i < path_parsed->folders->used; i++){
+        char* name = (char*)path_parsed->folders->list[i].data;
+        if (!node_where_to_mount->is_folder){
+            return NULL;
+        }
+        vfs_tree_node_t* temp_node = vfs_tree_find_child_with_name(name, node_where_to_mount->childrens);
+        if (temp_node){
+            node_where_to_mount = temp_node;
+        } else {
+            // create node
+            vfs_tree_node_t* new_node = vfs_tree_node_create(name, true);
+            list_append(new_node, node_where_to_mount->childrens);
+            node_where_to_mount = new_node;
+        }
+    }
+    // now node_where_to_mount should contain to the node where we will mount the filesystem
+
+    node_where_to_mount->is_mount_point = true;
+    node_where_to_mount->mount_point_fs_node = local_root;
+
+
+    /*if (vfs_get_depth(path) > 2){
         // Can't mount in subfolder, only in direct folder to root
         return NULL;
     }
@@ -56,8 +122,44 @@ void* vfs_mount(const char* path, fs_node_t* local_root){
     }
     ((vfs_tree_node_t*)fs_tree->root->childrens->list[pos].data)->fs_node = local_root; // maybe replace entire vfs_tree_node by passing to this function entire vfs_tree_node or find other way to do it
     // TODO : verify if mount folder exists
-
+    */
     }
+}
+
+
+// function find local root for fs_node
+struct vfs_tree_find_result* vfs_tree_find_local_root(char* path){
+    if (*path == '/'){
+        struct vfs_tree_find_result* result = kmalloc(sizeof(struct vfs_tree_find_result));
+        result->path_to_use = "/";
+        result->fs_node = fs_tree->root->mount_point_fs_node;
+        return result;
+    }
+    vfs_tree_node_t* node_local_root = NULL;
+    node_local_root = fs_tree->root;
+    path_t* path_parsed = parse_path(path);
+    for (int i = 0; i < path_parsed->folders->used; i++){
+        if (node_local_root->is_mount_point){
+            char* path_to_use = kmalloc(sizeof(char) * 4096);
+            for (int j = i; j < path_parsed->folders->used; j++){
+                strcat(path_to_use, (char*)path_parsed->folders->list[j].data);
+            }
+            struct vfs_tree_find_result* result = kmalloc(sizeof(struct vfs_tree_find_result));
+            result->path_to_use = path_to_use;
+            result->fs_node = node_local_root->mount_point_fs_node;
+            return result;
+            //return (struct vfs_tree_find_result){path_to_use, node_local_root->mount_point_fs_node};
+        }
+        char* name = (char*)path_parsed->folders->list[i].data;
+        vfs_tree_node_t* temp_node = vfs_tree_find_child_with_name(name, node_local_root->childrens);
+        if (temp_node){
+            node_local_root = temp_node;
+        } else {
+            // couldn't find child with this name
+            return NULL;
+        }
+    }
+    return NULL;
 }
 
 char *canonicalize_path(const char *cwd, const char *input) {
@@ -353,12 +455,6 @@ void open_fs(fs_node_t *node, uint32_t flags){
     return node->open(node);
   else {
     node->mode =  flags;
-    /*if (read == 1){
-      node->mode =  READ_MODE;
-    } else if (write == 1){
-      node->mode = WRITE_MODE;
-    }*/
-    //return;
   }
 } 
 
@@ -380,8 +476,9 @@ uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buff
     return node->write(node, offset, size, buffer);
   else
     return 0;
-} 
+}
 
+// TODO : remove index at some point in args or create wrapper to be compatible with linux readdir
 struct dirent *readdir_fs(fs_node_t *node, uint32_t index){
 	// Is the node a directory, and does it have a callback?
 	/*if ( (node->flags & 0x7) == FS_DIRECTORY && node->readdir != 0 )
@@ -439,6 +536,12 @@ void init_file_descriptor_table(){
   list_append(&stdoutfd, file_descriptors_table);
   list_append(&stderrfd, file_descriptors_table);
   list_append(&serialfd, file_descriptors_table);
+  char* path_test = "/dev/proc/a/b/c";
+  path_t* path = parse_path(path_test);
+  log(LOG_SERIAL, false, "path parsing test\n");
+  for (int i = 0; i < path->folders->used; i++){
+    log(LOG_SERIAL, false, "path %d : %s\n", i, (char*)path->folders->list[i].data);
+  }
 }
 
 // write a character
@@ -454,6 +557,33 @@ int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size){
 
 }
 
+
+#if VFS_NEW_IMPL
+
+fs_node_t* vfs_search_node(fs_node_t* local_root, const char* path, size_t index_child){
+    if (!local_root){
+        return NULL;
+    }
+    fs_node_t* child;
+    while ((child = readdir_fs(local_root, index_child)) != NULL){
+        if (strcmp(child->name, path) == 0){
+            return child;
+        }
+        if (child->node_type == FT_Directory){
+            index_child++;
+            fs_node_t* recursive_child = vfs_search_node(child, path, index_child);
+			if (recursive_child != NULL){
+				return recursive_child;
+			}
+        } else {
+            ++index_child;
+        }
+    }
+    return NULL;
+}
+
+#else
+
 fs_node_t* vfs_search_node(fs_node_t* parent, const char* path, size_t index_child){
 	if (parent == NULL){
 		return NULL;
@@ -466,29 +596,72 @@ fs_node_t* vfs_search_node(fs_node_t* parent, const char* path, size_t index_chi
     //log(LOG_SERIAL, false, "readdir_fs(fs_get_root_node(), 3)->name %s\n", readdir_fs(fs_get_root_node(), 3)->name);
     //log(LOG_SERIAL, false, "index_child : %d\n", index_child);
 		if (strcmp(child->name, path) == 0){
-      log(LOG_SERIAL, false, "return child\n");
+            log(LOG_SERIAL, false, "return child\n");
 			return child;
 		}
 		if (child->node_type == FT_Directory){
-      log(LOG_SERIAL, false, "directory %s\n", child->name);
-      index_child++;
+            log(LOG_SERIAL, false, "directory %s\n", child->name);
+            index_child++;
 			fs_node_t* recursive_child = vfs_search_node(child, path, index_child);
 			if (recursive_child != NULL){
 				return recursive_child;
 			}
 		} else {
 		++index_child;
-    }
+        }
 	}
 	return NULL;
 }
 
+#endif
+
+#if VFS_NEW_IMPL
+
 fs_node_t* vfs_open(const char* path, const char* mode){
-  fs_node_t* root  = fs_get_root_node();
-  if (root == NULL){
-    log(LOG_SERIAL, false, "Couldn't find root node\n");
-    return NULL;
-  }
+    log(LOG_SERIAL, false, "vfs_open %s\n", path);
+    struct vfs_tree_find_result* result = vfs_tree_find_local_root(path);
+    if (!result){
+        return NULL;
+    }
+    fs_node_t* local_root = result->fs_node;
+    char* path_to_use = result->path_to_use;
+    fs_node_t* fs_node = vfs_search_node(local_root, path_to_use, 0);
+    
+    if (!fs_node){
+        return NULL;
+    }
+
+    /*struct vfs_tree_find_result* result = vfs_tree_find_local_root(path);
+    if (!result){
+        return NULL;
+    }
+    fs_node_t* local_root = result->fs_node;
+    char* path_to_use = result->path_to_use;
+    while ()
+
+
+    kfree(result);*/
+
+    //fs_node_t* fs_node = NULL;
+    uint32_t flags = 0;
+    if (strcmp(mode, "r") == 0){
+        flags |= O_RDONLY;
+	}
+	if (strcmp(mode, "w") == 0){
+		flags |= O_WRONLY;
+	}
+    open_fs(fs_node, flags);
+	return fs_node;
+}
+
+#else
+
+fs_node_t* vfs_open(const char* path, const char* mode){
+    fs_node_t* root  = fs_get_root_node();
+    if (root == NULL){
+        log(LOG_SERIAL, false, "Couldn't find root node\n");
+        return NULL;
+    }
 	fs_node_t* file = vfs_search_node(root, path, 0);
 	if (file == NULL){
     log(LOG_SERIAL, false, "Couldn't find %s file vfs_open\n", path);
@@ -497,7 +670,7 @@ fs_node_t* vfs_open(const char* path, const char* mode){
 	if (file->node_type != FT_File){
 		return NULL;
 	}
-  uint32_t flags = 0;
+    uint32_t flags = 0;
 	if (strcmp(mode, "r") == 0){
     flags |= O_RDONLY;
 	}
@@ -508,5 +681,6 @@ fs_node_t* vfs_open(const char* path, const char* mode){
 	return file;
 }
 
+#endif
 
 

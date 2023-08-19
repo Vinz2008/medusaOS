@@ -8,7 +8,7 @@
 
 void enter_user_jmp(uintptr_t location, int argc, char ** argv, uintptr_t stack) {
     // disable interrupts
-    set_kernel_stack()
+    //set_kernel_stack();
     PUSH(stack, uintptr_t, (uintptr_t)argv);
 	PUSH(stack, int, argc);
     asm volatile(

@@ -64,11 +64,11 @@ struct multiboot_tag *tag;
 void kernel_main(uint32_t addr, uint32_t magic) {
 	init_serial();
 	write_serial("LOG START\n");
-  fpu_init();
+    fpu_init();
 	log(LOG_SERIAL, false, "FPU initialized\n");
 	init_pmm(addr);
-  init_paging(addr);
-  vfs_init();
+    init_paging(addr);
+    vfs_init();
 	log(LOG_SERIAL, false, "MedusaOS\n");
 	log(LOG_SERIAL, false, "kernel is %d KiB large\n", ((uint32_t) &KERNEL_SIZE) >> 0);
 	//mb_info = mbd;
@@ -104,7 +104,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
                 set_initrd_address(data);
                 fs_root = initialise_initrd(data);
                 vfs_mount("/", fs_root);
-                vfs_mount("/tmp", fs_root);
+                //vfs_mount("/tmp", fs_root);
                 struct dirent* dir = NULL;
                 int i = 0;
                 while ((dir = readdir_fs(fs_root, i))!=NULL){
