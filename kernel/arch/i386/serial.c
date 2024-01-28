@@ -26,8 +26,7 @@ int init_serial() {
 int serial_received() { return inb(PORT + 5) & 1; }
 
 char read_serial() {
-  while (serial_received() == 0)
-    ;
+  while (serial_received() == 0) {}
 
   return inb(PORT);
 }
@@ -35,8 +34,7 @@ char read_serial() {
 int is_transmit_empty() { return inb(PORT + 5) & 0x20; }
 
 void write_serial_char(char a) {
-  while (is_transmit_empty() == 0)
-    ;
+  while (is_transmit_empty() == 0) {}
 
   outb(PORT, a);
 }
@@ -49,8 +47,9 @@ void write_serial(const char* str) {
 
 void write_serial_with_size(const char* data, size_t length) {
   const unsigned char* bytes = (const unsigned char*)data;
-  for (size_t i = 0; i < length; i++)
+  for (size_t i = 0; i < length; i++) {
     write_serial_char(bytes[i]);
+  }
 }
 
 void write_serialf(const char* restrict format, ...) {

@@ -116,8 +116,9 @@ char* read_rtc_date() {
     year += century * 100;
   } else {
     year += (CURRENT_YEAR / 100) * 100;
-    if (year < CURRENT_YEAR)
+    if (year < CURRENT_YEAR) {
       year += 100;
+    }
   }
   char* str = kmalloc(150 * sizeof(char));
   sprintf(str, "%d:%d:%d %d/%d/%d", hour, minute, second, day, month, year);

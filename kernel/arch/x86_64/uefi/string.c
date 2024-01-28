@@ -33,8 +33,9 @@
 void* memcpy(void* dst, const void* src, size_t n) {
   uint8_t *a = (uint8_t*)dst, *b = (uint8_t*)src;
   if (src && dst && src != dst && n > 0) {
-    while (n--)
+    while (n--) {
       *a++ = *b++;
+    }
   }
   return dst;
 }
@@ -45,11 +46,13 @@ void* memmove(void* dst, const void* src, size_t n) {
     if (a > b && a < b + n) {
       a += n - 1;
       b += n - 1;
-      while (n-- > 0)
+      while (n-- > 0) {
         *a-- = *b--;
+      }
     } else {
-      while (n--)
+      while (n--) {
         *a++ = *b++;
+      }
     }
   }
   return dst;
@@ -58,8 +61,9 @@ void* memmove(void* dst, const void* src, size_t n) {
 void* memset(void* s, int c, size_t n) {
   uint8_t* p = (uint8_t*)s;
   if (s && n > 0) {
-    while (n--)
+    while (n--) {
       *p++ = c;
+    }
   }
   return s;
 }
@@ -68,8 +72,9 @@ int memcmp(const void* s1, const void* s2, size_t n) {
   uint8_t *a = (uint8_t*)s1, *b = (uint8_t*)s2;
   if (s1 && s2 && s1 != s2 && n > 0) {
     while (n--) {
-      if (*a != *b)
+      if (*a != *b) {
         return *a - *b;
+      }
       a++;
       b++;
     }
@@ -80,9 +85,11 @@ int memcmp(const void* s1, const void* s2, size_t n) {
 void* memchr(const void* s, int c, size_t n) {
   uint8_t *e, *p = (uint8_t*)s;
   if (s && n > 0) {
-    for (e = p + n; p < e; p++)
-      if (*p == (uint8_t)c)
+    for (e = p + n; p < e; p++) {
+      if (*p == (uint8_t)c) {
         return p;
+      }
+    }
   }
   return NULL;
 }
@@ -90,21 +97,25 @@ void* memchr(const void* s, int c, size_t n) {
 void* memrchr(const void* s, int c, size_t n) {
   uint8_t *e, *p = (uint8_t*)s;
   if (s && n > 0) {
-    for (e = p + n; p < e; --e)
-      if (*e == (uint8_t)c)
+    for (e = p + n; p < e; --e) {
+      if (*e == (uint8_t)c) {
         return e;
+      }
+    }
   }
   return NULL;
 }
 
 void* memmem(const void* haystack, size_t hl, const void* needle, size_t nl) {
   uint8_t* c = (uint8_t*)haystack;
-  if (!haystack || !needle || !hl || !nl || nl > hl)
+  if (!haystack || !needle || !hl || !nl || nl > hl) {
     return NULL;
+  }
   hl -= nl - 1;
   while (hl) {
-    if (!memcmp(c, needle, nl))
+    if (!memcmp(c, needle, nl)) {
       return c;
+    }
     c++;
     hl--;
   }
@@ -113,13 +124,15 @@ void* memmem(const void* haystack, size_t hl, const void* needle, size_t nl) {
 
 void* memrmem(const void* haystack, size_t hl, const void* needle, size_t nl) {
   uint8_t* c = (uint8_t*)haystack;
-  if (!haystack || !needle || !hl || !nl || nl > hl)
+  if (!haystack || !needle || !hl || !nl || nl > hl) {
     return NULL;
+  }
   hl -= nl;
   c += hl;
   while (hl) {
-    if (!memcmp(c, needle, nl))
+    if (!memcmp(c, needle, nl)) {
       return c;
+    }
     c--;
     hl--;
   }
@@ -200,16 +213,18 @@ int strncmp(const char_t* s1, const char_t* s2, size_t n) {
 char_t* strdup(const char_t* s) {
   int i = (strlen(s) + 1) * sizeof(char_t);
   char_t* s2 = (char_t*)malloc(i);
-  if (s2 != NULL)
+  if (s2 != NULL) {
     memcpy(s2, (void*)s, i);
+  }
   return s2;
 }
 
 char_t* strchr(const char_t* s, int c) {
   if (s) {
     while (*s) {
-      if (*s == (char_t)c)
+      if (*s == (char_t)c) {
         return (char_t*)s;
+      }
       s++;
     }
   }
@@ -221,8 +236,9 @@ char_t* strrchr(const char_t* s, int c) {
   if (s) {
     e = (char_t*)s + strlen(s) - 1;
     while (s <= e) {
-      if (*e == (char_t)c)
+      if (*e == (char_t)c) {
         return e;
+      }
       e--;
     }
   }
@@ -238,13 +254,15 @@ char_t* _strtok_r(char_t* s, const char_t* d, char_t** p) {
   int c, sc;
   char_t *tok, *sp;
 
-  if (d == NULL || (s == NULL && (s = *p) == NULL))
+  if (d == NULL || (s == NULL && (s = *p) == NULL)) {
     return NULL;
+  }
 again:
   c = *s++;
   for (sp = (char_t*)d; (sc = *sp++) != 0;) {
-    if (c == sc)
+    if (c == sc) {
       goto again;
+    }
   }
 
   if (c == 0) {
@@ -257,10 +275,11 @@ again:
     sp = (char_t*)d;
     do {
       if ((sc = *sp++) == c) {
-        if (c == 0)
+        if (c == 0) {
           s = NULL;
-        else
+        } else {
           *(s - 1) = 0;
+        }
         *p = s;
         return tok;
       }
@@ -281,8 +300,9 @@ char_t* strtok_r(char_t* s, const char_t* delim, char_t** ptr) {
 size_t strlen(const char_t* __s) {
   size_t ret;
 
-  if (!__s)
+  if (!__s) {
     return 0;
+  }
   for (ret = 0; __s[ret]; ret++)
     ;
   return ret;

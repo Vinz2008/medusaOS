@@ -12,11 +12,13 @@ int sprintf(char* string, const char* format, ...) {
     size_t maxrem = INT_MAX - written;
 
     if (format[0] != '%' || format[1] == '%') {
-      if (format[0] == '%')
+      if (format[0] == '%') {
         format++;
+      }
       size_t amount = 1;
-      while (format[amount] && format[amount] != '%')
+      while (format[amount] && format[amount] != '%') {
         amount++;
+      }
       if (maxrem < amount) {
         // TODO: Set errno to EOVERFLOW.
         return -1;

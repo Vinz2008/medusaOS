@@ -100,8 +100,9 @@ pci_device_t pci_find_any(uint8_t class_code, uint8_t subclass_code,
         if (read_class(bus, slot, func) == class_code &&
             read_subclass(bus, slot, func) == subclass_code) {
           if (interface_value != -1 &&
-              read_prog_if(bus, slot, func) != interface_value)
+              read_prog_if(bus, slot, func) != interface_value) {
             continue;
+          }
           init_dev(&dev, bus, slot, func);
           return dev;
         }

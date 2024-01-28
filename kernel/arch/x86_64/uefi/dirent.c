@@ -35,8 +35,9 @@ struct dirent __dirent;
 
 DIR* opendir(const char_t* __name) {
   DIR* dp = (DIR*)fopen(__name, CL("rd"));
-  if (dp)
+  if (dp) {
     rewinddir(dp);
+  }
   return dp;
 }
 
@@ -47,10 +48,11 @@ struct dirent* readdir(DIR* __dirp) {
   memset(&__dirent, 0, sizeof(struct dirent));
   status = __dirp->Read(__dirp, &bs, &info);
   if (EFI_ERROR(status) || !bs) {
-    if (EFI_ERROR(status))
+    if (EFI_ERROR(status)) {
       __stdio_seterrno(status);
-    else
+    } else {
       errno = 0;
+    }
     return NULL;
   }
   __dirent.d_type = info.Attribute & EFI_FILE_DIRECTORY ? DT_DIR : DT_REG;
@@ -65,8 +67,9 @@ struct dirent* readdir(DIR* __dirp) {
 }
 
 void rewinddir(DIR* __dirp) {
-  if (__dirp)
+  if (__dirp) {
     __dirp->SetPosition(__dirp, 0);
+  }
 }
 
 int closedir(DIR* __dirp) { return fclose((FILE*)__dirp); }

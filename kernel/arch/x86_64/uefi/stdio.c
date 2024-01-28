@@ -38,8 +38,9 @@ extern time_t __mktime_efi(efi_time_t* t);
 
 void __stdio_cleanup() {
 #ifndef UEFI_NO_UTF8
-  if (__argvutf8)
+  if (__argvutf8) {
     BS->FreePool(__argvutf8);
+  }
 #endif
   if (__blk_devs) {
     free(__blk_devs);
@@ -95,7 +96,7 @@ int fstat(FILE* __f, struct stat* __buf) {
     __buf->st_mode = S_IREAD | S_IWRITE | S_IFCHR;
     return 0;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__f == (FILE*)__blk_devs[i].bio) {
       __buf->st_mode = S_IREAD | S_IWRITE | S_IFBLK;
       __buf->st_size = (off_t)__blk_devs[i].bio->Media->BlockSize *
@@ -103,6 +104,7 @@ int fstat(FILE* __f, struct stat* __buf) {
       __buf->st_blocks = __blk_devs[i].bio->Media->LastBlock + 1;
       return 0;
     }
+  }
   status = __f->GetInfo(__f, &infGuid, &fsiz, &info);
   if (EFI_ERROR(status)) {
     __stdio_seterrno(status);
@@ -130,9 +132,11 @@ int fclose(FILE* __stream) {
       (__ser && __stream == (FILE*)__ser)) {
     return 1;
   }
-  for (i = 0; i < __blk_ndevs; i++)
-    if (__stream == (FILE*)__blk_devs[i].bio)
+  for (i = 0; i < __blk_ndevs; i++) {
+    if (__stream == (FILE*)__blk_devs[i].bio) {
       return 1;
+    }
+  }
   status = __stream->Close(__stream);
   free(__stream);
   return !EFI_ERROR(status);
@@ -149,10 +153,11 @@ int fflush(FILE* __stream) {
       (__ser && __stream == (FILE*)__ser)) {
     return 1;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__stream == (FILE*)__blk_devs[i].bio) {
       return 1;
     }
+  }
   status = __stream->Flush(__stream);
   return !EFI_ERROR(status);
 }
@@ -165,22 +170,25 @@ int __remove(const char_t* __filename, int isdir) {
   /* little hack to support read and write mode for Delete() and stat() without
    * create mode or checks */
   FILE* f = fopen(__filename, CL("*"));
-  if (errno)
+  if (errno) {
     return 1;
+  }
   if (!f || f == stdin || f == stdout || f == stderr ||
       (__ser && f == (FILE*)__ser)) {
     errno = EBADF;
     return 1;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (f == (FILE*)__blk_devs[i].bio) {
       errno = EBADF;
       return 1;
     }
+  }
   if (isdir != -1) {
     status = f->GetInfo(f, &infGuid, &fsiz, &info);
-    if (EFI_ERROR(status))
+    if (EFI_ERROR(status)) {
       goto err;
+    }
     if (isdir == 0 && (info.Attribute & EFI_FILE_DIRECTORY)) {
       fclose(f);
       errno = EISDIR;
@@ -273,46 +281,53 @@ FILE* fopen(const char_t* __filename, const char_t* __modes) {
         handle_size /= (uintn_t)sizeof(efi_handle_t);
         /* workaround a bug in TianoCore, it reports zero size even though the
          * data is in the buffer */
-        if (handle_size < 1)
+        if (handle_size < 1) {
           handle_size = (uintn_t)sizeof(handles) / sizeof(efi_handle_t);
+        }
         __blk_devs = (block_file_t*)malloc(handle_size * sizeof(block_file_t));
         if (__blk_devs) {
           memset(__blk_devs, 0, handle_size * sizeof(block_file_t));
-          for (i = __blk_ndevs = 0; i < handle_size; i++)
+          for (i = __blk_ndevs = 0; i < handle_size; i++) {
             if (handles[i] &&
                 !EFI_ERROR(
                     BS->HandleProtocol(handles[i], &bioGuid,
                                        (void**)&__blk_devs[__blk_ndevs].bio)) &&
                 __blk_devs[__blk_ndevs].bio &&
                 __blk_devs[__blk_ndevs].bio->Media &&
-                __blk_devs[__blk_ndevs].bio->Media->BlockSize > 0)
+                __blk_devs[__blk_ndevs].bio->Media->BlockSize > 0) {
               __blk_ndevs++;
-        } else
+            }
+          }
+        } else {
           __blk_ndevs = 0;
+        }
       }
     }
-    if (__blk_ndevs && par >= 0 && par < __blk_ndevs)
+    if (__blk_ndevs && par >= 0 && par < __blk_ndevs) {
       return (FILE*)__blk_devs[par].bio;
+    }
     errno = ENOENT;
     return NULL;
   }
   if (!__root_dir && LIP) {
     status = BS->HandleProtocol(LIP->DeviceHandle, &sfsGuid, (void**)&sfs);
-    if (!EFI_ERROR(status))
+    if (!EFI_ERROR(status)) {
       status = sfs->OpenVolume(sfs, &__root_dir);
+    }
   }
   if (!__root_dir) {
     errno = ENODEV;
     return NULL;
   }
   ret = (FILE*)malloc(sizeof(FILE));
-  if (!ret)
+  if (!ret) {
     return NULL;
-    /* normally write means read,write,create. But for remove (internal '*'
-     * mode), we need read,write without create also mode 'w' in POSIX means
-     * write-only (without read), but that's not working on certain firmware, we
-     * must pass read too. This poses a problem of truncating a write-only file,
-     * see issue #26, we have to do that manually */
+  }
+  /* normally write means read,write,create. But for remove (internal '*'
+   * mode), we need read,write without create also mode 'w' in POSIX means
+   * write-only (without read), but that's not working on certain firmware, we
+   * must pass read too. This poses a problem of truncating a write-only file,
+   * see issue #26, we have to do that manually */
 #ifndef UEFI_NO_UTF8
   mbstowcs((wchar_t*)&wcname, __filename, BUFSIZ - 1);
   status = __root_dir->Open(
@@ -333,11 +348,13 @@ FILE* fopen(const char_t* __filename, const char_t* __modes) {
     free(ret);
     return NULL;
   }
-  if (__modes[0] == CL('*'))
+  if (__modes[0] == CL('*')) {
     return ret;
+  }
   status = ret->GetInfo(ret, &infGuid, &fsiz, &info);
-  if (EFI_ERROR(status))
+  if (EFI_ERROR(status)) {
     goto err;
+  }
   if (__modes[1] == CL('d') && !(info.Attribute & EFI_FILE_DIRECTORY)) {
     ret->Close(ret);
     free(ret);
@@ -350,8 +367,9 @@ FILE* fopen(const char_t* __filename, const char_t* __modes) {
     errno = EISDIR;
     return NULL;
   }
-  if (__modes[0] == CL('a'))
+  if (__modes[0] == CL('a')) {
     fseek(ret, 0, SEEK_END);
+  }
   if (__modes[0] == CL('w')) {
     /* manually truncate file size
      * See
@@ -377,7 +395,7 @@ size_t fread(void* __ptr, size_t __size, size_t __n, FILE* __stream) {
   if (__ser && __stream == (FILE*)__ser) {
     status = __ser->Read(__ser, &bs, __ptr);
   } else {
-    for (i = 0; i < __blk_ndevs; i++)
+    for (i = 0; i < __blk_ndevs; i++) {
       if (__stream == (FILE*)__blk_devs[i].bio) {
         n = __blk_devs[i].offset / __blk_devs[i].bio->Media->BlockSize;
         bs = (bs / __blk_devs[i].bio->Media->BlockSize) *
@@ -391,6 +409,7 @@ size_t fread(void* __ptr, size_t __size, size_t __n, FILE* __stream) {
         __blk_devs[i].offset += bs;
         return bs / __size;
       }
+    }
     status = __stream->Read(__stream, &bs, __ptr);
   }
   if (EFI_ERROR(status)) {
@@ -414,7 +433,7 @@ size_t fwrite(const void* __ptr, size_t __size, size_t __n, FILE* __stream) {
   if (__ser && __stream == (FILE*)__ser) {
     status = __ser->Write(__ser, &bs, (void*)__ptr);
   } else {
-    for (i = 0; i < __blk_ndevs; i++)
+    for (i = 0; i < __blk_ndevs; i++) {
       if (__stream == (FILE*)__blk_devs[i].bio) {
         n = __blk_devs[i].offset / __blk_devs[i].bio->Media->BlockSize;
         bs = (bs / __blk_devs[i].bio->Media->BlockSize) *
@@ -429,6 +448,7 @@ size_t fwrite(const void* __ptr, size_t __size, size_t __n, FILE* __stream) {
         __blk_devs[i].offset += bs;
         return bs / __size;
       }
+    }
     status = __stream->Write(__stream, &bs, (void*)__ptr);
   }
   if (EFI_ERROR(status)) {
@@ -457,7 +477,7 @@ int fseek(FILE* __stream, long int __off, int __whence) {
     errno = EBADF;
     return -1;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__stream == (FILE*)__blk_devs[i].bio) {
       off = (uint64_t)__blk_devs[i].bio->Media->BlockSize *
             (uint64_t)__blk_devs[i].bio->Media->LastBlock;
@@ -472,15 +492,18 @@ int fseek(FILE* __stream, long int __off, int __whence) {
         __blk_devs[i].offset = __off;
         break;
       }
-      if (__blk_devs[i].offset < 0)
+      if (__blk_devs[i].offset < 0) {
         __blk_devs[i].offset = 0;
-      if (__blk_devs[i].offset > off)
+      }
+      if (__blk_devs[i].offset > off) {
         __blk_devs[i].offset = off;
+      }
       __blk_devs[i].offset =
           (__blk_devs[i].offset / __blk_devs[i].bio->Media->BlockSize) *
           __blk_devs[i].bio->Media->BlockSize;
       return 0;
     }
+  }
   switch (__whence) {
   case SEEK_END:
     status = __stream->GetInfo(__stream, &infoGuid, &fsiz, &info);
@@ -519,10 +542,11 @@ long int ftell(FILE* __stream) {
     errno = EBADF;
     return -1;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__stream == (FILE*)__blk_devs[i].bio) {
       return (long int)__blk_devs[i].offset;
     }
+  }
   status = __stream->GetPosition(__stream, &off);
   return EFI_ERROR(status) ? -1 : (long int)off;
 }
@@ -545,13 +569,14 @@ int feof(FILE* __stream) {
     errno = EBADF;
     return 0;
   }
-  for (i = 0; i < __blk_ndevs; i++)
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__stream == (FILE*)__blk_devs[i].bio) {
       errno = EBADF;
       return __blk_devs[i].offset ==
              (off_t)__blk_devs[i].bio->Media->BlockSize *
                  (off_t)__blk_devs[i].bio->Media->LastBlock;
     }
+  }
   status = __stream->GetPosition(__stream, &off);
   if (EFI_ERROR(status)) {
   err:
@@ -559,8 +584,9 @@ int feof(FILE* __stream) {
     return 1;
   }
   status = __stream->GetInfo(__stream, &infGuid, &fsiz, &info);
-  if (EFI_ERROR(status))
+  if (EFI_ERROR(status)) {
     goto err;
+  }
   __stream->SetPosition(__stream, off);
   return info.FileSize == off;
 }
@@ -579,26 +605,30 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
 #ifdef UEFI_NO_UTF8
   char* c;
 #endif
-  if (dst == NULL || fmt == NULL)
+  if (dst == NULL || fmt == NULL) {
     return 0;
+  }
 
   arg = 0;
   while (*fmt && dst < end) {
     if (*fmt == CL('%')) {
       fmt++;
-      if (*fmt == CL('%'))
+      if (*fmt == CL('%')) {
         goto put;
+      }
       len = 0;
       pad = CL(' ');
-      if (*fmt == CL('0'))
+      if (*fmt == CL('0')) {
         pad = CL('0');
+      }
       while (*fmt >= CL('0') && *fmt <= CL('9')) {
         len *= 10;
         len += *fmt - CL('0');
         fmt++;
       }
-      if (*fmt == CL('l'))
+      if (*fmt == CL('l')) {
         fmt++;
+      }
       if (*fmt == CL('c')) {
         arg = __builtin_va_arg(args, uint32_t);
 #ifndef UEFI_NO_UTF8
@@ -703,8 +733,9 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
               break;
             }
           } else {
-            if (*p == CL('\n') && (orig == dst || *(dst - 1) != CL('\r')))
+            if (*p == CL('\n') && (orig == dst || *(dst - 1) != CL('\r'))) {
               *dst++ = CL('\r');
+            }
             *dst++ = *p++;
           }
         }
@@ -712,8 +743,9 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
 #ifdef UEFI_NO_UTF8
           if (*fmt == L'S' || *fmt == L'Q') {
         c = __builtin_va_arg(args, char*);
-        if (c == NULL)
+        if (c == NULL) {
           goto copystring;
+        }
         while (*p && dst + 2 < end) {
           arg = *c;
           if ((*c & 128) != 0) {
@@ -728,11 +760,13 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
               arg = ((*c & 0x7) << 18) | ((*(c + 1) & 0x3F) << 12) |
                     ((*(c + 2) & 0x3F) << 6) | (*(c + 3) & 0x3F);
               c += 3;
-            } else
+            } else {
               arg = L'?';
+            }
           }
-          if (!arg)
+          if (!arg) {
             break;
+          }
           if (*fmt == L'Q' && needsescape(arg)) {
             *dst++ = L'\\';
             switch (arg) {
@@ -765,8 +799,9 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
               break;
             }
           } else {
-            if (arg == L'\n')
+            if (arg == L'\n') {
               *dst++ = L'\r';
+            }
             *dst++ = (wchar_t)(arg & 0xffff);
           }
         }
@@ -778,50 +813,61 @@ int vsnprintf(char_t* dst, size_t maxlen, const char_t* fmt,
           for (i = 44; i >= 0; i -= 4) {
             n = (m >> i) & 15;
             *dst++ = n + (n > 9 ? 0x37 : 0x30);
-            if (dst >= end)
+            if (dst >= end) {
               goto zro;
+            }
           }
           *dst++ = CL(':');
-          if (dst >= end)
+          if (dst >= end) {
             goto zro;
+          }
           *dst++ = CL(' ');
-          if (dst >= end)
+          if (dst >= end) {
             goto zro;
+          }
           mem = (uint8_t*)m;
           for (i = 0; i < 16; i++) {
             n = (mem[i] >> 4) & 15;
             *dst++ = n + (n > 9 ? 0x37 : 0x30);
-            if (dst >= end)
+            if (dst >= end) {
               goto zro;
+            }
             n = mem[i] & 15;
             *dst++ = n + (n > 9 ? 0x37 : 0x30);
-            if (dst >= end)
+            if (dst >= end) {
               goto zro;
+            }
             *dst++ = CL(' ');
-            if (dst >= end)
+            if (dst >= end) {
               goto zro;
+            }
           }
           *dst++ = CL(' ');
-          if (dst >= end)
+          if (dst >= end) {
             goto zro;
+          }
           for (i = 0; i < 16; i++) {
             *dst++ = (mem[i] < 32 || mem[i] >= 127 ? CL('.') : mem[i]);
-            if (dst >= end)
+            if (dst >= end) {
               goto zro;
+            }
           }
           *dst++ = CL('\r');
-          if (dst >= end)
+          if (dst >= end) {
             goto zro;
+          }
           *dst++ = CL('\n');
-          if (dst >= end)
+          if (dst >= end) {
             goto zro;
+          }
           m += 16;
         }
       }
     } else {
     put:
-      if (*fmt == CL('\n') && (orig == dst || *(dst - 1) != CL('\r')))
+      if (*fmt == CL('\n') && (orig == dst || *(dst - 1) != CL('\r'))) {
         *dst++ = CL('\r');
+      }
       *dst++ = *fmt;
     }
     fmt++;
@@ -887,18 +933,20 @@ int vfprintf(FILE* __stream, const char_t* __format, __builtin_va_list args) {
 #else
   ret = vsnprintf(dst, BUFSIZ, __format, args);
 #endif
-  if (ret < 1 || !__stream || __stream == stdin)
+  if (ret < 1 || !__stream || __stream == stdin) {
     return 0;
-  for (i = 0; i < __blk_ndevs; i++)
+  }
+  for (i = 0; i < __blk_ndevs; i++) {
     if (__stream == (FILE*)__blk_devs[i].bio) {
       errno = EBADF;
       return -1;
     }
-  if (__stream == stdout)
+  }
+  if (__stream == stdout) {
     ST->ConOut->OutputString(ST->ConOut, (wchar_t*)&dst);
-  else if (__stream == stderr)
+  } else if (__stream == stderr) {
     ST->StdErr->OutputString(ST->StdErr, (wchar_t*)&dst);
-  else if (__ser && __stream == (FILE*)__ser) {
+  } else if (__ser && __stream == (FILE*)__ser) {
 #ifdef UEFI_NO_UTF8
     wcstombs((char*)&tmp, dst, BUFSIZ - 1);
 #endif

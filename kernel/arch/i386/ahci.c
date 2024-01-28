@@ -6,10 +6,12 @@ static int check_type(hba_port* port) {
   uint32_t ssts = port->ssts;
   uint8_t ipm = (ssts >> 8) & 0x0F;
   uint8_t det = ssts & 0x0F;
-  if (det != HBA_PORT_DET_PRESENT) // Check drive status
+  if (det != HBA_PORT_DET_PRESENT) { // Check drive status
     return AHCI_DEV_NULL;
-  if (ipm != HBA_PORT_IPM_ACTIVE)
+  }
+  if (ipm != HBA_PORT_IPM_ACTIVE) {
     return AHCI_DEV_NULL;
+  }
   switch (port->sig) {
   case SATA_SIG_ATAPI:
     return AHCI_DEV_SATAPI;

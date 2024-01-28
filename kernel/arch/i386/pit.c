@@ -53,8 +53,9 @@ void pit_sleep(uint64_t t) {
   uint64_t rest_ticks = ticks + t;
   log(LOG_SERIAL, false, "ticks : %d\n", ticks);
   log(LOG_SERIAL, false, "rest_ticks : %d\n", rest_ticks);
-  while (ticks < rest_ticks)
+  while (ticks < rest_ticks) {
     log(LOG_SERIAL, false, "ticks in loop : %d\n", ticks);
+  }
 }
 
 void sys_tick_handler(registers_t* frame) {

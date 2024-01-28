@@ -3,7 +3,6 @@
 #include <kernel/paging.h>
 #include <kernel/pmm.h>
 #include <kernel/proc.h>
-#include <kernel/scheduler.h>
 #include <kernel/x86.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +11,7 @@
 
 extern uint32_t irq_handler_end;
 process_t* current_process = NULL;
-scheduler_t* scheduler = NULL;
+// scheduler_t* scheduler = NULL;
 static uint32_t next_pid = 1;
 
 void init_proc() {
@@ -151,7 +150,7 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc) {
         [jmp] "r" (jmp)
       : "%eax", "%ebx"
   );*/
-  scheduler->sched_add(scheduler, process);
+  // scheduler->sched_add(scheduler, process);
 
   return process;
 }
@@ -159,13 +158,13 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc) {
 void proc_enter_usermode() {
   x86_disable_int(); // Interrupts will be reenabled by `iret`
 
-  current_process = scheduler->sched_get_current(scheduler);
+  /*current_process = scheduler->sched_get_current(scheduler);
 
   if (!current_process) {
     printf("no process to run\n");
     abort();
   }
-  paging_switch_directory(current_process->directory);
+  paging_switch_directory(current_process->directory);*/
 
   /*asm volatile (
       "mov $0x23, %%eax\n"

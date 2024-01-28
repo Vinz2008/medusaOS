@@ -56,8 +56,9 @@ static __inline void swapfunc(char*, char*, int, int);
              : es == sizeof(long)                                      ? 0     \
                                                                        : 1;
 static __inline void swapfunc(char* a, char* b, int n, int swaptype) {
-  if (swaptype <= 1)
+  if (swaptype <= 1) {
     swapcode(long, a, b, n) else swapcode(char, a, b, n)
+  }
 }
 #define swap(a, b)                                                             \
   if (swaptype == 0) {                                                         \
@@ -82,9 +83,11 @@ loop:
   SWAPINIT(a, es);
   swap_cnt = 0;
   if (n < 7) {
-    for (pm = (char*)a + es; pm < (char*)a + n * es; pm += es)
-      for (pl = pm; pl > (char*)a && cmp(pl - es, pl) > 0; pl -= es)
+    for (pm = (char*)a + es; pm < (char*)a + n * es; pm += es) {
+      for (pl = pm; pl > (char*)a && cmp(pl - es, pl) > 0; pl -= es) {
         swap(pl, pl - es);
+      }
+    }
     return;
   }
   pm = (char*)a + (n / 2) * es;
@@ -120,17 +123,20 @@ loop:
       }
       pc -= es;
     }
-    if (pb > pc)
+    if (pb > pc) {
       break;
+    }
     swap(pb, pc);
     swap_cnt = 1;
     pb += es;
     pc -= es;
   }
   if (swap_cnt == 0) { /* Switch to insertion sort */
-    for (pm = (char*)a + es; pm < (char*)a + n * es; pm += es)
-      for (pl = pm; pl > (char*)a && cmp(pl - es, pl) > 0; pl -= es)
+    for (pm = (char*)a + es; pm < (char*)a + n * es; pm += es) {
+      for (pl = pm; pl > (char*)a && cmp(pl - es, pl) > 0; pl -= es) {
         swap(pl, pl - es);
+      }
+    }
     return;
   }
   pn = (char*)a + n * es;
@@ -138,8 +144,9 @@ loop:
   vecswap(a, pb - r, r);
   r = min(pd - pc, pn - pd - (int)es);
   vecswap(pb, pn - r, r);
-  if ((r = pb - pa) > (int)es)
+  if ((r = pb - pa) > (int)es) {
     qsort(a, r / es, es, cmp);
+  }
   if ((r = pd - pc) > (int)es) {
     /* Iterate rather than recurse to save stack space */
     a = pn - r;

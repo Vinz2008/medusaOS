@@ -15,21 +15,24 @@ static inline Elf32_Shdr* elf_section(Elf32_Ehdr* header, int idx) {
 }
 
 static inline char* elf_str_table(Elf32_Ehdr* header) {
-  if (header->e_shstrndx == SHN_UNDEF)
+  if (header->e_shstrndx == SHN_UNDEF) {
     return NULL;
+  }
   return (char*)header + elf_section(header, header->e_shstrndx)->sh_offset;
 }
 
 static inline char* elf_lookup_string(Elf32_Ehdr* header, int offset) {
   char* strtab = elf_str_table(header);
-  if (strtab == NULL)
+  if (strtab == NULL) {
     return NULL;
+  }
   return strtab + offset;
 }
 
 bool elf_check_file(Elf32_Ehdr* header) {
-  if (!header)
+  if (!header) {
     return false;
+  }
   if (header->e_ident[EI_MAG0] != ELFMAG0) {
     log(LOG_SERIAL, false, "ERROR : ELF Header EI_MAG0 incorrect.\n");
     return false;
@@ -82,8 +85,9 @@ void* elf_lookup_symbol(const char* name) {
 }
 
 static int elf_get_symval(Elf32_Ehdr* header, int table, uint8_t idx) {
-  if (table == SHN_UNDEF || idx == SHN_UNDEF)
+  if (table == SHN_UNDEF || idx == SHN_UNDEF) {
     return 0;
+  }
   Elf32_Shdr* symtab = elf_section(header, table);
   uint32_t symtab_entries = symtab->sh_size / symtab->sh_entsize;
   if (idx >= symtab_entries) {
@@ -133,8 +137,9 @@ static int elf_load_stage1(Elf32_Ehdr* header) {
     // If the section isn't present in the file
     if (section->sh_type == SHT_NOBITS) {
       // Skip if it the section is empty
-      if (!section->sh_size)
+      if (!section->sh_size) {
         continue;
+      }
       // If the section should appear in memory
       if (section->sh_flags & SHF_ALLOC) {
         // Allocate and zero some memory
@@ -200,8 +205,9 @@ int elf_do_reloc(Elf32_Ehdr* header, Elf32_Rel* rel, Elf32_Shdr* reltab) {
   int symval = 0;
   if (ELF32_R_SYM(rel->r_info) != SHN_UNDEF) {
     symval = elf_get_symval(header, reltab->sh_link, ELF32_R_SYM(rel->r_info));
-    if (symval == ELF_RELOC_ERR)
+    if (symval == ELF_RELOC_ERR) {
       return ELF_RELOC_ERR;
+    }
   }
   // Relocate based on type
   switch (ELF32_R_TYPE(rel->r_info)) {

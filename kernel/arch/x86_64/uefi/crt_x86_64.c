@@ -194,8 +194,9 @@ efi_status_t uefi_init(
   if (!image || !systab || !systab->BootServices ||
       !systab->BootServices->HandleProtocol ||
       !systab->BootServices->OpenProtocol ||
-      !systab->BootServices->AllocatePool || !systab->BootServices->FreePool)
+      !systab->BootServices->AllocatePool || !systab->BootServices->FreePool) {
     return EFI_UNSUPPORTED;
+  }
   /* save EFI pointers and loaded image into globals */
   IM = image;
   ST = systab;
@@ -221,9 +222,11 @@ efi_status_t uefi_init(
 #ifndef UEFI_NO_UTF8
   if (argc && argv) {
     ret = (argc + 1) * (sizeof(uintptr_t) + 1);
-    for (i = 0; i < argc; i++)
-      for (j = 0; argv[i] && argv[i][j]; j++)
+    for (i = 0; i < argc; i++) {
+      for (j = 0; argv[i] && argv[i][j]; j++) {
         ret += argv[i][j] < 0x80 ? 1 : (argv[i][j] < 0x800 ? 2 : 3);
+      }
+    }
     status = BS->AllocatePool(LIP ? LIP->ImageDataType : EfiLoaderData, ret,
                               (void**)&__argvutf8);
     if (EFI_ERROR(status) || !__argvutf8) {
@@ -252,8 +255,9 @@ efi_status_t uefi_init(
     }
   }
   ret = main(argc, (char**)__argvutf8);
-  if (__argvutf8)
+  if (__argvutf8) {
     BS->FreePool(__argvutf8);
+  }
 #else
   ret = main(argc, argv);
 #endif

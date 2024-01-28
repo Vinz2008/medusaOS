@@ -58,8 +58,9 @@ unsigned int getsize(const char* in) {
   unsigned int size = 0;
   unsigned int j;
   unsigned int count = 1;
-  for (j = 11; j > 0; j--, count *= 8)
+  for (j = 11; j > 0; j--, count *= 8) {
     size += ((in[j - 1] - '0') * count);
+  }
   return size;
 }
 
@@ -68,14 +69,16 @@ void generate_list_files_initrd(unsigned int address) {
   unsigned int i;
   for (i = 0;; i++) {
     struct tar_header* header = (struct tar_header*)address;
-    if (header->filename[0] == '\0')
+    if (header->filename[0] == '\0') {
       break;
+    }
     write_serialf("filename %i : %s\n", i, header->filename);
     unsigned int size = getsize(header->size);
     add_header_list(&list_headers, header);
     address += ((size / 512) + 1) * 512;
-    if (size % 512)
+    if (size % 512) {
       address += 512;
+    }
   }
 }
 
@@ -83,13 +86,15 @@ unsigned int initrd_get_number_files(unsigned int address) {
   unsigned int i;
   for (i = 0;; i++) {
     struct tar_header* header = (struct tar_header*)address;
-    if (header->filename[0] == '\0')
+    if (header->filename[0] == '\0') {
       break;
+    }
     write_serialf("filename %i : %s\n", i, header->filename);
     unsigned int size = getsize(header->size);
     address += ((size / 512) + 1) * 512;
-    if (size % 512)
+    if (size % 512) {
       address += 512;
+    }
   }
   return i;
 }
@@ -98,13 +103,15 @@ void initrd_list_filenames(unsigned int address) {
   unsigned int i = 0;
   while (i <= initrd_get_number_files(address)) {
     struct tar_header* header = (struct tar_header*)address;
-    if (header->filename[0] == '\0')
+    if (header->filename[0] == '\0') {
       break;
+    }
     printf("\nfilename [%i] : %s\n", i, header->filename);
     unsigned int size = getsize(header->size);
     address += ((size / 512) + 1) * 512;
-    if (size % 512)
+    if (size % 512) {
       address += 512;
+    }
     i++;
   }
 }
@@ -178,13 +185,16 @@ static struct dirent* initrd_readdir(fs_node_t* dir, uint32_t index) {
 }
 
 static fs_node_t* initrd_finddir(fs_node_t* node, char* name) {
-  if (node == initrd_root && !strcmp(name, "dev"))
+  if (node == initrd_root && !strcmp(name, "dev")) {
     return initrd_dev;
+  }
 
   int i;
-  for (i = 0; i < nroot_nodes; i++)
-    if (!strcmp(name, root_nodes[i].name))
+  for (i = 0; i < nroot_nodes; i++) {
+    if (!strcmp(name, root_nodes[i].name)) {
       return &root_nodes[i];
+    }
+  }
   return NULL;
 }
 

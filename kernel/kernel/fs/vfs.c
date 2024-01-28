@@ -445,17 +445,18 @@ uint32_t read_fs(fs_node_t* node, uint32_t offset, uint32_t size,
     log(LOG_SERIAL, false, "NULL in read_fs\n");
     return;
   }
-  if (node->read != 0)
+  if (node->read != 0) {
     return node->read(node, offset, size, buffer);
-  else
+  } else {
     return 0;
+  }
 }
 
 void open_fs(fs_node_t* node, uint32_t flags) {
   // Has the node got a read callback?
-  if (node->open != 0)
+  if (node->open != 0) {
     return node->open(node);
-  else {
+  } else {
     node->mode = flags;
   }
 }
@@ -465,20 +466,22 @@ void close_fs(fs_node_t* node) {
   if (node == NULL) {
     return;
   }
-  if (node->close != 0)
+  if (node->close != 0) {
     return node->close(node);
-  else
+  } else {
     node->mode = 0;
+  }
   // return;
 }
 
 uint32_t write_fs(fs_node_t* node, uint32_t offset, uint32_t size,
                   uint8_t* buffer) {
   // Has the node got a read callback?
-  if (node->write != 0)
+  if (node->write != 0) {
     return node->write(node, offset, size, buffer);
-  else
+  } else {
     return 0;
+  }
 }
 
 // TODO : remove index at some point in args or create wrapper to be compatible
@@ -503,10 +506,11 @@ struct dirent* readdir_fs(fs_node_t* node, uint32_t index) {
 
 fs_node_t* finddir_fs(fs_node_t* node, char* name) {
   // Is the node a directory, and does it have a callback?
-  if ((node->flags & 0x7) == FS_DIRECTORY && node->finddir != 0)
+  if ((node->flags & 0x7) == FS_DIRECTORY && node->finddir != 0) {
     return node->finddir(node, name);
-  else
+  } else {
     return 0;
+  }
 }
 
 fs_node_t* fs_get_root_node() { return fs_root; }
@@ -515,8 +519,9 @@ uint32_t vfs_get_depth(const char* path) {
   uint32_t depth = 0;
 
   for (size_t i = 0; path[i] != '\0'; ++i) {
-    if (path[i] == '/')
+    if (path[i] == '/') {
       ++depth;
+    }
   }
 
   return depth;

@@ -149,13 +149,14 @@ void kernel_main(uint32_t addr, uint32_t magic) {
            (multiboot_uint8_t*)mmap < (multiboot_uint8_t*)tag + tag->size;
            mmap = (multiboot_memory_map_t*)((unsigned long)mmap +
                                             ((struct multiboot_tag_mmap*)tag)
-                                                ->entry_size))
+                                                ->entry_size)) {
         log(LOG_SERIAL, false,
             " base_addr = %x%x,"
             " length = %x%x, type = %x\n",
             (unsigned)(mmap->addr >> 32), (unsigned)(mmap->addr & 0xffffffff),
             (unsigned)(mmap->len >> 32), (unsigned)(mmap->len & 0xffffffff),
             (unsigned)mmap->type);
+      }
     } break;
     case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {
       multiboot_uint32_t color;
@@ -322,9 +323,9 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   initTasking();
   log(LOG_SERIAL, false, "Cooperative multitasking initialized\n");
   test_switch_task();
-  init_proc();
-  log(LOG_SERIAL, false, "scheduler initialized\n");
-  // syscall_c(SYS_READ, 0, 0, 0);
+  // init_proc();
+  //  log(LOG_SERIAL, false, "scheduler initialized\n");
+  //   syscall_c(SYS_READ, 0, 0, 0);
   /*char buf[15];
   strcpy(buf, "test syscall\n");
   for (int i = 0; i < strlen(buf); i++){

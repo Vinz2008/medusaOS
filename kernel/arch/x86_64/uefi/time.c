@@ -41,15 +41,18 @@ uint64_t __year_to_secs(uint64_t year, int* is_leap) {
     leaps = (y - 68) >> 2;
     if (!((y - 68) & 3)) {
       leaps--;
-      if (is_leap)
+      if (is_leap) {
         *is_leap = 1;
-    } else if (is_leap)
+      }
+    } else if (is_leap) {
       *is_leap = 0;
+    }
     return 31536000 * (y - 70) + 86400 * leaps;
   }
 
-  if (!is_leap)
+  if (!is_leap) {
     is_leap = &(int){0};
+  }
   cycles = (year - 100) / 400;
   rem = (year - 100) % 400;
   if (rem < 0) {
@@ -62,15 +65,17 @@ uint64_t __year_to_secs(uint64_t year, int* is_leap) {
     leaps = 0;
   } else {
     if (rem >= 200) {
-      if (rem >= 300)
+      if (rem >= 300) {
         centuries = 3, rem -= 300;
-      else
+      } else {
         centuries = 2, rem -= 200;
+      }
     } else {
-      if (rem >= 100)
+      if (rem >= 100) {
         centuries = 1, rem -= 100;
-      else
+      } else {
         centuries = 0;
+      }
     }
     if (!rem) {
       *is_leap = 0;
@@ -130,8 +135,9 @@ time_t mktime(const struct tm* tm) {
   }
   t = __year_to_secs(year, &is_leap);
   t += secs_through_month[month];
-  if (is_leap && month >= 2)
+  if (is_leap && month >= 2) {
     t += 86400;
+  }
   t += 86400LL * (tm->tm_mday - 1);
   t += 3600LL * tm->tm_hour;
   t += 60LL * tm->tm_min;
@@ -144,7 +150,8 @@ time_t time(time_t* __timer) {
   efi_time_t t = {0};
   ST->RuntimeServices->GetTime(&t, NULL);
   ret = __mktime_efi(&t);
-  if (__timer)
+  if (__timer) {
     *__timer = ret;
+  }
   return ret;
 }

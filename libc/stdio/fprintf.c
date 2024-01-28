@@ -9,9 +9,11 @@
 
 static bool fprint(file_descriptor_t file, const char* data, size_t length) {
   const unsigned char* bytes = (const unsigned char*)data;
-  for (size_t i = 0; i < length; i++)
-    if (fputchar(bytes[i], file) == EOF)
+  for (size_t i = 0; i < length; i++) {
+    if (fputchar(bytes[i], file) == EOF) {
       return false;
+    }
+  }
   return true;
 }
 
@@ -27,17 +29,20 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters) {
     size_t maxrem = INT_MAX - written;
 
     if (format[0] != '%' || format[1] == '%') {
-      if (format[0] == '%')
+      if (format[0] == '%') {
         format++;
+      }
       size_t amount = 1;
-      while (format[amount] && format[amount] != '%')
+      while (format[amount] && format[amount] != '%') {
         amount++;
+      }
       if (maxrem < amount) {
         // TODO: Set errno to EOVERFLOW.
         return -1;
       }
-      if (!fprint(file, format, amount))
+      if (!fprint(file, format, amount)) {
         return -1;
+      }
       format += amount;
       written += amount;
       continue;
@@ -52,8 +57,9 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters) {
         // TODO: Set errno to EOVERFLOW.
         return -1;
       }
-      if (!fprint(file, &c, sizeof(c)))
+      if (!fprint(file, &c, sizeof(c))) {
         return -1;
+      }
       written++;
     } else if (*format == 's') {
       format++;
@@ -64,8 +70,9 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters) {
         return -1;
       }
 
-      if (!fprint(file, str, len))
+      if (!fprint(file, str, len)) {
         return -1;
+      }
       written += len;
 
     } else if (*format == 'd') {
@@ -134,8 +141,9 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters) {
         // TODO: Set errno to EOVERFLOW.
         return -1;
       }
-      if (!fprint(file, format, len))
+      if (!fprint(file, format, len)) {
         return -1;
+      }
       written += len;
       format += len;
     }

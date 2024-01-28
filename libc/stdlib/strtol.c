@@ -32,17 +32,19 @@ long strtol(const char* nptr, char** endptr, int base) {
   /*
    * Sign
    */
-  if (*p == '-' || *p == '+')
-    if (*p++ == '-')
+  if (*p == '-' || *p == '+') {
+    if (*p++ == '-') {
       neg = 1;
+    }
+  }
 
   /*
    * Base
    */
   if (base == 0) {
-    if (*p != '0')
+    if (*p != '0') {
       base = 10;
-    else {
+    } else {
       base = 8;
       if (p[1] == 'x' || p[1] == 'X') {
         p += 2;
@@ -50,10 +52,12 @@ long strtol(const char* nptr, char** endptr, int base) {
       }
     }
   } else if (base == 16 && *p == '0') {
-    if (p[1] == 'x' || p[1] == 'X')
+    if (p[1] == 'x' || p[1] == 'X') {
       p += 2;
-  } else if (base < 0 || 36 < base)
+    }
+  } else if (base < 0 || 36 < base) {
     goto Return;
+  }
 
   /*
    * Non-empty sequence of digits
@@ -61,33 +65,40 @@ long strtol(const char* nptr, char** endptr, int base) {
   for (;; p++, ndig++) {
     c = *p;
     v = base;
-    if ('0' <= c && c <= '9')
+    if ('0' <= c && c <= '9') {
       v = c - '0';
-    else if ('a' <= c && c <= 'z')
+    } else if ('a' <= c && c <= 'z') {
       v = c - 'a' + 10;
-    else if ('A' <= c && c <= 'Z')
+    } else if ('A' <= c && c <= 'Z') {
       v = c - 'A' + 10;
-    if (v >= base)
+    }
+    if (v >= base) {
       break;
+    }
     nn = n * base + v;
-    if (nn < n)
+    if (nn < n) {
       ovfl = 1;
+    }
     n = nn;
   }
 
 Return:
-  if (ndig == 0)
+  if (ndig == 0) {
     p = nptr;
-  if (endptr)
+  }
+  if (endptr) {
     *endptr = (char*)p;
+  }
   if (ovfl) {
     errno = ERANGE;
-    if (neg)
+    if (neg) {
       // return LONG_MIN;
       // return LONG_MAX;
       log(LOG_SERIAL, false, "ERROR strtol() failed\n");
+    }
   }
-  if (neg)
+  if (neg) {
     return -n;
+  }
   return n;
 }

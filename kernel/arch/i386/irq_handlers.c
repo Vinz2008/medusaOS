@@ -33,8 +33,9 @@ uint8_t mouse_cycle = 0;
 
 void irq_register_handler(int irq, void (*handler)(registers_t*)) {
 
-  if ((NULL == handler) || (irq < 0) || (irq > 15))
+  if ((NULL == handler) || (irq < 0) || (irq > 15)) {
     return;
+  }
   irq_routines[irq] = handler;
 }
 

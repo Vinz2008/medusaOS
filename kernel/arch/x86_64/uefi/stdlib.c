@@ -42,25 +42,29 @@ int atoi(const char_t* s) { return (int)atol(s); }
 
 int64_t atol(const char_t* s) {
   int64_t sign = 1;
-  if (!s || !*s)
+  if (!s || !*s) {
     return 0;
+  }
   if (*s == CL('-')) {
     sign = -1;
     s++;
   }
   if (s[0] == CL('0')) {
-    if (s[1] == CL('x'))
+    if (s[1] == CL('x')) {
       return strtol(s + 2, NULL, 16) * sign;
-    if (s[1] >= CL('0') && s[1] <= CL('7'))
+    }
+    if (s[1] >= CL('0') && s[1] <= CL('7')) {
       return strtol(s, NULL, 8) * sign;
+    }
   }
   return strtol(s, NULL, 10) * sign;
 }
 
 int64_t strtol(const char_t* s, char_t** __endptr, int __base) {
   int64_t v = 0, sign = 1;
-  if (!s || !*s)
+  if (!s || !*s) {
     return 0;
+  }
   if (*s == CL('-')) {
     sign = -1;
     s++;
@@ -70,16 +74,18 @@ int64_t strtol(const char_t* s, char_t** __endptr, int __base) {
         (__base >= 10 && ((*s > CL('9') && *s < CL('A')) ||
                           (*s > CL('F') && *s < CL('a')) || *s > CL('f'))))) {
     v *= __base;
-    if (*s >= CL('0') && *s <= (__base < 10 ? __base + CL('0') : CL('9')))
+    if (*s >= CL('0') && *s <= (__base < 10 ? __base + CL('0') : CL('9'))) {
       v += (*s) - CL('0');
-    else if (__base == 16 && *s >= CL('a') && *s <= CL('f'))
+    } else if (__base == 16 && *s >= CL('a') && *s <= CL('f')) {
       v += (*s) - CL('a') + 10;
-    else if (__base == 16 && *s >= CL('A') && *s <= CL('F'))
+    } else if (__base == 16 && *s >= CL('A') && *s <= CL('F')) {
       v += (*s) - CL('A') + 10;
+    }
     s++;
   };
-  if (__endptr)
+  if (__endptr) {
     *__endptr = (char_t*)s;
+  }
   return v * sign;
 }
 
@@ -99,8 +105,9 @@ void* malloc(size_t __size) {
       errno = ENOMEM;
       return NULL;
     }
-    if (__stdlib_allocs)
+    if (__stdlib_allocs) {
       memcpy(ret, __stdlib_allocs, __stdlib_numallocs * sizeof(uintptr_t));
+    }
     __stdlib_allocs = (uintptr_t*)ret;
     __stdlib_allocs[i] = __stdlib_allocs[i + 1] = 0;
     __stdlib_numallocs += 2;
@@ -122,8 +129,9 @@ void* malloc(size_t __size) {
 
 void* calloc(size_t __nmemb, size_t __size) {
   void* ret = malloc(__nmemb * __size);
-  if (ret)
+  if (ret) {
     memset(ret, 0, __nmemb * __size);
+  }
   return ret;
 }
 
@@ -133,8 +141,9 @@ void* realloc(void* __ptr, size_t __size) {
 #ifndef UEFI_NO_TRACK_ALLOC
   uintn_t i;
 #endif
-  if (!__ptr)
+  if (!__ptr) {
     return malloc(__size);
+  }
   if (!__size) {
     free(__ptr);
     return NULL;
@@ -157,9 +166,10 @@ void* realloc(void* __ptr, size_t __size) {
   } else {
     memcpy(ret, (void*)__stdlib_allocs[i],
            __stdlib_allocs[i + 1] < __size ? __stdlib_allocs[i + 1] : __size);
-    if (__size > __stdlib_allocs[i + 1])
+    if (__size > __stdlib_allocs[i + 1]) {
       memset((uint8_t*)ret + __stdlib_allocs[i + 1], 0,
              __size - __stdlib_allocs[i + 1]);
+    }
     /* free old buffer and store new buffer in slot */
     BS->FreePool((void*)__stdlib_allocs[i]);
     __stdlib_allocs[i] = (uintptr_t)ret;
@@ -210,14 +220,16 @@ void free(void* __ptr) {
   }
 #endif
   status = BS->FreePool(__ptr);
-  if (EFI_ERROR(status))
+  if (EFI_ERROR(status)) {
     errno = ENOMEM;
+  }
 }
 
 void abort() {
 #ifndef UEFI_NO_TRACK_ALLOC
-  if (__stdlib_allocs)
+  if (__stdlib_allocs) {
     BS->FreePool(__stdlib_allocs);
+  }
   __stdlib_allocs = NULL;
   __stdlib_numallocs = 0;
 #endif
@@ -227,8 +239,9 @@ void abort() {
 
 void exit(int __status) {
 #ifndef UEFI_NO_TRACK_ALLOC
-  if (__stdlib_allocs)
+  if (__stdlib_allocs) {
     BS->FreePool(__stdlib_allocs);
+  }
   __stdlib_allocs = NULL;
   __stdlib_numallocs = 0;
 #endif
@@ -243,8 +256,9 @@ int exit_bs() {
   efi_memory_descriptor_t* memory_map = NULL;
   uintn_t cnt = 3, memory_map_size = 0, map_key = 0, desc_size = 0;
 #ifndef UEFI_NO_TRACK_ALLOC
-  if (__stdlib_allocs)
+  if (__stdlib_allocs) {
     BS->FreePool(__stdlib_allocs);
+  }
   __stdlib_allocs = NULL;
   __stdlib_numallocs = 0;
 #endif
@@ -252,11 +266,13 @@ int exit_bs() {
   while (cnt--) {
     status = BS->GetMemoryMap(&memory_map_size, memory_map, &map_key,
                               &desc_size, NULL);
-    if (status != EFI_BUFFER_TOO_SMALL)
+    if (status != EFI_BUFFER_TOO_SMALL) {
       break;
+    }
     status = BS->ExitBootServices(IM, map_key);
-    if (!EFI_ERROR(status))
+    if (!EFI_ERROR(status)) {
       return 0;
+    }
   }
   return (int)(status & 0xffff);
 }
@@ -268,12 +284,13 @@ void* bsearch(const void* key, const void* base, size_t nmemb, size_t size,
   while (s < e) {
     m = s + (e - s) / 2;
     ret = cmp(key, (uint8_t*)base + m * size);
-    if (ret < 0)
+    if (ret < 0) {
       e = m;
-    else if (ret > 0)
+    } else if (ret > 0) {
       s = m + 1;
-    else
+    } else {
       return (void*)((uint8_t*)base + m * size);
+    }
   }
   return NULL;
 }
@@ -284,12 +301,13 @@ int mblen(const char* s, size_t n) {
   if (s) {
     while (s < e && *s) {
       if ((*s & 128) != 0) {
-        if ((*s & 32) == 0)
+        if ((*s & 32) == 0) {
           s++;
-        else if ((*s & 16) == 0)
+        } else if ((*s & 16) == 0) {
           s += 2;
-        else if ((*s & 8) == 0)
+        } else if ((*s & 8) == 0) {
           s += 3;
+        }
       }
       c++;
       s++;
@@ -301,8 +319,9 @@ int mblen(const char* s, size_t n) {
 int mbtowc(wchar_t* __pwc, const char* s, size_t n) {
   wchar_t arg;
   int ret = 1;
-  if (!s || !*s)
+  if (!s || !*s) {
     return 0;
+  }
   arg = (wchar_t)*s;
   if ((*s & 128) != 0) {
     if ((*s & 32) == 0 && n > 0) {
@@ -315,11 +334,13 @@ int mbtowc(wchar_t* __pwc, const char* s, size_t n) {
       arg = ((*s & 0x7) << 18) | ((*(s + 1) & 0x3F) << 12) |
             ((*(s + 2) & 0x3F) << 6) | (*(s + 3) & 0x3F);
       ret = 4;
-    } else
+    } else {
       return -1;
+    }
   }
-  if (__pwc)
+  if (__pwc) {
     *__pwc = arg;
+  }
   return ret;
 }
 
@@ -344,12 +365,14 @@ int wctomb(char* s, wchar_t u) {
 size_t mbstowcs(wchar_t* __pwcs, const char* __s, size_t __n) {
   int r;
   wchar_t* orig = __pwcs;
-  if (!__s || !*__s)
+  if (!__s || !*__s) {
     return 0;
+  }
   while (*__s) {
     r = mbtowc(__pwcs, __s, __n - (__pwcs - orig));
-    if (r < 0)
+    if (r < 0) {
       return (size_t)-1;
+    }
     __pwcs++;
     __s += r;
   }
@@ -360,12 +383,14 @@ size_t mbstowcs(wchar_t* __pwcs, const char* __s, size_t __n) {
 size_t wcstombs(char* __s, const wchar_t* __pwcs, size_t __n) {
   int r;
   char* orig = __s;
-  if (!__s || !__pwcs || !*__pwcs)
+  if (!__s || !__pwcs || !*__pwcs) {
     return 0;
+  }
   while (*__pwcs && (__s - orig + 4 < __n)) {
     r = wctomb(__s, *__pwcs);
-    if (r < 0)
+    if (r < 0) {
       return (size_t)-1;
+    }
     __pwcs++;
     __s += r;
   }
@@ -383,8 +408,9 @@ int rand() {
 
   __srand_seed = 6364136223846793005ULL * __srand_seed + 1;
   status = BS->LocateProtocol(&rngGuid, NULL, (void**)&rng);
-  if (!EFI_ERROR(status) && rng)
+  if (!EFI_ERROR(status) && rng) {
     rng->GetRNG(rng, NULL, (uintn_t)sizeof(int), (uint8_t*)&ret);
+  }
   ret ^= (int)(__srand_seed >> 33);
   return ret;
 }

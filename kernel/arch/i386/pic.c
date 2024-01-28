@@ -45,8 +45,9 @@ void pic_disable(void) {
 }
 
 void pic_send_EOI(uint32_t irq) {
-  if (40 <= irq)
+  if (40 <= irq) {
     outb(PIC_SLAVE_REG, 0x20);
+  }
 
   outb(PIC_MASTER_REG, 0x20);
 }

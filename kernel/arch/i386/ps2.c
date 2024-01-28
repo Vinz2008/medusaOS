@@ -11,8 +11,9 @@ bool controllers[] = {true, true};
 static int ps2_wait_input(void) {
   uint64_t timeout = 100000UL;
   while (--timeout) {
-    if (!(inb(PS2_STATUS) & (1 << 1)))
+    if (!(inb(PS2_STATUS) & (1 << 1))) {
       return 0;
+    }
   }
   return 1;
 }
