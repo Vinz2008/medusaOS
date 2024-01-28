@@ -42,8 +42,8 @@ void handle_ansi_sequence(char* sequence) {
   if (sequence[pos] == '[') {
     pos++;
   }
-  char c = '\x1B';
-  // find mode number
+  // char c = '\x1B';
+  //  find mode number
   if (isalnum(sequence[pos])) {
     mode_number = ansi_get_number(sequence, &pos);
     log(LOG_SERIAL, false, "mode_number : %d\n", mode_number);

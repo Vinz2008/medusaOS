@@ -47,9 +47,12 @@ int get_model_name(uint32_t* buf) {
     fprintf(LOG_STDERR, "Feature not implemented.\n");
     return 1;
   }
-  __get_cpuid(0x80000002, buf + 0x0, buf + 0x1, buf + 0x2, buf + 0x3);
-  __get_cpuid(0x80000003, buf + 0x4, buf + 0x5, buf + 0x6, buf + 0x7);
-  __get_cpuid(0x80000004, buf + 0x8, buf + 0x9, buf + 0xa, buf + 0xb);
+  __get_cpuid(0x80000002, (unsigned int*)buf + 0x0, (unsigned int*)buf + 0x1,
+              (unsigned int*)buf + 0x2, (unsigned int*)buf + 0x3);
+  __get_cpuid(0x80000003, (unsigned int*)buf + 0x4, (unsigned int*)buf + 0x5,
+              (unsigned int*)buf + 0x6, (unsigned int*)buf + 0x7);
+  __get_cpuid(0x80000004, (unsigned int*)buf + 0x8, (unsigned int*)buf + 0x9,
+              (unsigned int*)buf + 0xa, (unsigned int*)buf + 0xb);
   return 0;
 }
 

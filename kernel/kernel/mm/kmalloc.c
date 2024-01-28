@@ -20,7 +20,7 @@ static mem_block_t* bottom = NULL;
 static mem_block_t* top = NULL;
 static uint32_t used_memory = 0;
 
-static void* sbrk(uint32_t size) {
+/*static void* sbrk(uint32_t size) {
   uintptr_t addr;
 
   asm volatile("mov $4, %%eax\n"
@@ -32,7 +32,7 @@ static void* sbrk(uint32_t size) {
                : "%eax", "%ebx");
 
   return (void*)addr;
-}
+}*/
 
 uint32_t mem_block_size(mem_block_t* block) {
   return sizeof(mem_block_t) + (block->size & ~1);

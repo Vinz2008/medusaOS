@@ -285,6 +285,7 @@ void set_dev_node_initrd() {
 }
 
 fs_node_t* get_initrd_root() { return initrd_root; }
+
 vfs_tree_node_t* initrd_create_vfs_tree() {
   vfs_tree_node_t* initrd_root_tree;
   for (int i = 0; i < nroot_nodes; i++) {

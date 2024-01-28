@@ -4,6 +4,7 @@
 #include <kernel/irq_handlers.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
+#include <kernel/tty.h>
 #include <kernel/x86.h>
 #include <stdio.h>
 #include <types.h>

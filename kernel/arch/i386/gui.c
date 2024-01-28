@@ -294,6 +294,7 @@ window_t* find_first_normal_window() {
       return win;
     }
   }
+  return NULL;
 }
 
 void close_window(window_t* win) {

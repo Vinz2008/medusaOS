@@ -32,7 +32,7 @@ static uint32_t stdout_write(fs_node_t* node, uint32_t offset, uint32_t size,
                              uint8_t* buffer) {
   char* str = kmalloc(sizeof(char) * size);
   memcpy(str, buffer, size);
-  printf("%s", str);
+  return (uint32_t)printf("%s", str);
 }
 
 void register_devices_necessary() {

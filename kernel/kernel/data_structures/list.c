@@ -69,6 +69,7 @@ void* list_find(void* data, list_t* list) {
       return list->list[i].data;
     }
   }
+  return NULL;
 }
 
 void* list_find_at(int index, list_t* list) { return list->list[index].data; }

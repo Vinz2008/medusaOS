@@ -126,7 +126,7 @@ int vfprintf(file_descriptor_t file, const char* format, va_list parameters) {
       char i2[10];
       memset(i2, 0, 10);
       void* i = va_arg(parameters, void*);
-      hex_to_ascii(i, i2);
+      hex_to_ascii((int)i, i2);
       int length = strlen(i2);
       if (!maxrem) {
         // TODO: Set errno to EOVERFLOW.

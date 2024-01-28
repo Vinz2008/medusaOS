@@ -38,7 +38,7 @@ uint8_t read_months_RTC() { return read_RTC_register(0x08); }
 uint8_t read_years_RTC() { return read_RTC_register(0x09); }
 
 char* read_rtc_date() {
-  uint8_t century;
+  uint8_t century = 20;
   uint8_t last_second;
   uint8_t last_minute;
   uint8_t last_hour;
@@ -52,8 +52,8 @@ char* read_rtc_date() {
   // a row" technique
   //       to avoid getting dodgy/inconsistent values due to RTC updates
 
-  while (get_update_in_progress_flag())
-    ; // Make sure an update isn't in progress
+  while (get_update_in_progress_flag()) {
+  } // Make sure an update isn't in progress
   second = read_seconds_RTC();
   minute = read_minutes_RTC();
   hour = read_hours_RTC();
@@ -73,8 +73,8 @@ char* read_rtc_date() {
     last_year = year;
     last_century = century;
 
-    while (get_update_in_progress_flag())
-      ; // Make sure an update isn't in progress
+    while (get_update_in_progress_flag()) {
+    } // Make sure an update isn't in progress
     second = read_seconds_RTC();
     minute = read_minutes_RTC();
     hour = read_hours_RTC();

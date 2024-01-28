@@ -103,8 +103,8 @@ void kernel_main(uint32_t addr, uint32_t magic) {
       uint8_t* data = (uint8_t*)kmalloc(size);
       memcpy(data, (void*)mod->mod_start, size);
       if (strcmp(mod->cmdline, "initrd") == 0) {
-        set_initrd_address(data);
-        fs_root = initialise_initrd(data);
+        set_initrd_address((uint32_t)data);
+        fs_root = initialise_initrd((uint32_t)data);
         vfs_mount("/", fs_root);
         // vfs_mount("/tmp", fs_root);
         struct dirent* dir = NULL;
@@ -159,7 +159,7 @@ void kernel_main(uint32_t addr, uint32_t magic) {
     } break;
     case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {
       multiboot_uint32_t color;
-      unsigned i;
+      // unsigned i;
 
       struct multiboot_tag_framebuffer* tagfb =
           (struct multiboot_tag_framebuffer*)tag;
@@ -403,7 +403,6 @@ printf ("cmdline = %s\n", (char *) mb_info->cmdline);
 #else
   printf("> ");
 #endif
-  char* argv[] = {"/bin/init", NULL};
-  while (1)
-    ;
+  // char* argv[] = {"/bin/init", NULL};
+  while (1) {};
 }

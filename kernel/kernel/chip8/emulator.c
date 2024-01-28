@@ -274,9 +274,9 @@ void chip8_execute_instruction(uint8_t opcode_1, uint8_t opcode_2) {
       uint8_t sum = (emulator.vregisters[opcode_1 & 0x0F] +=
                      emulator.vregisters[opcode_2 >> 4]);
       emulator.vregisters[0xF] = 0;
-      if (sum > 0xFF) {
+      /*if (sum > 0xFF) {
         emulator.vregisters[0xF] = 1;
-      }
+      }*/
       emulator.vregisters[opcode_1 & 0x0F] = sum;
       break;
     case 0x5:

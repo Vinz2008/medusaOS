@@ -83,6 +83,7 @@ bool elf_check_supported(Elf32_Ehdr* header) {
 }
 
 void* elf_lookup_symbol(const char* name) {
+  (void)name;
   return NULL; // minimal implementation
 }
 
@@ -233,7 +234,7 @@ int elf_do_reloc(Elf32_Ehdr* header, Elf32_Rel* rel, Elf32_Shdr* reltab) {
   return symval;
 }
 
-void elf_start_executable(void* file) {}
+void elf_start_executable(void* file) { (void)file; }
 
 char* current_process_name =
     ""; // TODO : INTEGRATE THIS WITH SCHEDULING AND PROCESS SYSTEM

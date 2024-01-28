@@ -14,6 +14,8 @@ vfs_tree_t* fs_tree = NULL;
 
 uint32_t vfs_get_depth(const char* path);
 
+void init_file_descriptor_table();
+
 path_t* parse_path(char* path_string) {
   path_t* path = kmalloc(sizeof(path_t));
   path->folders = list_create();
@@ -124,6 +126,8 @@ void* vfs_mount(const char* path, fs_node_t* local_root) {
     // TODO : verify if mount folder exists
     */
   }
+
+  return NULL;
 }
 
 // function find local root for fs_node
@@ -184,7 +188,7 @@ char* canonicalize_path(const char* cwd, const char* input) {
     /* Setup tokenizer */
     char* pch;
     char* save;
-    pch = strtok_r(path, PATH_SEPARATOR_STRING, &save);
+    pch = strtok_r(path, PATH_SEPARATOR, &save);
 
     /* Start tokenizing */
     while (pch != NULL) {
@@ -195,7 +199,7 @@ char* canonicalize_path(const char* cwd, const char* input) {
       out[nb_out_used] = strdup(s);
       krealloc(out, sizeof(char) * nb_allocated++);
       nb_out_used++;
-      pch = strtok_r(NULL, PATH_SEPARATOR_STRING, &save);
+      pch = strtok_r(NULL, PATH_SEPARATOR, &save);
     }
     kfree(path);
   }
@@ -207,7 +211,7 @@ char* canonicalize_path(const char* cwd, const char* input) {
   /* Initialize the tokenizer... */
   char* pch;
   char* save;
-  pch = strtok_r(path, PATH_SEPARATOR_STRING, &save);
+  pch = strtok_r(path, PATH_SEPARATOR, &save);
 
   /*
    * Tokenize the path, this time, taking care to properly
@@ -230,7 +234,7 @@ char* canonicalize_path(const char* cwd, const char* input) {
   for existence! char * s = malloc(sizeof(char) * (strlen(pch) + 1)); memcpy(s,
   pch, strlen(pch) + 1); list_insert(out, s);
           }
-          pch = strtok_r(NULL, PATH_SEPARATOR_STRING, &save);
+          pch = strtok_r(NULL, PATH_SEPARATOR, &save);
   }*/
   kfree(path);
 
@@ -443,7 +447,7 @@ uint32_t read_fs(fs_node_t* node, uint32_t offset, uint32_t size,
   // Has the node got a read callback?
   if (node == NULL) {
     log(LOG_SERIAL, false, "NULL in read_fs\n");
-    return;
+    return -1;
   }
   if (node->read != 0) {
     return node->read(node, offset, size, buffer);
@@ -555,12 +559,15 @@ void init_file_descriptor_table() {
 int vfs_write_fd(file_descriptor_t file, uint8_t* data, size_t size) {
   (void)size;
   if (file == VFS_FD_STDOUT) {
-    putchar(*data);
+    return putchar(*data);
   } else if (file == VFS_FD_SERIAL) {
     write_serial_char(*data);
+    return size;
   } else if (file == VFS_FD_STDERR) {
     alert("%c", *data);
+    return size;
   }
+  return size;
 }
 
 #if VFS_NEW_IMPL

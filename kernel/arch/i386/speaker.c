@@ -27,7 +27,7 @@ void pcspkr_tone_off() {
 }
 
 // make it shutup
-static void nosound() {
+void nosound() {
   uint8_t tmp = inb(0x61) & 0xFC;
   outb(0x61, tmp);
 }

@@ -105,7 +105,7 @@ int sprintf(char* string, const char* format, ...) {
       char i2[10];
       memset(i2, 0, 10);
       void* i = va_arg(parameters, void*);
-      hex_to_ascii(i, i2);
+      hex_to_ascii((int)i, i2);
       int length = strlen(i2);
       if (!maxrem) {
         // TODO: Set errno to EOVERFLOW.
@@ -131,4 +131,6 @@ int sprintf(char* string, const char* format, ...) {
   }
 
   va_end(parameters);
+
+  return written;
 }

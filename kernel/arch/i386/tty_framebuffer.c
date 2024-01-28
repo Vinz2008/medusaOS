@@ -52,6 +52,8 @@ int framebuffer_height_in_row = 0;
 bool is_in_ansi_escape_char = false;
 char* escape_char_buf;
 
+void terminal_framebuffer_putc_pixel(char c);
+
 int get_offset(int x, int y) { return (x * framebuffer_width_in_column + y); }
 
 void terminal_framebuffer_initialize() {
@@ -284,7 +286,7 @@ void launch_command_framebuffer() {
     }
     printf("\n");
   } else if (strcmp("ls", command) == 0) {
-    char* temp;
+    char* temp = "";
     log(LOG_SERIAL, false, "command ptr : %p\n", command);
     fs_node_t* root = get_initrd_root();
     fs_node_t* node;
@@ -431,7 +433,7 @@ void launch_command_framebuffer() {
   } else if (strcmp("lscpu", command) == 0) {
     detect_cpu();
   } else if (strcmp("base64", command) == 0) {
-    char* filename;
+    char* filename = "";
     bool decode = false;
     for (int i = 0; i < argc; i++) {
       if (strcmp("--d", argv[i]) == 0) {
@@ -446,7 +448,7 @@ void launch_command_framebuffer() {
     size_t output_length;
     char* output;
     if (decode) {
-      output = base64_decode(buffer, node->length, &output_length);
+      output = base64_decode((char*)buffer, node->length, &output_length);
     } else {
       output = base64_encode(buffer, node->length, &output_length);
     }

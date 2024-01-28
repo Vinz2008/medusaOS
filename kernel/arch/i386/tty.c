@@ -1,5 +1,6 @@
 #include "vga.h"
 #include <ctype.h>
+#include <kernel/chip8_emulator.h>
 #include <kernel/fb.h>
 #include <kernel/initrd.h>
 #include <kernel/io.h>

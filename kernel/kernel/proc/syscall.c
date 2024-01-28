@@ -28,7 +28,7 @@ void syscall_write(registers_t* frame) {
   frame->eax = vfs_write_fd(fd, buf, size);
 }
 
-void syscall_sbrk(registers_t* frame) {}
+void syscall_sbrk(registers_t* frame) { (void)frame; }
 
 void init_syscalls() {
   irq_register_handler(0x80, syscall_handler);

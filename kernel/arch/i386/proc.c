@@ -12,7 +12,7 @@
 extern uint32_t irq_handler_end;
 process_t* current_process = NULL;
 // scheduler_t* scheduler = NULL;
-static uint32_t next_pid = 1;
+// static uint32_t next_pid = 1;
 
 void init_proc() {
   // scheduler = scheduler_medusaos();
@@ -101,8 +101,8 @@ process_t* proc_run_code(uint8_t* code, uint32_t size, char** argv, int argc) {
       .sleep_ticks = 0,
       .cwd = strdup("/")
   };*/
-  uint32_t* jmp = &irq_handler_end;
-  // Setup the process's kernel stack as if it had already been interrupted
+  // uint32_t* jmp = &irq_handler_end;
+  //  Setup the process's kernel stack as if it had already been interrupted
   /*asm volatile (
       // Save our stack in %ebx
       "mov %%esp, %%ebx\n"
