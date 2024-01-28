@@ -1,8 +1,8 @@
 #pragma once
 
 typedef struct Stack {
-    void* data;
-    struct StackNode* next;
+  void* data;
+  struct StackNode* next;
 } stack_t;
 
 void stack_push(stack_t** root, void* data);

@@ -1,5 +1,5 @@
-#include <stddef.h>
 #include <kernel/x86.h>
+#include <stddef.h>
 
 #define SYSCALL_INTERRUPT "$0x80" // for inline assembly
 
@@ -13,7 +13,7 @@
 
 #define SYSCALL_NUM 64
 
-void syscall_handler(registers_t * frame);
+void syscall_handler(registers_t* frame);
 typedef void (*handler_t)(registers_t*);
 
 void init_syscalls();

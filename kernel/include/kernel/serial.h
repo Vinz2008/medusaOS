@@ -1,6 +1,6 @@
 #include <stdarg.h>
 
-#define PORT 0x3f8 
+#define PORT 0x3f8
 
 int init_serial();
 void write_serial_char(char a);

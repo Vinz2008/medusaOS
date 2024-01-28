@@ -1,15 +1,15 @@
-#include <stddef.h>
 #include <kernel/list.h>
+#include <stddef.h>
 
-#define HASHTABLE_INITIAL_CAPACITY 16 
+#define HASHTABLE_INITIAL_CAPACITY 16
 
 typedef struct {
-    char* key;  // key is NULL if this slot is empty
-    void* value;
+  char* key; // key is NULL if this slot is empty
+  void* value;
 } hashtable_entry;
 
 typedef struct Hashtable {
-    list_t* entries;  // hash slots
+  list_t* entries; // hash slots
 } hashtable_t;
 
 hashtable_t* hashtable_create();

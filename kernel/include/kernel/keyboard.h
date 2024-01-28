@@ -11,13 +11,13 @@
 #define KBD_LED_ALL 0xFF
 
 typedef struct {
-    uint8_t scancode[8];
-    uint32_t current;
-    bool alt;
-    bool alt_gr;
-    bool shift;
-    bool super;
-    bool control;
+  uint8_t scancode[8];
+  uint32_t current;
+  bool alt;
+  bool alt_gr;
+  bool shift;
+  bool super;
+  bool control;
 } kbd_context_t;
 
 uint8_t read_scan_code(void);

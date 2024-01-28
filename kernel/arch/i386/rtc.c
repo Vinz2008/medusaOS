@@ -1,7 +1,6 @@
 #include "kernel/rtc.h"
 #include <kernel/io.h>
 #include <kernel/kmalloc.h>
-#include <kernel/nmi.h>
 #include <stdio.h>
 #include <types.h>
 

@@ -3,9 +3,9 @@
 // https://github.com/Plan9-Archive/ports2plan9/blob/ffb0ecedc16be982affeedb1b3cc800314e7f098/GNU/gcc-apelibs/include/sys/ctype.h
 
 unsigned char _ctype[] = {
-    /* 	0			1			2			3
+    /* 	0			1			2 3
      */
-    /* 	4			5			6			7
+    /* 	4			5			6 7
      */
 
     /*  0*/ _IScntrl,

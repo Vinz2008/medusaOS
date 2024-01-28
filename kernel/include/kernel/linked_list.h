@@ -1,6 +1,6 @@
 typedef struct linkedList {
-    void* data;
-    struct linkedList* next;
+  void* data;
+  struct linkedList* next;
 } linked_list_t;
 
 linked_list_t* linked_list_init();

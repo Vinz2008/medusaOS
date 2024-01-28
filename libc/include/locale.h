@@ -9,23 +9,22 @@
 #define LC_TIME 5
 #define _NCAT 6
 
-struct lvconv 
-{
-    char* currency_symbol;
-    char* int_curr_symbol;
-    char* mon_decimal_symbol;
-    char* mon_grouping;
-    char* mon_thousands_sep;
-    char* negative_sign;
-    char* positive_sign;
-    char frac_digits;
-    char int_frac_digits;
-    char n_cs_precedes;
-    char n_sep_by_space;
-    char n_sign_posn;
-    char* decimal_point;
-    char* grouping;
-    char* thousands_sep;
+struct lvconv {
+  char* currency_symbol;
+  char* int_curr_symbol;
+  char* mon_decimal_symbol;
+  char* mon_grouping;
+  char* mon_thousands_sep;
+  char* negative_sign;
+  char* positive_sign;
+  char frac_digits;
+  char int_frac_digits;
+  char n_cs_precedes;
+  char n_sep_by_space;
+  char n_sign_posn;
+  char* decimal_point;
+  char* grouping;
+  char* thousands_sep;
 };
 
 struct lvconv* localeconv(void);

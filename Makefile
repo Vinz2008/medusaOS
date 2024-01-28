@@ -10,8 +10,9 @@ qemu:
 onefetch:
 	./onefetch.sh
 
+clean:
+	./clean.sh
 
-
-format: FORMAT_FILES = $(shell find kernel -name '*.c') $(shell find libc -name '*.c') $(shell find modules -name '*.c')
+format: FORMAT_FILES = $(shell find kernel -name '*.c' -o -name '*.h') $(shell find libc -name '*.c' -o -name '*.h') $(shell find modules -name '*.c' -o -name '*.h')
 format:
 	clang-format -i $(FORMAT_FILES)

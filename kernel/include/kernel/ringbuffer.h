@@ -1,12 +1,12 @@
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct ringbuffer_t {
-    size_t size;
-    size_t r_base;
-    size_t data_size;
-    uint8_t* data;
+  size_t size;
+  size_t r_base;
+  size_t data_size;
+  uint8_t* data;
 } ringbuffer_t;
 
 ringbuffer_t* ringbuffer_init(ringbuffer_t* ref, uint8_t* buf, size_t size);

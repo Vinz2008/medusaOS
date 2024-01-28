@@ -17,7 +17,6 @@
 #include <kernel/kmalloc.h>
 #include <kernel/mouse.h>
 #include <kernel/multiboot2_internal.h>
-#include <kernel/nmi.h>
 #include <kernel/paging.h>
 #include <kernel/pci.h>
 #include <kernel/pic.h>
@@ -311,8 +310,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   puts(key_str);
 #endif
   x86_enable_int();
-  NMI_enable();
-  log(LOG_SERIAL, false, "NMI enabled\n");
   sse_init();
   log(LOG_SERIAL, false, "SSE initialized\n");
   init_syscalls();

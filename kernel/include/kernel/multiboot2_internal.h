@@ -15,36 +15,36 @@
 #define MB2_MMAP_AVAIL 1
 
 typedef struct mb2_tag_t {
-    uint32_t type;
-    uint32_t size;
+  uint32_t type;
+  uint32_t size;
 } mb2_tag_t __attribute__((packed));
 
 typedef struct mb2_tag_module_t {
-    mb2_tag_t header;
-    uintptr_t mod_start;
-    uintptr_t mod_end;
-    unsigned char name[];
+  mb2_tag_t header;
+  uintptr_t mod_start;
+  uintptr_t mod_end;
+  unsigned char name[];
 } mb2_tag_module_t __attribute__((packed));
 
 typedef struct mb2_mmap_entry_t {
-    uint64_t base_addr;
-    uint64_t length;
-    uint32_t type;
-    uint32_t reserved;
+  uint64_t base_addr;
+  uint64_t length;
+  uint32_t type;
+  uint32_t reserved;
 } mb2_mmap_entry_t __attribute__((packed));
 
 typedef struct mb2_tag_mmap_t {
-    mb2_tag_t header;
-    uint32_t entry_size;
-    uint32_t entry_version;
-    mb2_mmap_entry_t entries[];
+  mb2_tag_t header;
+  uint32_t entry_size;
+  uint32_t entry_version;
+  mb2_mmap_entry_t entries[];
 } mb2_tag_mmap_t __attribute__((packed));
 
 typedef struct mb2_t {
-    uint32_t total_size;
-    uint32_t reserved;
-    /* Not an array: just points to the first tag */
-    mb2_tag_t tags[];
+  uint32_t total_size;
+  uint32_t reserved;
+  /* Not an array: just points to the first tag */
+  mb2_tag_t tags[];
 } mb2_t __attribute__((packed));
 
 mb2_tag_t* mb2_find_tag(mb2_t* boot, uint32_t tag_type);
