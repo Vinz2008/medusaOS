@@ -14,3 +14,4 @@ bochs-serial.log
 bochs.log
 init
 *.mod
+.vscode/
