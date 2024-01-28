@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// TODO : work on this/remove this
+
 static inline Elf32_Shdr* elf_sheader(Elf32_Ehdr* header) {
   return (Elf32_Shdr*)((int)header + header->e_shoff);
 }

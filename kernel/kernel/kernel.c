@@ -26,7 +26,6 @@
 #include <kernel/ps2.h>
 #include <kernel/rtc.h>
 #include <kernel/serial.h>
-#include <kernel/sound-blaster-16.h>
 #include <kernel/speaker.h>
 #include <kernel/syscall.h>
 #include <kernel/task.h>
@@ -318,8 +317,6 @@ void kernel_main(uint32_t addr, uint32_t magic) {
   ahci_init();
   log(LOG_SERIAL, false, "AHCI initialized\n");
   init_speaker();
-  init_sound_blaster_16();
-  log(LOG_SERIAL, false, "Sound Blaster 16 initialized\n");
   initTasking();
   log(LOG_SERIAL, false, "Cooperative multitasking initialized\n");
   test_switch_task();
