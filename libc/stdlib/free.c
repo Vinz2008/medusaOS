@@ -1,6 +1,4 @@
-#include <stdlib.h>
 #include <kernel/kmalloc.h>
+#include <stdlib.h>
 
-void free(void* ptr){
-    kfree(ptr);
-}
+void free(void* ptr) { kfree(ptr); }

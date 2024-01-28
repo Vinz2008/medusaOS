@@ -1,10 +1,10 @@
-#include <kernel/speaker.h>
-#include <types.h>
-#include <stdio.h>
 #include <kernel/io.h>
 #include <kernel/pit.h>
+#include <kernel/speaker.h>
 #include <kernel/x86.h>
- 
+#include <stdio.h>
+#include <types.h>
+
 void pit_phase_c2(uint32_t hz) {
   uint32_t divisor = 1193180 / hz;
   outb(0x43, 0xB6);
@@ -24,23 +24,21 @@ void pcspkr_tone_off() {
   outb(0x61, tmp);
   pit_phase_c2(1);
 }
- 
- //make it shutup
+
+// make it shutup
 static void nosound() {
- 	uint8_t tmp = inb(0x61) & 0xFC;
- 	outb(0x61, tmp);
-}
- 
- //Make a beep
-void pcspkr_beep(uint32_t mst, uint16_t hz) {
-	pcspkr_tone_on(hz);
-	log(LOG_SERIAL, false, "before sleep\n");
- 	//pit_sleep(mst);
-	pit_mdelay(mst);
-	log(LOG_SERIAL, false, "after sleep\n");
-	pcspkr_tone_off();
+  uint8_t tmp = inb(0x61) & 0xFC;
+  outb(0x61, tmp);
 }
 
-void init_speaker(){
-	outb(0x61, inb(0x61) | 0x1);
+// Make a beep
+void pcspkr_beep(uint32_t mst, uint16_t hz) {
+  pcspkr_tone_on(hz);
+  log(LOG_SERIAL, false, "before sleep\n");
+  // pit_sleep(mst);
+  pit_mdelay(mst);
+  log(LOG_SERIAL, false, "after sleep\n");
+  pcspkr_tone_off();
 }
+
+void init_speaker() { outb(0x61, inb(0x61) | 0x1); }

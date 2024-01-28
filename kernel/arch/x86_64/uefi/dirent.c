@@ -33,44 +33,40 @@
 extern void __stdio_seterrno(efi_status_t status);
 struct dirent __dirent;
 
-DIR *opendir (const char_t *__name)
-{
-    DIR *dp = (DIR*)fopen(__name, CL("rd"));
-    if(dp) rewinddir(dp);
-    return dp;
+DIR* opendir(const char_t* __name) {
+  DIR* dp = (DIR*)fopen(__name, CL("rd"));
+  if (dp)
+    rewinddir(dp);
+  return dp;
 }
 
-struct dirent *readdir (DIR *__dirp)
-{
-    efi_status_t status;
-    efi_file_info_t info;
-    uintn_t bs = sizeof(efi_file_info_t);
-    memset(&__dirent, 0, sizeof(struct dirent));
-    status = __dirp->Read(__dirp, &bs, &info);
-    if(EFI_ERROR(status) || !bs) {
-        if(EFI_ERROR(status)) __stdio_seterrno(status);
-        else errno = 0;
-        return NULL;
-    }
-    __dirent.d_type = info.Attribute & EFI_FILE_DIRECTORY ? DT_DIR : DT_REG;
+struct dirent* readdir(DIR* __dirp) {
+  efi_status_t status;
+  efi_file_info_t info;
+  uintn_t bs = sizeof(efi_file_info_t);
+  memset(&__dirent, 0, sizeof(struct dirent));
+  status = __dirp->Read(__dirp, &bs, &info);
+  if (EFI_ERROR(status) || !bs) {
+    if (EFI_ERROR(status))
+      __stdio_seterrno(status);
+    else
+      errno = 0;
+    return NULL;
+  }
+  __dirent.d_type = info.Attribute & EFI_FILE_DIRECTORY ? DT_DIR : DT_REG;
 #ifndef UEFI_NO_UTF8
-    __dirent.d_reclen = wcstombs(__dirent.d_name, info.FileName, FILENAME_MAX - 1);
+  __dirent.d_reclen =
+      wcstombs(__dirent.d_name, info.FileName, FILENAME_MAX - 1);
 #else
-    __dirent.d_reclen = strlen(info.FileName);
-    strncpy(__dirent.d_name, info.FileName, FILENAME_MAX - 1);
+  __dirent.d_reclen = strlen(info.FileName);
+  strncpy(__dirent.d_name, info.FileName, FILENAME_MAX - 1);
 #endif
-    return &__dirent;
+  return &__dirent;
 }
 
-void rewinddir (DIR *__dirp)
-{
-    if(__dirp)
-        __dirp->SetPosition(__dirp, 0);
+void rewinddir(DIR* __dirp) {
+  if (__dirp)
+    __dirp->SetPosition(__dirp, 0);
 }
 
-int closedir (DIR *__dirp)
-{
-    return fclose((FILE*)__dirp);
-}
-
-
+int closedir(DIR* __dirp) { return fclose((FILE*)__dirp); }

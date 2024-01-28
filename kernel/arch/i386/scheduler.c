@@ -1,34 +1,32 @@
+#include <kernel/kmalloc.h>
+#include <kernel/paging.h>
+#include <kernel/proc.h>
+#include <kernel/x86.h>
 #include <stdlib.h>
 #include <string.h>
-#include <kernel/proc.h>
-#include <kernel/kmalloc.h>
-#include <kernel/x86.h>
-#include <kernel/paging.h>
-
-
 
 typedef struct _proc_node_t {
-    process_t* process;
-    struct _proc_node_t* next;
+  process_t* process;
+  struct _proc_node_t* next;
 } proc_node_t;
 
 typedef struct {
-    scheduler_t sched;
-    proc_node_t* processes;
+  scheduler_t sched;
+  proc_node_t* processes;
 } scheduler_medusaos_t;
 
-process_t *pqueue;
-process_t *current_proc;
+process_t* pqueue;
+process_t* current_proc;
 
-volatile void switch_task(registers_t* regs){
-    memcpy(&current_proc->regs, regs, sizeof(registers_t));
-    if (current_proc->next != NULL){
-         current_proc = current_proc->next;
-    } else {
-        current_proc = pqueue;
-    }
-    memcpy(regs, &current_proc->regs, sizeof(registers_t));
-    paging_switch_directory(current_proc->directory);
+volatile void switch_task(registers_t* regs) {
+  memcpy(&current_proc->regs, regs, sizeof(registers_t));
+  if (current_proc->next != NULL) {
+    current_proc = current_proc->next;
+  } else {
+    current_proc = pqueue;
+  }
+  memcpy(regs, &current_proc->regs, sizeof(registers_t));
+  paging_switch_directory(current_proc->directory);
 }
 
 /*
